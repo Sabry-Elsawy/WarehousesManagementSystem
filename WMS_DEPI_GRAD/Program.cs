@@ -8,7 +8,7 @@ namespace WMS_DEPI_GRAD
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
+            builder.Services.AddDependences(builder.Configuration);
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
