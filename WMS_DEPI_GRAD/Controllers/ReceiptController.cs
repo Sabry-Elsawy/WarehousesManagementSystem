@@ -1,4 +1,6 @@
 ﻿
+using WMS_DEPI_GRAD.Models;
+
 namespace WMS_DEPI_GRAD;
 
 public class ReceiptController : Controller

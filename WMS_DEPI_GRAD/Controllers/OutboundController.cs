@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WMS_DEPI_GRAD.Models;
 
 namespace WMS_DEPI_GRAD.Controllers;
 public class OutboundController : Controller

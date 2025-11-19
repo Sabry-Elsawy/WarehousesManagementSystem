@@ -1,4 +1,4 @@
-﻿namespace WMS_DEPI_GRAD;
+﻿namespace WMS_DEPI_GRAD.Models;
 
 public class ReceiptItem
 {
