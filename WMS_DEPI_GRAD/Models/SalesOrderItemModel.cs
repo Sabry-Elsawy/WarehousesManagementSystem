@@ -1,6 +1,6 @@
 ﻿namespace WMS_DEPI_GRAD.Models;
 
-public class SalesOrderItem
+public class SalesOrderItemModel
 {
     public string SKU { get; set; } = null!;
     public int SalesOrderId { get; set; }

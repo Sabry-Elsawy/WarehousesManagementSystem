@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SalesOrder = WMS_DEPI_GRAD.Data.Entities.SalesOrder;
-
+﻿
 namespace WMS_DEPI_GRAD.Data.Configurations;
 
 public class SalesOrderConfiguration : IEntityTypeConfiguration<SalesOrder>

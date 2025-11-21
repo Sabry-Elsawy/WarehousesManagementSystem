@@ -22,7 +22,67 @@ namespace WMS_DEPI_GRAD.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Aisle", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.AdvancedShippingNotice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpectedArrivalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.ToTable("ASNs", (string)null);
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.AdvancedShippingNoticeItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AdvancedShippingNoticeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvancedShippingNoticeId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ASN_Items", (string)null);
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Aisle", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -45,7 +105,7 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.ToTable("Aisles");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Bin", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Bin", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -76,7 +136,7 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.ToTable("Bins");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Inventory", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Inventory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -117,7 +177,7 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.ToTable("Inventories");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Picking", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Picking", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -153,7 +213,7 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.ToTable("Pickings");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Product", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -192,7 +252,122 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Rack", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.PurchaseOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VendorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("VendorId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("POs");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.PurchaseOrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.ToTable("PO_Items");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Putaway", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReceiptItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiptItemId");
+
+                    b.ToTable("Putaways", (string)null);
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.PutawayBin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BinId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PutawayId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BinId");
+
+                    b.HasIndex("PutawayId");
+
+                    b.ToTable("Putaway_Bins");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Rack", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -215,7 +390,69 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.ToTable("Racks");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.SO_Item", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Receipt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AdvancedShippingNoticeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RecievedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvancedShippingNoticeId")
+                        .IsUnique();
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("Receipts", (string)null);
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.ReceiptItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ExpectedQty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReceiptId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReceivedQty")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ReceiptId");
+
+                    b.ToTable("ReceiptItems", (string)null);
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.SO_Item", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -249,7 +486,7 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.ToTable("SO_Items");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.SalesOrder", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.SalesOrder", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -270,12 +507,96 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WarehouseId");
 
                     b.ToTable("SalesOrders");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Warehouse", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.TransferOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DestinationWarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SourceWarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DestinationWarehouseId");
+
+                    b.HasIndex("SourceWarehouseId");
+
+                    b.ToTable("TransferOrders");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.TransferOrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransferOrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("TransferOrderId");
+
+                    b.ToTable("TransferOrderItems", (string)null);
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Vendor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Vendors");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Warehouse", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -316,7 +637,7 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.ToTable("Warehouses");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Zone", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Zone", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -339,9 +660,39 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.ToTable("Zones");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Aisle", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.AdvancedShippingNotice", b =>
                 {
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.Zone", "Zone")
+                    b.HasOne("WMS_DEPI_GRAD.PurchaseOrder", "PurchaseOrder")
+                        .WithMany("ASNs")
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PurchaseOrder");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.AdvancedShippingNoticeItem", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.AdvancedShippingNotice", "AdvancedShippingNotice")
+                        .WithMany("ASNItems")
+                        .HasForeignKey("AdvancedShippingNoticeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WMS_DEPI_GRAD.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdvancedShippingNotice");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Aisle", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.Zone", "Zone")
                         .WithMany("Aisles")
                         .HasForeignKey("ZoneId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -350,9 +701,9 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.Navigation("Zone");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Bin", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Bin", b =>
                 {
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.Rack", "Rack")
+                    b.HasOne("WMS_DEPI_GRAD.Rack", "Rack")
                         .WithMany("Bins")
                         .HasForeignKey("RackId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -361,15 +712,15 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.Navigation("Rack");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Inventory", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Inventory", b =>
                 {
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.Bin", "Bin")
+                    b.HasOne("WMS_DEPI_GRAD.Bin", "Bin")
                         .WithMany("Inventories")
                         .HasForeignKey("BinId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.Product", "Product")
+                    b.HasOne("WMS_DEPI_GRAD.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -380,21 +731,21 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Picking", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Picking", b =>
                 {
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.Bin", "Bin")
+                    b.HasOne("WMS_DEPI_GRAD.Bin", "Bin")
                         .WithMany("Pickings")
                         .HasForeignKey("BinId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.Product", "Product")
+                    b.HasOne("WMS_DEPI_GRAD.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.SO_Item", "SO_Item")
+                    b.HasOne("WMS_DEPI_GRAD.SO_Item", "SO_Item")
                         .WithMany()
                         .HasForeignKey("SO_ItemId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -407,9 +758,85 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.Navigation("SO_Item");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Rack", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.PurchaseOrder", b =>
                 {
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.Aisle", "Aisle")
+                    b.HasOne("WMS_DEPI_GRAD.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WMS_DEPI_GRAD.Vendor", "Vendor")
+                        .WithMany("PurchaseOrders")
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WMS_DEPI_GRAD.Warehouse", "Warehouse")
+                        .WithMany("PurchaseOrders")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Vendor");
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.PurchaseOrderItem", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WMS_DEPI_GRAD.PurchaseOrder", "PurchaseOrder")
+                        .WithMany("POItems")
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("PurchaseOrder");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Putaway", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.ReceiptItem", "ReceiptItem")
+                        .WithMany("Putaways")
+                        .HasForeignKey("ReceiptItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReceiptItem");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.PutawayBin", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.Bin", "Bin")
+                        .WithMany("PutawayBins")
+                        .HasForeignKey("BinId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WMS_DEPI_GRAD.Putaway", "Putaway")
+                        .WithMany("PutawayBins")
+                        .HasForeignKey("PutawayId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bin");
+
+                    b.Navigation("Putaway");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Rack", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.Aisle", "Aisle")
                         .WithMany("Racks")
                         .HasForeignKey("AisleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -418,15 +845,53 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.Navigation("Aisle");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.SO_Item", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Receipt", b =>
                 {
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.Product", "Product")
+                    b.HasOne("WMS_DEPI_GRAD.AdvancedShippingNotice", "AdvancedShippingNotice")
+                        .WithOne()
+                        .HasForeignKey("WMS_DEPI_GRAD.Receipt", "AdvancedShippingNoticeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WMS_DEPI_GRAD.Warehouse", "Warehouse")
+                        .WithMany("Receipts")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AdvancedShippingNotice");
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.ReceiptItem", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WMS_DEPI_GRAD.Receipt", "Receipt")
+                        .WithMany("ReceiptItems")
+                        .HasForeignKey("ReceiptId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Receipt");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.SO_Item", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.Product", "Product")
                         .WithMany("SO_Items")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.SalesOrder", "SalesOrder")
+                    b.HasOne("WMS_DEPI_GRAD.SalesOrder", "SalesOrder")
                         .WithMany("SO_Items")
                         .HasForeignKey("SalesOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -437,9 +902,58 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.Navigation("SalesOrder");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Zone", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.SalesOrder", b =>
                 {
-                    b.HasOne("WMS_DEPI_GRAD.Data.Entities.Warehouse", "Warehouse")
+                    b.HasOne("WMS_DEPI_GRAD.Warehouse", "Warehouse")
+                        .WithMany("SalesOrders")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.TransferOrder", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.Warehouse", "DestinationWarehouse")
+                        .WithMany("DestinationTransferOrders")
+                        .HasForeignKey("DestinationWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WMS_DEPI_GRAD.Warehouse", "SourceWarehouse")
+                        .WithMany("SourceTransferOrders")
+                        .HasForeignKey("SourceWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DestinationWarehouse");
+
+                    b.Navigation("SourceWarehouse");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.TransferOrderItem", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WMS_DEPI_GRAD.TransferOrder", "TransferOrder")
+                        .WithMany("TransferOrderItems")
+                        .HasForeignKey("TransferOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("TransferOrder");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Zone", b =>
+                {
+                    b.HasOne("WMS_DEPI_GRAD.Warehouse", "Warehouse")
                         .WithMany("Zones")
                         .HasForeignKey("WareHouseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -448,39 +962,88 @@ namespace WMS_DEPI_GRAD.Data.Migrations
                     b.Navigation("Warehouse");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Aisle", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.AdvancedShippingNotice", b =>
+                {
+                    b.Navigation("ASNItems");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Aisle", b =>
                 {
                     b.Navigation("Racks");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Bin", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Bin", b =>
                 {
                     b.Navigation("Inventories");
 
                     b.Navigation("Pickings");
+
+                    b.Navigation("PutawayBins");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Product", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Product", b =>
                 {
                     b.Navigation("SO_Items");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Rack", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.PurchaseOrder", b =>
+                {
+                    b.Navigation("ASNs");
+
+                    b.Navigation("POItems");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Putaway", b =>
+                {
+                    b.Navigation("PutawayBins");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Rack", b =>
                 {
                     b.Navigation("Bins");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.SalesOrder", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Receipt", b =>
+                {
+                    b.Navigation("ReceiptItems");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.ReceiptItem", b =>
+                {
+                    b.Navigation("Putaways");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.SalesOrder", b =>
                 {
                     b.Navigation("SO_Items");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Warehouse", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.TransferOrder", b =>
                 {
+                    b.Navigation("TransferOrderItems");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Vendor", b =>
+                {
+                    b.Navigation("PurchaseOrders");
+                });
+
+            modelBuilder.Entity("WMS_DEPI_GRAD.Warehouse", b =>
+                {
+                    b.Navigation("DestinationTransferOrders");
+
+                    b.Navigation("PurchaseOrders");
+
+                    b.Navigation("Receipts");
+
+                    b.Navigation("SalesOrders");
+
+                    b.Navigation("SourceTransferOrders");
+
                     b.Navigation("Zones");
                 });
 
-            modelBuilder.Entity("WMS_DEPI_GRAD.Data.Entities.Zone", b =>
+            modelBuilder.Entity("WMS_DEPI_GRAD.Zone", b =>
                 {
                     b.Navigation("Aisles");
                 });

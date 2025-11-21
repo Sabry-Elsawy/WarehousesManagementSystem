@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WMS_DEPI_GRAD.Data.Entities;
-
+﻿
 namespace WMS_DEPI_GRAD.Data.Configurations;
 
 public class BinConfiguration : IEntityTypeConfiguration<Bin>
@@ -24,5 +21,10 @@ public class BinConfiguration : IEntityTypeConfiguration<Bin>
         builder.HasOne(b => b.Rack)
             .WithMany(r => r.Bins)
             .HasForeignKey(b => b.RackId);
+
+        // one bin to many putaway bins
+        builder.HasMany(b => b.PutawayBins)
+            .WithOne(pb => pb.Bin)
+            .HasForeignKey(pb => pb.BinId);
     }
 }

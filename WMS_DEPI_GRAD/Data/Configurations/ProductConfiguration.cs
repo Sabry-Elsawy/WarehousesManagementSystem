@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WMS_DEPI_GRAD.Data.Entities;
+﻿
 
 namespace WMS_DEPI_GRAD.Data.Configurations;
 

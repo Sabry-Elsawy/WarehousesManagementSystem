@@ -1,4 +1,4 @@
-﻿namespace WMS_DEPI_GRAD.Data.Entities;
+﻿namespace WMS_DEPI_GRAD;
 
 public class SalesOrder
 {
@@ -8,4 +8,7 @@ public class SalesOrder
     public string Status { get; set; }
 
     public ICollection<SO_Item> SO_Items { get; set; } = new List<SO_Item>();
+
+    public Warehouse Warehouse { get; set; } = null!;
+    public int WarehouseId { get; set; }
 }

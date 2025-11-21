@@ -1,11 +1,11 @@
 ﻿namespace WMS_DEPI_GRAD.Models;
 
-public class SalesOrder
+public class SalesOrderModel
 {
     public int Id { get; set; }
     public string CustomerName { get; set; } = string.Empty;
     public DateTime OrderDate { get; set; }
-    public List<SalesOrderItem> Items { get; set; } = new List<SalesOrderItem>();
+    public List<SalesOrderItemModel> Items { get; set; } = new List<SalesOrderItemModel>();
 
 }
     

@@ -1,4 +1,5 @@
-﻿namespace WMS_DEPI_GRAD.Data.Entities;
+﻿
+namespace WMS_DEPI_GRAD;
 
 public class Warehouse
 {
@@ -12,4 +13,9 @@ public class Warehouse
 
     //relations
     public ICollection<Zone> Zones { get; set; }  
+    public ICollection<TransferOrder> SourceTransferOrders { get; set; } = new List<TransferOrder>();
+    public ICollection<TransferOrder> DestinationTransferOrders { get; set; } = new List<TransferOrder>();
+    public IReadOnlyCollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
+    public IReadOnlyCollection<SalesOrder> SalesOrders { get; set; } = new List<SalesOrder>();
+    public IReadOnlyCollection<Receipt> Receipts { get; set; } = new List<Receipt>();
 }

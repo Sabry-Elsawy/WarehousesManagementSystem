@@ -1,4 +1,4 @@
-﻿namespace WMS_DEPI_GRAD.Data.Entities;
+﻿namespace WMS_DEPI_GRAD;
 
 public class Zone
 {

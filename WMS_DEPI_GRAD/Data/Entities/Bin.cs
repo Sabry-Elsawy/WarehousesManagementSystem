@@ -1,4 +1,4 @@
-﻿namespace WMS_DEPI_GRAD.Data.Entities;
+﻿namespace WMS_DEPI_GRAD;
 
 public class Bin
 {
@@ -12,4 +12,6 @@ public class Bin
 
     public ICollection<Picking> Pickings { get; set; }
     public ICollection<Inventory> Inventories { get; set; }
+
+    public IReadOnlyCollection<PutawayBin> PutawayBins { get; set; } = new List<PutawayBin>();
 }

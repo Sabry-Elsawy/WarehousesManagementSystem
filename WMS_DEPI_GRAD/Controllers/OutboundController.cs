@@ -4,10 +4,10 @@ using WMS_DEPI_GRAD.Models;
 namespace WMS_DEPI_GRAD.Controllers;
 public class OutboundController : Controller
 {
-    private static List<SalesOrder> Orders = new()
+    private static List<SalesOrderModel> Orders = new()
         {
-            new SalesOrder { Id = 1, CustomerName = "John Smith", OrderDate = DateTime.Parse("2024-01-15"), Items = new List<SalesOrderItem>() },
-            new SalesOrder { Id = 2, CustomerName = "Sarah Johnson", OrderDate = DateTime.Parse("2024-01-16"), Items = new List<SalesOrderItem>() },
+            new SalesOrderModel { Id = 1, CustomerName = "John Smith", OrderDate = DateTime.Parse("2024-01-15"), Items = new List<SalesOrderItemModel>() },
+            new SalesOrderModel { Id = 2, CustomerName = "Sarah Johnson", OrderDate = DateTime.Parse("2024-01-16"), Items = new List<SalesOrderItemModel>() },
         };
 
     public IActionResult Index()
@@ -18,12 +18,12 @@ public class OutboundController : Controller
     [HttpPost]
     public IActionResult CreateOrder(string CustomerName, DateTime OrderDate)
     {
-        var newOrder = new SalesOrder
+        var newOrder = new SalesOrderModel
         {
             Id = Orders.Count + 1,
             CustomerName = CustomerName,
             OrderDate = OrderDate,
-            Items = new List<SalesOrderItem>()
+            Items = new List<SalesOrderItemModel>()
         };
 
         Orders.Add(newOrder);
