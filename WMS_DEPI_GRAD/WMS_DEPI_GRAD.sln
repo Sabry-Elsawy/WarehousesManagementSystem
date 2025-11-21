@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WMS_DEPI_GRAD", "WMS_DEPI_GRAD.csproj", "{DC43B1FB-6449-45A2-A8D0-1BDE8DCA62C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WMS.DL", "..\WMS.DL\WMS.DL.csproj", "{1A732FF6-C2DC-482F-8925-ED396049F350}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WMS.DAL", "..\WMS.DL\WMS.DAL.csproj", "{1A732FF6-C2DC-482F-8925-ED396049F350}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

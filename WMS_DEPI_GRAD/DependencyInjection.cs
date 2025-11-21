@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.RateLimiting;
-using WMS_DEPI_GRAD.Data;
+using WMS.DAL;
 
 namespace WMS_DEPI_GRAD;
 
