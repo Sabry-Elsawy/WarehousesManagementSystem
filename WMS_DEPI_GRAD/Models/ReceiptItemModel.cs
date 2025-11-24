@@ -1,6 +1,6 @@
-﻿namespace WMS_DEPI_GRAD;
+﻿namespace WMS_DEPI_GRAD.Models;
 
-public class ReceiptItem
+public class ReceiptItemModel
 {
     public int Id { get; set; }
     public int ReceiptId { get; set; }

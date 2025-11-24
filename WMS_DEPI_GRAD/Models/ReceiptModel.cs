@@ -1,6 +1,6 @@
-﻿namespace WMS_DEPI_GRAD;
+﻿namespace WMS_DEPI_GRAD.Models;
 
-public class Receipt
+public class ReceiptModel
 {
     public int Id { get; set; }
 
@@ -8,6 +8,6 @@ public class Receipt
     public int? ASNId { get; set; }
     public string VendorName { get; set; } = string.Empty;
     public DateTime ReceiptDate { get; set; }
-    public List<ReceiptItem> Items { get; set; } = new List<ReceiptItem>();
+    public List<ReceiptItemModel> Items { get; set; } = new List<ReceiptItemModel>();
 
 }

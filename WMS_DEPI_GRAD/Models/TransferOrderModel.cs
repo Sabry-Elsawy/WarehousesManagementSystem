@@ -1,6 +1,6 @@
 ﻿namespace WMS_DEPI_GRAD.Models;
 
-public class TransferOrder
+public class TransferOrderModel
 {
     public int Id { get; set; }
     public string TransferId { get; set; } = string.Empty; 
