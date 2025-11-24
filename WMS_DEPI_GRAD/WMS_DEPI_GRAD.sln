@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WMS_DEPI_GRAD", "WMS_DEPI_G
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WMS.DAL", "..\WMS.DL\WMS.DAL.csproj", "{1A732FF6-C2DC-482F-8925-ED396049F350}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WMS.BLL", "..\WMS.BLL\WMS.BLL.csproj", "{A1D340CA-09C1-4945-8EA1-63B89CA94CAC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{1A732FF6-C2DC-482F-8925-ED396049F350}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A732FF6-C2DC-482F-8925-ED396049F350}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A732FF6-C2DC-482F-8925-ED396049F350}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1D340CA-09C1-4945-8EA1-63B89CA94CAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1D340CA-09C1-4945-8EA1-63B89CA94CAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1D340CA-09C1-4945-8EA1-63B89CA94CAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1D340CA-09C1-4945-8EA1-63B89CA94CAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
