@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class AdvancedShippingNoticeItem
+namespace WMS.DAL;
+
+public class AdvancedShippingNoticeItem : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public int Qty { get; set; }
     public string SKU { get; set; } = null!;
 

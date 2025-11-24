@@ -1,22 +1,23 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
+
+namespace WMS.DAL;
 
 
-public class SalesOrderConfiguration : IEntityTypeConfiguration<SalesOrder>
+internal class SalesOrderConfiguration : BaseAuditableEntityConfiguration<SalesOrder, int>
 {
-    public void Configure(EntityTypeBuilder<SalesOrder> builder)
+    public override void Configure(EntityTypeBuilder<SalesOrder> builder)
     {
-        builder.HasKey(so => so.Id);
+        base.Configure(builder);
 
         builder.Property(so => so.OrderDate)
-               .IsRequired();
+       .IsRequired();
 
         builder.Property(so => so.CustomerRef)
                .HasMaxLength(50)
                .IsRequired();
 
         builder.Property(so => so.Status)
-               .HasMaxLength(20) 
+               .HasMaxLength(20)
                .IsRequired();
-
     }
 }

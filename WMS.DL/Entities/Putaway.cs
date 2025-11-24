@@ -1,9 +1,10 @@
 ﻿
+using WMS.DAL.Entities._Common;
+
 namespace WMS.DAL;
 
-public class Putaway
+public class Putaway : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public int Qty { get; set; }
     public PutawayStatus Status { get; set; }
 

@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class Receipt
+namespace WMS.DAL;
+
+public class Receipt : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public DateTime RecievedDate { get; set; }
 
 

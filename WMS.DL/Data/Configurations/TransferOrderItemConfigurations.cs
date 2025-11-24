@@ -1,17 +1,17 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
 
-public class TransferOrderItemConfigurations : IEntityTypeConfiguration<TransferOrderItem>
+namespace WMS.DAL;
+
+internal class TransferOrderItemConfigurations : BaseAuditableEntityConfiguration<TransferOrderItem, int>
 {
-    public void Configure(EntityTypeBuilder<TransferOrderItem> builder)
+    public override void Configure(EntityTypeBuilder<TransferOrderItem> builder)
     {
+        base.Configure(builder);
+
         builder.ToTable("TransferOrderItems");
-        builder.HasKey(toi => toi.Id);
-        
+
         builder.Property(toi => toi.Qty)
             .IsRequired();
-       
-        // Relationships
-        
     }
 }
 

@@ -1,15 +1,17 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
+
+namespace WMS.DAL;
 
 
-public class ZoneConfiguration : IEntityTypeConfiguration<Zone>
+internal class ZoneConfiguration : BaseAuditableEntityConfiguration<Zone, int>
 {
-    public void Configure(EntityTypeBuilder<Zone> builder)
+    public override void Configure(EntityTypeBuilder<Zone> builder)
     {
-        builder.HasKey(z => z.Id);
+        base.Configure(builder);
 
         builder.Property(z => z.Name)
-               .HasMaxLength(100)
-               .IsRequired();
+       .HasMaxLength(100)
+       .IsRequired();
 
         builder.HasOne(z => z.Warehouse)
             .WithMany(wh => wh.Zones)

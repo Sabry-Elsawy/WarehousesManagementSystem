@@ -1,9 +1,10 @@
 ﻿
+using WMS.DAL.Entities._Common;
+
 namespace WMS.DAL;
 
-public class PurchaseOrder
+public class PurchaseOrder : BaseAuditableEntity<int>
 {
-    public int Id { get; set; } 
     public DateTime OrderDate { get; set; } 
 
     public PurchaseOrderStatus Status { get; set; }

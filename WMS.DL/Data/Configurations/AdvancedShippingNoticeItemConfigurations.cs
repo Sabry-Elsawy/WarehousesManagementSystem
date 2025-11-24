@@ -1,10 +1,13 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
 
+namespace WMS.DAL;
 
-public class AdvancedShippingNoticeItemConfigurations : IEntityTypeConfiguration<AdvancedShippingNoticeItem>
+internal class AdvancedShippingNoticeItemConfigurations : BaseAuditableEntityConfiguration<AdvancedShippingNoticeItem, int>
 {
-    public void Configure(EntityTypeBuilder<AdvancedShippingNoticeItem> builder)
+    public override void Configure(EntityTypeBuilder<AdvancedShippingNoticeItem> builder)
     {
+        base.Configure(builder);
+
         builder.ToTable("ASN_Items");
 
         builder.HasKey(item => item.Id);
@@ -15,7 +18,5 @@ public class AdvancedShippingNoticeItemConfigurations : IEntityTypeConfiguration
         builder.Property(item => item.SKU)
                .IsRequired()
                .HasMaxLength(50);
-
-        
     }
 }

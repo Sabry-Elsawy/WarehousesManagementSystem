@@ -1,15 +1,17 @@
 ﻿
+using WMS.DAL.Data.Configurations._Common;
+
 namespace WMS.DAL;
 
-public class ProductConfiguration : IEntityTypeConfiguration<Product>
+internal class ProductConfiguration : BaseAuditableEntityConfiguration<Product, int>
 {
-    public void Configure(EntityTypeBuilder<Product> builder)
+    public override void Configure(EntityTypeBuilder<Product> builder)
     {
-        builder.HasKey(p => p.Id);
+        base.Configure(builder);
 
         builder.Property(p => p.Code)
-               .HasMaxLength(50)
-               .IsRequired();
+       .HasMaxLength(50)
+       .IsRequired();
 
         builder.Property(p => p.Name)
                .HasMaxLength(100)
@@ -28,4 +30,5 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                .HasMaxLength(20)
                .IsRequired();
     }
+
 }

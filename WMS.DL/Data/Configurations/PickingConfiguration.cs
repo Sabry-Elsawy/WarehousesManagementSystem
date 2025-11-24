@@ -1,14 +1,16 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
+
+namespace WMS.DAL;
 
 
-public class PickingConfiguration : IEntityTypeConfiguration<Picking>
+internal class PickingConfiguration : BaseAuditableEntityConfiguration<Picking, int>
 {
-    public void Configure(EntityTypeBuilder<Picking> builder)
+    public override void Configure(EntityTypeBuilder<Picking> builder)
     {
-        builder.HasKey(p => p.Id);
+        base.Configure(builder);
 
         builder.Property(p => p.Qty)
-               .IsRequired();
+       .IsRequired();
 
         builder.Property(p => p.Status)
                .HasMaxLength(50)
@@ -23,11 +25,12 @@ public class PickingConfiguration : IEntityTypeConfiguration<Picking>
         builder.HasOne(p => p.Product)
                .WithMany()
                .HasForeignKey(p => p.ProductId)
-               .OnDelete(DeleteBehavior.Restrict); 
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(p => p.Bin)
                .WithMany(b => b.Pickings)
                .HasForeignKey(p => p.BinId)
                 .OnDelete(DeleteBehavior.Restrict);
     }
+
 }

@@ -1,9 +1,9 @@
-﻿
+﻿using WMS.DAL.Entities._Common;
+
 namespace WMS.DAL;
 
-public class AdvancedShippingNotice
+public class AdvancedShippingNotice : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public DateTime ExpectedArrivalDate { get; set; }
     public string SKU { get; set; } = null!;
     public AdvancedShippingNoticeStatus Status { get; set; }
@@ -14,8 +14,4 @@ public class AdvancedShippingNotice
     public PurchaseOrder PurchaseOrder { get; set; } = null!;
 
     public IReadOnlyCollection<AdvancedShippingNoticeItem> ASNItems { get; set; } = new List<AdvancedShippingNoticeItem>();
-
-
-
-
 }

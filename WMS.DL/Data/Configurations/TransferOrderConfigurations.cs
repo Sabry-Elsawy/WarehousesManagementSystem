@@ -1,11 +1,14 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
+
+namespace WMS.DAL;
 
 
-public class TransferOrderConfigurations : IEntityTypeConfiguration<TransferOrder>
+internal class TransferOrderConfigurations : BaseAuditableEntityConfiguration<TransferOrder, int>
 {
-    public void Configure(EntityTypeBuilder<TransferOrder> builder)
+    public override void Configure(EntityTypeBuilder<TransferOrder> builder)
     {
-        builder.HasKey(to => to.Id);
+        base.Configure(builder);
+
 
         builder.Property(to => to.Status)
                .IsRequired();
@@ -15,7 +18,5 @@ public class TransferOrderConfigurations : IEntityTypeConfiguration<TransferOrde
                .WithOne(toi => toi.TransferOrder)
                .HasForeignKey(toi => toi.TransferOrderId)
                .OnDelete(DeleteBehavior.Cascade);
-
-
     }
 }

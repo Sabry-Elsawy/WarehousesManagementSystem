@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class Picking
+namespace WMS.DAL;
+
+public class Picking : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public int Qty { get; set; }
     public string Status { get; set; }
 

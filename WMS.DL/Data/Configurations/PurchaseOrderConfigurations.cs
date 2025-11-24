@@ -1,13 +1,16 @@
 ﻿
+using WMS.DAL.Data.Configurations._Common;
+
 namespace WMS.DAL;
 
-public class PurchaseOrderConfigurations : IEntityTypeConfiguration<PurchaseOrder>
+internal class PurchaseOrderConfigurations : BaseAuditableEntityConfiguration<PurchaseOrder, int>
 {
-    public void Configure(EntityTypeBuilder<PurchaseOrder> builder)
+    public override void Configure(EntityTypeBuilder<PurchaseOrder> builder)
     {
-        builder.HasKey(po => po.Id);
+        base.Configure(builder);
+
         builder.Property(po => po.OrderDate)
-            .IsRequired();
+    .IsRequired();
         builder.Property(po => po.Status)
             .IsRequired();
 
@@ -20,8 +23,6 @@ public class PurchaseOrderConfigurations : IEntityTypeConfiguration<PurchaseOrde
             .WithOne(poi => poi.PurchaseOrder)
             .HasForeignKey(poi => poi.PurchaseOrderId)
             .OnDelete(DeleteBehavior.Restrict);
-      
-
-        
     }
+
 }
