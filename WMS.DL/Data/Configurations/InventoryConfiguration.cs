@@ -1,22 +1,24 @@
 ﻿
+using WMS.DAL.Data.Configurations._Common;
+
 namespace WMS.DAL;
 
-public class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
+internal class InventoryConfiguration : BaseAuditableEntityConfiguration<Inventory, int>
 {
-    public void Configure(EntityTypeBuilder<Inventory> builder)
+    public override void Configure(EntityTypeBuilder<Inventory> builder)
     {
-        builder.HasKey(i => i.Id);
+        base.Configure(builder);
 
         builder.Property(i => i.Status)
-               .HasMaxLength(50)
-               .IsRequired();
+       .HasMaxLength(50)
+       .IsRequired();
 
         builder.Property(i => i.Quantity)
                .IsRequired();
 
         builder.Property(i => i.BatchNumber)
                .HasMaxLength(50);
-         
+
         builder.Property(i => i.ExpiryDate)
                .HasMaxLength(20);
 

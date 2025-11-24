@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class Product
+namespace WMS.DAL;
+
+public class Product : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public string Code { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }

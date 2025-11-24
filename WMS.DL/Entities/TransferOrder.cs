@@ -1,9 +1,10 @@
 ﻿
+using WMS.DAL.Entities._Common;
+
 namespace WMS.DAL;
 
-public class TransferOrder
+public class TransferOrder : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public TransferOrderStatus Status { get; set; }
 
 

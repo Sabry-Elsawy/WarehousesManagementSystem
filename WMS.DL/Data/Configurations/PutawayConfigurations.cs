@@ -1,12 +1,14 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
 
-public class PutawayConfigurations : IEntityTypeConfiguration<Putaway>
+namespace WMS.DAL;
+
+internal class PutawayConfigurations : BaseAuditableEntityConfiguration<Putaway, int>
 {
-    public void Configure(EntityTypeBuilder<Putaway> builder)
+    public override void Configure(EntityTypeBuilder<Putaway> builder)
     {
-        builder.ToTable("Putaways");
+        base.Configure(builder);
 
-        builder.HasKey(p => p.Id);
+        builder.ToTable("Putaways");
 
         builder.Property(p => p.Qty)
             .IsRequired();
@@ -20,4 +22,5 @@ public class PutawayConfigurations : IEntityTypeConfiguration<Putaway>
             .HasForeignKey(pb => pb.PutawayId)
             .OnDelete(DeleteBehavior.Cascade);
     }
+
 }

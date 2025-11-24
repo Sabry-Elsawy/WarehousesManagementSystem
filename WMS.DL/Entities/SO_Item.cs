@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class SO_Item
+namespace WMS.DAL;
+
+public class SO_Item : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public int SalesOrderId { get; set; } // FK 
     public int ProductId { get; set; }    // FK 
     public int QtyOrdered { get; set; }

@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class Inventory
+namespace WMS.DAL;
+
+public class Inventory : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public string Status { get; set; }
     public int Quantity { get; set; }
     public string BatchNumber { get; set; }

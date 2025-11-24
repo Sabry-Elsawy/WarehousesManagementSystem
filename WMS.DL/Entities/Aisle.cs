@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class Aisle
+namespace WMS.DAL;
+
+public class Aisle : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public string Name { get; set; }
 
 

@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class PutawayBin
+namespace WMS.DAL;
+
+public class PutawayBin : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public int PutawayId { get; set; }
     public Putaway Putaway { get; set; } = null!;
     public int BinId { get; set; }

@@ -1,10 +1,12 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
 
-public class BinConfiguration : IEntityTypeConfiguration<Bin>
+namespace WMS.DAL;
+
+internal class BinConfiguration : BaseAuditableEntityConfiguration<Bin, int>
 {
-    public void Configure(EntityTypeBuilder<Bin> builder)
+    public override void Configure(EntityTypeBuilder<Bin> builder)
     {
-        builder.HasKey(b => b.Id);
+        base.Configure(builder);
 
         builder.Property(b => b.Code)
                .HasMaxLength(50)
@@ -26,4 +28,5 @@ public class BinConfiguration : IEntityTypeConfiguration<Bin>
             .WithOne(pb => pb.Bin)
             .HasForeignKey(pb => pb.BinId);
     }
+
 }

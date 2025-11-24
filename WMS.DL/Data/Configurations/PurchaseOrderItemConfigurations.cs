@@ -1,11 +1,14 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
+
+namespace WMS.DAL;
 
 
-public class PurchaseOrderItemConfigurations : IEntityTypeConfiguration<PurchaseOrderItem>
+internal class PurchaseOrderItemConfigurations : BaseAuditableEntityConfiguration<PurchaseOrderItem, int>
 {
-    public void Configure(EntityTypeBuilder<PurchaseOrderItem> builder)
+    public override void Configure(EntityTypeBuilder<PurchaseOrderItem> builder)
     {
-        builder.HasKey(poi => poi.Id);
+        base.Configure(builder);
+
 
         builder.Property(poi => poi.PurchaseOrderId)
                .IsRequired();
@@ -19,10 +22,6 @@ public class PurchaseOrderItemConfigurations : IEntityTypeConfiguration<Purchase
         builder.Property(poi => poi.SKU)
                  .IsRequired()
                  .HasMaxLength(100);
-
-
-
-
-
     }
+
 }

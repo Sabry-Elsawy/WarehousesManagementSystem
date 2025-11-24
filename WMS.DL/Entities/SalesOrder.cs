@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class SalesOrder
+namespace WMS.DAL;
+
+public class SalesOrder : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public DateTime OrderDate { get; set; }
     public string CustomerRef { get; set; }
     public string Status { get; set; }

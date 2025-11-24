@@ -1,14 +1,15 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
+
+namespace WMS.DAL;
 
 
-public class ReceiptConfigurations : IEntityTypeConfiguration<Receipt>
+internal class ReceiptConfigurations : BaseAuditableEntityConfiguration<Receipt, int>
 {
-    public void Configure(EntityTypeBuilder<Receipt> builder)
+    public override void Configure(EntityTypeBuilder<Receipt> builder)
     {
+        base.Configure(builder);
+
         builder.ToTable("Receipts");
-
-
-        builder.HasKey(r => r.Id);
 
         builder.Property(r => r.RecievedDate)
             .IsRequired()
@@ -23,11 +24,6 @@ public class ReceiptConfigurations : IEntityTypeConfiguration<Receipt>
         // one ASN to one receipt
         builder.HasOne(builder => builder.AdvancedShippingNotice)
             .WithOne();
-
-
-
-
-
-
     }
+
 }

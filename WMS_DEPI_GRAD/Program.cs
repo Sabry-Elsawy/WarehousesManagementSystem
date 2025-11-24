@@ -1,3 +1,9 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using WMS.DAL;
+using WMS.DAL.Entities._Identity;
+using WMS_DEPI_GRAD.Extensions;
+
 namespace WMS_DEPI_GRAD
 {
     public class Program
@@ -9,6 +15,9 @@ namespace WMS_DEPI_GRAD
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddDependences(builder.Configuration);
+
+            builder.Services.AddIdentityService();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -28,7 +37,7 @@ namespace WMS_DEPI_GRAD
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Account}/{action=Index}/{id?}");
 
             app.Run();
         }

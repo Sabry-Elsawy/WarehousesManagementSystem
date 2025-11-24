@@ -1,11 +1,13 @@
 ﻿
+using WMS.DAL.Data.Configurations._Common;
+
 namespace WMS.DAL;
 
-public class AisleConfiguration : IEntityTypeConfiguration<Aisle>
+internal class AisleConfiguration : BaseAuditableEntityConfiguration<Aisle, int>
 {
-    public void Configure(EntityTypeBuilder<Aisle> builder)
+    public override void Configure(EntityTypeBuilder<Aisle> builder)
     {
-        builder.HasKey(a => a.Id);
+        base.Configure(builder);
 
         builder.Property(a => a.Name)
                .HasMaxLength(100)

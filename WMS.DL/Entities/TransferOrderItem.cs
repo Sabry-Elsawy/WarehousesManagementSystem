@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class TransferOrderItem
+namespace WMS.DAL;
+
+public class TransferOrderItem : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public int Qty { get; set; }
 
 

@@ -1,10 +1,12 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
 
-public class WarehouseConfiguration : IEntityTypeConfiguration<Warehouse>
+namespace WMS.DAL;
+
+internal class WarehouseConfiguration : BaseAuditableEntityConfiguration<Warehouse, int>
 {
-    public void Configure(EntityTypeBuilder<Warehouse> builder)
+    public override void Configure(EntityTypeBuilder<Warehouse> builder)
     {
-        builder.HasKey(w => w.Id);
+        base.Configure(builder);
 
         builder.Property(w => w.Name)
                .HasMaxLength(100)

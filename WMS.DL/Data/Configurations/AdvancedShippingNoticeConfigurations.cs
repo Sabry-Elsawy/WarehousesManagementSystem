@@ -1,13 +1,14 @@
 ﻿
+using WMS.DAL.Data.Configurations._Common;
+
 namespace WMS.DAL;
 
-public class AdvancedShippingNoticeConfigurations : IEntityTypeConfiguration<AdvancedShippingNotice>
+internal class AdvancedShippingNoticeConfigurations : BaseAuditableEntityConfiguration<AdvancedShippingNotice, int>
 {
-    public void Configure(EntityTypeBuilder<AdvancedShippingNotice> builder)
+    public override void Configure(EntityTypeBuilder<AdvancedShippingNotice> builder)
     {
+        base.Configure(builder);
         builder.ToTable("ASNs");
-        
-        builder.HasKey(asn => asn.Id);
 
         builder.Property(asn => asn.ExpectedArrivalDate)
             .IsRequired();
@@ -24,9 +25,5 @@ public class AdvancedShippingNoticeConfigurations : IEntityTypeConfiguration<Adv
             .WithOne(item => item.AdvancedShippingNotice)
             .HasForeignKey(item => item.AdvancedShippingNoticeId)
             .OnDelete(DeleteBehavior.Restrict);
-
-
-
-
     }
 }

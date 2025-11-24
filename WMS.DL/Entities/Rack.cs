@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class Rack
+namespace WMS.DAL;
+
+public class Rack : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public string Name { get; set; }
 
 

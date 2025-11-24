@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class Bin
+namespace WMS.DAL;
+
+public class Bin : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public string Code { get; set; }
     public int Capacity { get; set; }
     public string BinType { get; set; }

@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class ReceiptItem
+namespace WMS.DAL;
+
+public class ReceiptItem : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public int ExpectedQty { get; set; }
     public int ReceivedQty { get; set; }
     public string SKU { get; set; } = null!;

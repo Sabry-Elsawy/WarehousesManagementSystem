@@ -1,13 +1,14 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Data.Configurations._Common;
+
+namespace WMS.DAL;
 
 
-public class ReceiptItemConfigurations : IEntityTypeConfiguration<ReceiptItem>
+internal class ReceiptItemConfigurations : BaseAuditableEntityConfiguration<ReceiptItem, int>
 {
-    public void Configure(EntityTypeBuilder<ReceiptItem> builder)
+    public override void Configure(EntityTypeBuilder<ReceiptItem> builder)
     {
+        base.Configure(builder);
         builder.ToTable("ReceiptItems");
-
-        builder.HasKey(ri => ri.Id);
 
         builder.Property(ri => ri.ExpectedQty)
             .IsRequired();
@@ -21,4 +22,5 @@ public class ReceiptItemConfigurations : IEntityTypeConfiguration<ReceiptItem>
             .OnDelete(DeleteBehavior.Cascade);
 
     }
+
 }

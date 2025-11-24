@@ -1,8 +1,9 @@
-﻿namespace WMS.DAL;
+﻿using WMS.DAL.Entities._Common;
 
-public class Vendor
+namespace WMS.DAL;
+
+public class Vendor : BaseAuditableEntity<int>
 {
-    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public string ContactEmail { get; set; } = string.Empty;

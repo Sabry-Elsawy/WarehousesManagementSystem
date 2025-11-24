@@ -1,9 +1,9 @@
-﻿
-
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using WMS.DAL.Entities._Identity;
 
 namespace WMS.DAL;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     
     public ApplicationDbContext(DbContextOptions options) : base(options)
@@ -39,6 +39,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<TransferOrderItem> TO_Items { get; set; }
     public DbSet<Vendor> Vendors { get; set; }
     public DbSet<PutawayBin> Putaway_Bins { get; set; }
+
+    public DbSet<Address> Addresses { get; set; }
 
 
 
