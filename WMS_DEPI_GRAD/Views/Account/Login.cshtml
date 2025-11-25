@@ -5,37 +5,57 @@
 <div class="container my-5">
     <h1 class="text-primary-orange">Account Login</h1>
     <p class="lead">Please enter your login credentials to access your account.</p>
+
     <div class="row justify-content-center d-flex mt-4 g-4">
+
+        <!-- Left Image -->
         <div class="login-image col-lg-8">
-            <img  src="~/images/wms-worker.jpg" alt="Warehouse Worker" class="img-fluid" />
+            <img src="~/images/wms-worker.jpg" alt="Warehouse Worker" class="img-fluid" />
         </div>
 
+        <!-- Login Form -->
         <div class="login col-lg-4 align-self-center">
             <h5 class="text-primary-orange">Login</h5>
-            <form>
+
+            <form asp-action="Login" asp-controller="Account" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Email -->
                 <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="exampleInputPassword1" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1">
+                    <label for="Email" class="form-label">Email address</label>
+                    <input type="email"
+                           name="Email"
+                           id="Email"
+                           class="form-control"
+                           placeholder="Enter your email"
+                           required />
                 </div>
 
+                <!-- Password -->
+                <div class="mb-3">
+                    <label for="Password" class="form-label">Password</label>
+                    <input type="password"
+                           name="Password"
+                           id="Password"
+                           class="form-control"
+                           placeholder="Enter your password"
+                           required />
+                </div>
+
+                <!-- Forgot + Register -->
                 <div class="mb-3 forgot-password">
                     <a asp-controller="Account" asp-action="ForgotPassword" class="text-primary-orange">Forgot Password?</a>
                 </div>
+
                 <div class="mb-3 forgot-password">
-                    <a asp-controller="Account" asp-action="Register" class="text-primary-orange">Register</a>
+                    <a asp-controller="Account" asp-action="Register" class="text-primary-orange">Create a new account</a>
                 </div>
 
-                <button type="submit" class="btn btn-hero-primary">Submit</button>
+                <!-- Submit -->
+                <button type="submit" class="btn btn-hero-primary w-100">Login</button>
+
             </form>
-
         </div>
+
     </div>
-   
-
-
 </div>
