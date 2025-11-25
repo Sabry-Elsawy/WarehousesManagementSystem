@@ -45,13 +45,41 @@ public class AccountController(UserManager<ApplicationUser> _userManager) : Cont
         return View(nameof(ForgotPassword), viewModel);
     }
     [HttpGet]
-    public IActionResult ResetPassword()
+    public IActionResult ResetPassword(string email , string Token)
     {
+        TempData["email"] = email;
+        TempData["Token"] = Token;
+
         return View();
     }
-   // [HttpPost]
-    //public IActionResult ResetPassword()
-    //{
+    [HttpPost]
+    public IActionResult ResetPassword(ResetPasswordViewModel ViewModel)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(ViewModel);
 
-    //}
+        }
+        string email = TempData["email"] as string?? string.Empty;
+        string token = TempData["Token"] as string ?? string.Empty;
+
+        var user = _userManager.FindByEmailAsync(email).Result;
+        if (user is not null)
+        {
+            var result = _userManager.ResetPasswordAsync(user, token, ViewModel.Password).Result;
+            if (result.Succeeded)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(ViewModel);
+            }
+        }
+        return View(nameof(Index)); 
+    }
 }
