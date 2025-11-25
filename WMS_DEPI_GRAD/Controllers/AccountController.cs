@@ -9,9 +9,39 @@ namespace WMS_DEPI_GRAD.Controllers;
 public class AccountController(UserManager<ApplicationUser> _userManager) : Controller 
 {
      
-    public IActionResult Index()
+    public IActionResult Login()
     {
         return View();
+    }
+
+    [HttpGet]
+    public IActionResult Register()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Register(RegisterViewModel viewModel)
+    {
+        if (!ModelState.IsValid) return View(viewModel);
+        var user = new ApplicationUser()
+        {
+            PhoneNumber = viewModel.PhoneNumber,
+            UserName = viewModel.UserName,
+            Email = viewModel.Email,
+            Role = UserRole.user
+        };
+        var Result = await _userManager.CreateAsync(user, viewModel.Password);
+        if (Result.Succeeded)
+            return RedirectToAction("Login");
+        else
+        {
+            foreach (var error in Result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+            return View(viewModel);
+        }
     }
 
     [HttpGet]
