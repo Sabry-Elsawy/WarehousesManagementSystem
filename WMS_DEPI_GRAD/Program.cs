@@ -14,7 +14,7 @@ namespace WMS_DEPI_GRAD
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDependences(builder.Configuration);
+            builder.Services.AddDependencies(builder.Configuration);
 
             builder.Services.AddIdentityService();
 
@@ -33,11 +33,13 @@ namespace WMS_DEPI_GRAD
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Account}/{action=Login}/{id?}");
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }

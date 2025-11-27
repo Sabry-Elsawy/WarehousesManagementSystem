@@ -6,12 +6,38 @@ using WMS_DEPI_GRAD.ViewModels;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-public class AccountController(UserManager<ApplicationUser> _userManager) : Controller 
+public class AccountController(UserManager<ApplicationUser> userManager,
+    SignInManager<ApplicationUser> signInManager) : Controller
 {
-     
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+
+    [HttpGet]
     public IActionResult Login()
     {
         return View();
+    }
+    [HttpPost]
+    public async Task<IActionResult> Login(LoginViewModel viewModel)
+    {
+        if (!ModelState.IsValid)
+            return View(viewModel);
+
+        if (await _userManager.FindByEmailAsync(viewModel.Email) is not { } user)
+        {
+            ModelState.AddModelError(string.Empty, "Invalid email or password");
+            return View(viewModel);
+        }
+
+        var result = await _signInManager.CheckPasswordSignInAsync(user, viewModel.Password, lockoutOnFailure: false);
+        if (result.Succeeded)
+        {
+            await _signInManager.SignInAsync(user, isPersistent: true);
+            return RedirectToAction("Index", "Home");
+        }
+
+        ModelState.AddModelError(string.Empty, "Invalid email or password");
+        return View(viewModel);
     }
 
     [HttpGet]
@@ -54,12 +80,12 @@ public class AccountController(UserManager<ApplicationUser> _userManager) : Cont
     {
         if (!ModelState.IsValid)
         {
-         
-        var user = _userManager.FindByEmailAsync(viewModel.Email).Result;
-        if (user is not null)
-        {
+
+            var user = _userManager.FindByEmailAsync(viewModel.Email).Result;
+            if (user is not null)
+            {
                 var token = _userManager.GeneratePasswordResetTokenAsync(user).Result;
-                var ResetPasswordLink = Url.Action("ResetPassword", "Account",new { email = viewModel.Email, token },Request.Scheme);
+                var ResetPasswordLink = Url.Action("ResetPassword", "Account", new { email = viewModel.Email, token }, Request.Scheme);
                 var email = new Email()
                 {
                     To = viewModel.Email,
@@ -69,13 +95,13 @@ public class AccountController(UserManager<ApplicationUser> _userManager) : Cont
                 // Send Email    
                 EmailSettings.SendEmail(email);
             }
-         
+
         }
         ModelState.AddModelError(string.Empty, "Invalid Operation");
         return View(nameof(ForgotPassword), viewModel);
     }
     [HttpGet]
-    public IActionResult ResetPassword(string email , string Token)
+    public IActionResult ResetPassword(string email, string Token)
     {
         TempData["email"] = email;
         TempData["Token"] = Token;
@@ -90,7 +116,7 @@ public class AccountController(UserManager<ApplicationUser> _userManager) : Cont
             return View(ViewModel);
 
         }
-        string email = TempData["email"] as string?? string.Empty;
+        string email = TempData["email"] as string ?? string.Empty;
         string token = TempData["Token"] as string ?? string.Empty;
 
         var user = _userManager.FindByEmailAsync(email).Result;
@@ -110,6 +136,6 @@ public class AccountController(UserManager<ApplicationUser> _userManager) : Cont
                 return View(ViewModel);
             }
         }
-        return View(nameof(Index)); 
+        return View(nameof(Index));
     }
 }
