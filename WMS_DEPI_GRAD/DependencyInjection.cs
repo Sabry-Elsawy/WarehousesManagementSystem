@@ -9,11 +9,12 @@ namespace WMS_DEPI_GRAD;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddDependences(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContextServices(configuration)
-            .AddScoped<ILoggedInUserService, LoggedInUserService>();
-        
+            .AddScoped<ILoggedInUserService, LoggedInUserService>()
+            .AddAuthConfigs();
+
 
         return services;
     }
@@ -30,7 +31,20 @@ public static class DependencyInjection
         return services;
     }
 
-    
+    private static IServiceCollection AddAuthConfigs(this IServiceCollection services)
+    {
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.ExpireTimeSpan = TimeSpan.FromDays(14); 
+            options.SlidingExpiration = true;            
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
+        return services;
+    }
+
+
 
 
 
