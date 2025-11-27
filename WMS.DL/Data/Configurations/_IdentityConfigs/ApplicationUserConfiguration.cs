@@ -12,13 +12,8 @@ namespace WMS.DAL.Data.Configurations._IdentityConfigs
     {
         public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
-            builder.Property(u => u.FirstName)
-               .IsRequired()
-               .HasMaxLength(100);
-
-            builder.Property(u => u.LastName)
-                    .IsRequired()
-                    .HasMaxLength(100);
+            builder.Property(u => u.UserName)
+               .IsRequired();
 
             builder.Property(c => c.Role)
                     .HasConversion(
