@@ -6,12 +6,9 @@ using WMS_DEPI_GRAD.ViewModels;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-public class AccountController(UserManager<ApplicationUser> userManager,
-    SignInManager<ApplicationUser> signInManager) : Controller
+public class AccountController(UserManager<ApplicationUser> _userManager,
+    SignInManager<ApplicationUser> _signInManager) : Controller
 {
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
-
     [HttpGet]
     public IActionResult Login()
     {
@@ -46,7 +43,7 @@ public class AccountController(UserManager<ApplicationUser> userManager,
         {
             await _signInManager.SignInAsync(user, isPersistent: true);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Inventory");
         }
 
         ModelState.AddModelError(string.Empty, "Invalid email or password");
@@ -76,13 +73,9 @@ public class AccountController(UserManager<ApplicationUser> userManager,
             //await _userManager.AddToRoleAsync(user, "User");
             //return RedirectToAction("Login");
 
-            // 1️⃣ إضافة المستخدم للـ Role "User"
             await _userManager.AddToRoleAsync(user, "User");
-
-            // 2️⃣ إنشاء توكن Email Confirmation
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            // 3️⃣ إنشاء لينك التفعيل
             var confirmationLink = Url.Action(
                 "ConfirmEmail",
                 "Account",
@@ -103,7 +96,7 @@ public class AccountController(UserManager<ApplicationUser> userManager,
 
             EmailSettings.SendEmail(email);
 
-            return RedirectToAction("EmailSent"); // صفحة تقول "Check your email"
+            return RedirectToAction("EmailSent"); 
         }
         else
         {
