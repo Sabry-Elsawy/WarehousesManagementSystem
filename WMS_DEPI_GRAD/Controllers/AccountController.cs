@@ -29,7 +29,19 @@ public class AccountController(UserManager<ApplicationUser> userManager,
             return View(viewModel);
         }
 
-        var result = await _signInManager.CheckPasswordSignInAsync(user, viewModel.Password, lockoutOnFailure: false);
+        var result = await _signInManager.CheckPasswordSignInAsync(user, viewModel.Password, true);
+        if (result.IsNotAllowed)
+        {
+            ModelState.AddModelError(string.Empty, "You are not allowed to login. Please contact support.");
+            return View(viewModel);
+        }
+
+        if (result.IsLockedOut)
+        {
+            ModelState.AddModelError(string.Empty, "Your account is locked. Please try again later.");
+            return View(viewModel);
+        }
+
         if (result.Succeeded)
         {
             await _signInManager.SignInAsync(user, isPersistent: true);
@@ -59,7 +71,10 @@ public class AccountController(UserManager<ApplicationUser> userManager,
         };
         var Result = await _userManager.CreateAsync(user, viewModel.Password);
         if (Result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, "User");
             return RedirectToAction("Login");
+        }
         else
         {
             foreach (var error in Result.Errors)
@@ -137,5 +152,12 @@ public class AccountController(UserManager<ApplicationUser> userManager,
             }
         }
         return View(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Logout()
+    {
+        await _signInManager.SignOutAsync();
+        return RedirectToAction("Login", "Account");
     }
 }
