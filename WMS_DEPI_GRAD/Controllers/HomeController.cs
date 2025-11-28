@@ -1,10 +1,6 @@
-
-
 using Microsoft.AspNetCore.Authorization;
-
 namespace WMS_DEPI_GRAD.Controllers;
 
-[Authorize]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

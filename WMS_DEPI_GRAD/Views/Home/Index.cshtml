@@ -1,112 +1,84 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
 <!-- Hero Cover Section -->
-<section class="hero-cover">
+<section class="hero-cover position-relative">
+    <!-- Overlay -->
     <div class="hero-overlay"></div>
-    <div class="hero-image">
-        <img  src="~/images/wms-cover-2.jpg" 
-             alt="Warehouse Management System" 
-             class="hero-bg-image" 
-             onerror="this.style.display='none'" />
-    </div>
-    <div class="hero-content">
-        <div class="hero-text">
-            <h1 class="hero-title">
-                <span class="hero-welcome">Welcome to</span>
-                <span class="hero-brand">WMS</span>
-                <span class="hero-subtitle">Warehouse Management System</span>
-            </h1>
-            <p class="hero-description">
-                Streamline your warehouse operations with our comprehensive management solution. 
-                Track inventory, manage orders, and optimize your workflow efficiently.
-            </p>
-            <div class="hero-actions">
-                <a asp-controller="Account" asp-action="Index" class="btn-hero-primary">
-                    <i class="fas fa-sign-in-alt me-2"></i>
-                    Get Started
-                </a>
-                <a href="/Account/Index" class="btn-hero-secondary">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Learn More
-                </a>
-            </div>
+
+    <!-- Background Image -->
+    <img src="~/images/wms-cover-2.jpg"
+         alt="Warehouse Management System"
+         class="hero-bg-image"
+         onerror="this.style.display='none'" />
+
+    <!-- Content -->
+    <div class="hero-content text-center text-white">
+        <h1 class="hero-title">
+            <span class="hero-welcome">Welcome to</span>
+            <span class="hero-brand">WMS</span>
+            <span class="hero-subtitle">Warehouse Management System</span>
+        </h1>
+        <p class="hero-description">
+            Streamline your warehouse operations with our comprehensive management solution.
+            Track inventory, manage orders, and optimize your workflow efficiently.
+        </p>
+        <div class="hero-actions d-flex justify-content-center gap-3 flex-wrap">
+            <a asp-controller="Account" asp-action="Login" class="btn btn-hero-primary">
+                <i class="fas fa-sign-in-alt me-2"></i> Get Started
+            </a>
+            <a href="/Account/Login" class="btn btn-hero-secondary">
+                <i class="fas fa-info-circle me-2"></i> Learn More
+            </a>
         </div>
     </div>
 </section>
 
-<!-- Content Section -->
-<section class="services content-section py-4">
-    <div class="container-fluid mt-5">
-        <h2 class="text-center text-muted mb-4">Our Services</h2>
-        <div class="row">
-            <div class="col-xl-4">
+<!-- Services Section -->
+<section class="services content-section py-5">
+    <div class="container">
+        <h2 class="text-center text-muted mb-5">Our Services</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-boxes text-primary-orange"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-boxes text-primary-orange"></i></div>
                     <h3>Inventory Management</h3>
                     <p>Track and manage your inventory with real-time updates and automated alerts.</p>
                 </div>
             </div>
-            <div class="col-xl-4">
+            <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-line text-primary-orange"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-chart-line text-primary-orange"></i></div>
                     <h3>Analytics & Reports</h3>
                     <p>Get detailed insights and reports to optimize your warehouse operations.</p>
                 </div>
             </div>
-            <div class="col-xl-4">
+            <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-users text-primary-orange"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-users text-primary-orange"></i></div>
                     <h3>Team Management</h3>
                     <p>Coordinate your team efficiently with role-based access and task management.</p>
                 </div>
             </div>
-            <div class="col-xl-4">
+            <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shipping-fast text-primary-orange"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-shipping-fast text-primary-orange"></i></div>
                     <h3>Order Fulfillment</h3>
                     <p>Streamline your order processing from picking to shipping with ease.</p>
                 </div>
-            </div>  
-            <div class="col-xl-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shipping-fast text-primary-orange"></i>
-                    </div>
-                    <h3>Order Fulfillment</h3>
-                    <p>Streamline your order processing from picking to shipping with ease.</p>
-                </div>
-            </div>  
-            <div class="col-xl-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shipping-fast text-primary-orange"></i>
-                    </div>
-                    <h3>Order Fulfillment</h3>
-                    <p>Streamline your order processing from picking to shipping with ease.</p>
-                </div>
-            </div>  
+            </div>
         </div>
     </div>
 </section>
 
-<div class="container-fluid">
-    <h2 class=" text-primary-orange mb-4">About WMS</h2>
-    <p>Welcome to our warehouse management system. Here you can manage your inventory, orders, and team efficiently.</p>
-    <p>Our platform offers real-time tracking, automated workflows, and powerful analytics to help you optimize your operations.</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-
-</div>
-
-
-
-
+<!-- About Section -->
+<section class="about py-5 bg-light">
+    <div class="container">
+        <h2 class="text-primary-orange mb-4">About WMS</h2>
+        <p>Welcome to our warehouse management system. Here you can manage your inventory, orders, and team efficiently.</p>
+        <p>Our platform offers real-time tracking, automated workflows, and powerful analytics to help you optimize your operations.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+    </div>
+</section>

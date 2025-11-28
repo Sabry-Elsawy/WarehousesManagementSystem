@@ -45,6 +45,7 @@ public class AccountController(UserManager<ApplicationUser> userManager,
         if (result.Succeeded)
         {
             await _signInManager.SignInAsync(user, isPersistent: true);
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -72,8 +73,37 @@ public class AccountController(UserManager<ApplicationUser> userManager,
         var Result = await _userManager.CreateAsync(user, viewModel.Password);
         if (Result.Succeeded)
         {
+            //await _userManager.AddToRoleAsync(user, "User");
+            //return RedirectToAction("Login");
+
+            // 1️⃣ إضافة المستخدم للـ Role "User"
             await _userManager.AddToRoleAsync(user, "User");
-            return RedirectToAction("Login");
+
+            // 2️⃣ إنشاء توكن Email Confirmation
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            // 3️⃣ إنشاء لينك التفعيل
+            var confirmationLink = Url.Action(
+                "ConfirmEmail",
+                "Account",
+                new { userId = user.Id, token = token },
+                protocol: HttpContext.Request.Scheme);
+
+            var email = new Email()
+            {
+                To = user.Email,
+                Subject = "Confirm your account",
+                Body = $@"
+        <h3>Welcome {user.UserName}</h3>
+        <p>Please confirm your email by clicking the link below:</p>
+        <p><a href='{confirmationLink}'>Click here to confirm your account</a></p>
+    "
+            };
+
+
+            EmailSettings.SendEmail(email);
+
+            return RedirectToAction("EmailSent"); // صفحة تقول "Check your email"
         }
         else
         {
@@ -160,4 +190,29 @@ public class AccountController(UserManager<ApplicationUser> userManager,
         await _signInManager.SignOutAsync();
         return RedirectToAction("Login", "Account");
     }
+
+    [HttpGet]
+    public IActionResult EmailSent()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    {
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            return BadRequest("User ID and Token are required.");
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            return NotFound("User not found.");
+
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+
+        if (result.Succeeded)
+            return View("ConfirmEmailSuccess"); 
+        else
+            return View("Error"); 
+    }
+
 }

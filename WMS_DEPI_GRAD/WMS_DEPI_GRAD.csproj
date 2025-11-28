@@ -25,4 +25,11 @@
     <ProjectReference Include="..\WMS.BLL\WMS.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Account\ConfirmEmailSuccess.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
