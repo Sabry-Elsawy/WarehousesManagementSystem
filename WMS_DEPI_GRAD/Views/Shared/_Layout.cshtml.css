@@ -291,6 +291,18 @@ button.accept-policy:hover {
   border-bottom: 1px solid var(--dark-orange);
 }
 
+.side-nav {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
 /* Responsive Design - Mobile First Approach */
 @media (max-width: 768px) {
   /* Sidebar becomes icon-only but not super narrow */
