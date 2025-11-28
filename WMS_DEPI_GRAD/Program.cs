@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using WMS.DAL;
 using WMS.DAL.Entities._Identity;
@@ -8,7 +8,7 @@ namespace WMS_DEPI_GRAD
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +17,8 @@ namespace WMS_DEPI_GRAD
             builder.Services.AddDependencies(builder.Configuration);
 
             builder.Services.AddIdentityService();
+
+
 
             var app = builder.Build();
 
@@ -40,6 +42,22 @@ namespace WMS_DEPI_GRAD
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            // Seed Roles
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+                string[] roles = { "Admin", "User" }; // تأكد من الاسماء متطابقة مع AddToRoleAsync
+
+                foreach (var role in roles)
+                {
+                    if (!await roleManager.RoleExistsAsync(role))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole(role));
+                    }
+                }
+            }
 
             app.Run();
         }
