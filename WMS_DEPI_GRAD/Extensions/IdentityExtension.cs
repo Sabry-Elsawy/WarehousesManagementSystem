@@ -9,7 +9,7 @@ namespace WMS_DEPI_GRAD.Extensions
         public static IServiceCollection AddIdentityService(this IServiceCollection services)
         {
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(identityOptions =>
             {
                 identityOptions.User.RequireUniqueEmail = true;
