@@ -21,7 +21,8 @@ public static class DependencyInjection
             .AddScoped<IUnitOfWork, UnitOfWork>()
             .AddScoped<IWarehouseService, WarehouseService>()
             .AddScoped<IZoneService, ZoneService>()
-            .AddScoped<IAisleService, AisleService>();
+            .AddScoped<IAisleService, AisleService>()
+            .AddScoped<IRackService, RackService>();
 
 
         return services;
