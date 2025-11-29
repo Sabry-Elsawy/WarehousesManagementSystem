@@ -1,0 +1,46 @@
+@model WMS_DEPI_GRAD.ViewModels.PermissionViewModel
+
+@{
+    ViewData["Title"] = "Manage Permissions";
+}
+
+<h1>Manage Permissions</h1>
+<h4>Role: @Model.RoleName</h4>
+
+<form asp-action="ManagePermissions" method="post">
+    <input type="hidden" asp-for="RoleId" />
+    <div class="card">
+        <div class="card-header">
+            <h2>Permissions</h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Selected</th>
+                        <th>Permission</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.RoleClaims.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                <input type="hidden" asp-for="@Model.RoleClaims[i].Value" />
+                                <input type="hidden" asp-for="@Model.RoleClaims[i].Type" />
+                                <input asp-for="@Model.RoleClaims[i].Selected" class="form-check-input" />
+                            </td>
+                            <td>
+                                @Model.RoleClaims[i].Value
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <input type="submit" value="Update" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div>
+</form>
