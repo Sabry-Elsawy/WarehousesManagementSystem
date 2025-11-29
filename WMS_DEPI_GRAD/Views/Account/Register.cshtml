@@ -1,0 +1,66 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="container my-5">
+    <h1 class="text-primary-orange">Create Your Account</h1>
+    <p class="lead">Please fill in the information below to create your account.</p>
+
+    <div class="row justify-content-center d-flex mt-4 g-4">
+
+        <!-- Left Image -->
+        <div class="login-image col-lg-8">
+            <img src="~/images/wms-worker.jpg" alt="Warehouse Worker" class="img-fluid" />
+        </div>
+
+        <!-- Register Form -->
+        <div class="login col-lg-4 align-self-center">
+            <h5 class="text-primary-orange">Register</h5>
+
+            <form asp-action="Register" asp-controller="Account" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Username -->
+                <div class="mb-3">
+                    <label asp-for="UserName" class="form-label"></label>
+                    <input asp-for="UserName" class="form-control" placeholder="Enter Username" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" placeholder="Enter Email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label asp-for="PhoneNumber" class="form-label"></label>
+                    <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="Enter Phone Number" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" placeholder="Enter Password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-hero-primary w-100">Create Account</button>
+
+                <div class="mt-3">
+                    <p>
+                        Already have an account?
+                        <a asp-action="Login" class="text-primary-orange">Login Now!</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
