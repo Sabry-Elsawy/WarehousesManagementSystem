@@ -1,0 +1,44 @@
+@model WMS.DAL.Zone
+
+@{
+    ViewData["Title"] = "Zone Details";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary-orange fw-bold mb-0">
+                <i class="fas fa-info-circle me-2"></i>Zone Details
+            </h2>
+            <p class="text-muted mb-0">View zone information</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <h6 class="text-muted small text-uppercase fw-bold">Zone Name</h6>
+                        <p class="fs-5 fw-bold text-primary-orange">@Model.Name</p>
+                    </div>
+                    <div class="mb-4">
+                        <h6 class="text-muted small text-uppercase fw-bold">Warehouse</h6>
+                        <p class="fs-5">@(Model.Warehouse?.Name ?? "N/A")</p>
+                    </div>
+
+                    <hr class="text-muted opacity-25 my-4">
+
+                    <div class="d-flex justify-content-end">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary px-4">
+                            <i class="fas fa-edit me-2"></i>Edit Zone
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

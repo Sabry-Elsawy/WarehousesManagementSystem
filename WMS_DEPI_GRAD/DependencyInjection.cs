@@ -19,7 +19,9 @@ public static class DependencyInjection
         services.AddDbContextServices(configuration)
             .AddScoped<ILoggedInUserService, LoggedInUserService>()
             .AddScoped<IUnitOfWork, UnitOfWork>()
-            .AddScoped<IWarehouseService, WarehouseService>();
+            .AddScoped<IWarehouseService, WarehouseService>()
+            .AddScoped<IZoneService, ZoneService>()
+            .AddScoped<IAisleService, AisleService>();
 
 
         return services;
