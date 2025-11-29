@@ -16,9 +16,10 @@ internal class BinConfiguration : BaseAuditableEntityConfiguration<Bin, int>
         builder.Property(b => b.Capacity)
                .IsRequired();
 
-        builder.Property(b => b.BinType)
-               .HasMaxLength(50)
-               .IsRequired();
+        builder.HasOne(b => b.BinType)
+         .WithMany(bt => bt.Bins)
+         .HasForeignKey(b => b.BinTypeId)
+         .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(b => b.Rack)
             .WithMany(r => r.Bins)

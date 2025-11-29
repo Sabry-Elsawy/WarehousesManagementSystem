@@ -3,20 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WMS.DAL;
 
 #nullable disable
 
-namespace WMS.DAL.Migrations
+namespace WMS.DAL.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251128124035_AddApplicationUserFirstNameAndLastName")]
-    partial class AddApplicationUserFirstNameAndLastName
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -277,7 +274,7 @@ namespace WMS.DAL.Migrations
                     b.ToTable("Aisles");
                 });
 
-            modelBuilder.Entity("WMS.DAL.Bin", b =>
+            modelBuilder.Entity("WMS.DAL.Entities.Bin", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -285,10 +282,8 @@ namespace WMS.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BinType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("BinTypeId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
@@ -315,9 +310,44 @@ namespace WMS.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BinTypeId");
+
                     b.HasIndex("RackId");
 
                     b.ToTable("Bins");
+                });
+
+            modelBuilder.Entity("WMS.DAL.Entities.BinType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BinTypes");
                 });
 
             modelBuilder.Entity("WMS.DAL.Entities._Identity.Address", b =>
@@ -376,13 +406,17 @@ namespace WMS.DAL.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("Unknown");
 
                     b.Property<string>("LastName")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("!!");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -1250,13 +1284,21 @@ namespace WMS.DAL.Migrations
                     b.Navigation("Zone");
                 });
 
-            modelBuilder.Entity("WMS.DAL.Bin", b =>
+            modelBuilder.Entity("WMS.DAL.Entities.Bin", b =>
                 {
+                    b.HasOne("WMS.DAL.Entities.BinType", "BinType")
+                        .WithMany("Bins")
+                        .HasForeignKey("BinTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("WMS.DAL.Rack", "Rack")
                         .WithMany("Bins")
                         .HasForeignKey("RackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("BinType");
 
                     b.Navigation("Rack");
                 });
@@ -1274,7 +1316,7 @@ namespace WMS.DAL.Migrations
 
             modelBuilder.Entity("WMS.DAL.Inventory", b =>
                 {
-                    b.HasOne("WMS.DAL.Bin", "Bin")
+                    b.HasOne("WMS.DAL.Entities.Bin", "Bin")
                         .WithMany("Inventories")
                         .HasForeignKey("BinId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1293,7 +1335,7 @@ namespace WMS.DAL.Migrations
 
             modelBuilder.Entity("WMS.DAL.Picking", b =>
                 {
-                    b.HasOne("WMS.DAL.Bin", "Bin")
+                    b.HasOne("WMS.DAL.Entities.Bin", "Bin")
                         .WithMany("Pickings")
                         .HasForeignKey("BinId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1369,7 +1411,7 @@ namespace WMS.DAL.Migrations
 
             modelBuilder.Entity("WMS.DAL.PutawayBin", b =>
                 {
-                    b.HasOne("WMS.DAL.Bin", "Bin")
+                    b.HasOne("WMS.DAL.Entities.Bin", "Bin")
                         .WithMany("PutawayBins")
                         .HasForeignKey("BinId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1524,13 +1566,18 @@ namespace WMS.DAL.Migrations
                     b.Navigation("Racks");
                 });
 
-            modelBuilder.Entity("WMS.DAL.Bin", b =>
+            modelBuilder.Entity("WMS.DAL.Entities.Bin", b =>
                 {
                     b.Navigation("Inventories");
 
                     b.Navigation("Pickings");
 
                     b.Navigation("PutawayBins");
+                });
+
+            modelBuilder.Entity("WMS.DAL.Entities.BinType", b =>
+                {
+                    b.Navigation("Bins");
                 });
 
             modelBuilder.Entity("WMS.DAL.Entities._Identity.ApplicationUser", b =>

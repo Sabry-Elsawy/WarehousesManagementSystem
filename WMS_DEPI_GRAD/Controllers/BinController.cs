@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Threading.Tasks;
 using WMS.BLL.Interfaces;
+using WMS.DAL;
 using WMS.DAL.Entities;
 
 namespace WMS_DEPI_GRAD.Controllers
@@ -85,6 +87,13 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(bin);
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            var bin = await _binService.GetBinByIdAsync(id);
+            if (bin == null) return NotFound();
+            return View(bin);
+        }
+
         public async Task<IActionResult> Delete(int id)
         {
             var bin = await _binService.GetBinByIdAsync(id);
@@ -110,11 +119,12 @@ namespace WMS_DEPI_GRAD.Controllers
 
         private async Task PopulateDropdowns()
         {
-            var racks = await _rackService.GetAllRacksAsync();
-            var binTypes = await _binTypeService.GetAllBinTypesAsync();
+            var racks = await _rackService.GetAllRacksAsync() ?? new List<Rack>();
+            var binTypes = await _binTypeService.GetAllBinTypesAsync() ?? new List<BinType>();
 
             ViewBag.RackId = new SelectList(racks, "Id", "Code");
             ViewBag.BinTypeId = new SelectList(binTypes, "Id", "Name");
         }
+
     }
 }

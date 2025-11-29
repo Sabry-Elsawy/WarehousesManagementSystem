@@ -1,0 +1,77 @@
+﻿@using WMS.DAL.Entities
+@model IEnumerable<Bin>
+@{
+    ViewData["Title"] = "Bins";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary-orange fw-bold mb-0">
+                <i class="fas fa-box me-2"></i>Bins
+            </h2>
+            <p class="text-muted mb-0">Manage storage bins and capacities</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus me-2"></i>Create New
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option selected>All Racks</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option selected>All Bin Types</option>
+                    </select>
+                </div>
+                <div class="col-md-4 ms-auto">
+                    <input type="text" class="form-control" placeholder="Search bins...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase text-muted small">
+                        <tr>
+                            <th class="ps-4 py-3">Code</th>
+                            <th class="py-3">Type</th>
+                            <th class="py-3">Capacity</th>
+                            <th class="py-3">Rack</th>
+                            <th class="py-3 text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-primary-orange">@item.Code</td>
+                                <td><span class="badge bg-light text-dark border">@item.BinType?.Name</span></td>
+                                <td>@item.Capacity</td>
+                                <td>@item.Rack?.Name</td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-light text-info"><i class="fas fa-info-circle"></i></a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light text-primary-orange"><i class="fas fa-edit"></i></a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-light text-danger"><i class="fas fa-trash-alt"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
