@@ -48,7 +48,7 @@ namespace WMS_DEPI_GRAD.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(UserViewModel model)
+        public async Task<IActionResult> Create(CreateUserViewModel model)
         {
             if (ModelState.IsValid)
             {
