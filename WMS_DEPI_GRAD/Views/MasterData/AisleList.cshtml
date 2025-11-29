@@ -1,0 +1,81 @@
+@{
+    ViewData["Title"] = "Aisles";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary-orange fw-bold mb-0">
+                <i class="fas fa-road me-2"></i>Aisles
+            </h2>
+            <p class="text-muted mb-0">Manage aisles within your zones</p>
+        </div>
+        <a asp-action="AisleUpsert" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus me-2"></i>Create New
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option selected>All Warehouses</option>
+                        <option>Main Distribution Center</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option selected>All Zones</option>
+                        <option>Zone A</option>
+                        <option>Zone B</option>
+                    </select>
+                </div>
+                <div class="col-md-4 ms-auto">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search aisles...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase text-muted small">
+                        <tr>
+                            <th class="ps-4 py-3">Code</th>
+                            <th class="py-3">Zone</th>
+                            <th class="py-3">Warehouse</th>
+                            <th class="py-3 text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-primary-orange">@item.Code</td>
+                                <td>@item.Zone</td>
+                                <td><span class="text-muted">@item.Warehouse</span></td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-light text-primary-orange"><i class="fas fa-eye"></i></button>
+                                        <a asp-action="AisleUpsert" asp-route-id="@item.Id" class="btn btn-sm btn-light text-primary-orange"><i class="fas fa-edit"></i></a>
+                                        <button class="btn btn-sm btn-light text-danger"><i class="fas fa-trash-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

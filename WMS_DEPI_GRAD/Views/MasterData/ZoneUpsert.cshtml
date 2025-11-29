@@ -1,0 +1,77 @@
+@{
+    ViewData["Title"] = "Create Zone";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary-orange fw-bold mb-0">
+                <i class="fas fa-plus-circle me-2"></i>Create Zone
+            </h2>
+            <p class="text-muted mb-0">Add a new zone to a warehouse</p>
+        </div>
+        <a asp-action="ZoneList" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 text-primary-orange">Zone Details</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Parent Warehouse <span class="text-danger">*</span></label>
+                                <select class="form-select" required>
+                                    <option selected disabled>Select Warehouse...</option>
+                                    <option>Main Distribution Center</option>
+                                    <option>Alexandria Hub</option>
+                                    <option>Giza Overflow</option>
+                                </select>
+                                <div class="form-text">The warehouse this zone belongs to.</div>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Zone Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g. Zone A - Cold Storage" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Zone Code</label>
+                                <input type="text" class="form-control" placeholder="e.g. Z-A-CS">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Description / Notes</label>
+                                <textarea class="form-control" rows="3" placeholder="Optional description of the zone's purpose..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-5 pt-3 border-top">
+                            <button type="button" class="btn btn-light me-2">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-4">Save Zone</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm bg-light mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold text-dark-orange"><i class="fas fa-info-circle me-2"></i>Hierarchy</h6>
+                    <p class="small text-muted mb-0">
+                        <strong>Warehouse</strong> > <strong>Zone</strong> > Aisle > Rack > Bin
+                    </p>
+                    <hr>
+                    <p class="small text-muted mb-0">
+                        Zones help segment the warehouse for different storage needs (e.g., Cold Storage, Hazardous Materials).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

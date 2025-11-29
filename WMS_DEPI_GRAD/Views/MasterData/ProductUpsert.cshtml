@@ -1,0 +1,73 @@
+@{
+    ViewData["Title"] = "Create Product";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary-orange fw-bold mb-0">
+                <i class="fas fa-plus-circle me-2"></i>Create Product
+            </h2>
+            <p class="text-muted mb-0">Add a new product to the catalog</p>
+        </div>
+        <a asp-action="ProductList" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Product Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g. PRD-001" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g. Wireless Mouse" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Description</label>
+                                <textarea class="form-control" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="col-12">
+                                <hr class="my-2 text-muted opacity-25">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">Specifications</h6>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Unit of Measure <span class="text-danger">*</span></label>
+                                <select class="form-select" required>
+                                    <option selected disabled>Select UOM...</option>
+                                    <option>Pcs</option>
+                                    <option>Kg</option>
+                                    <option>Box</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Weight (kg)</label>
+                                <input type="number" step="0.01" class="form-control" placeholder="0.00">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Volume (m³)</label>
+                                <input type="number" step="0.001" class="form-control" placeholder="0.000">
+                            </div>
+                             <div class="col-md-6">
+                                <label class="form-label fw-bold">Barcode</label>
+                                <input type="text" class="form-control" placeholder="Scan or type barcode">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-light me-2">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-4">Save Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

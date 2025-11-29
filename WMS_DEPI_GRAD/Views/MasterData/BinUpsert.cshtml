@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Create Bin";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary-orange fw-bold mb-0">
+                <i class="fas fa-plus-circle me-2"></i>Create Bin
+            </h2>
+            <p class="text-muted mb-0">Add a new bin to a rack</p>
+        </div>
+        <a asp-action="BinList" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Rack <span class="text-danger">*</span></label>
+                                <select class="form-select" required>
+                                    <option selected disabled>Select Rack...</option>
+                                    <option>R-01-A</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Bin Type <span class="text-danger">*</span></label>
+                                <select class="form-select" required>
+                                    <option selected disabled>Select Type...</option>
+                                    <option>Standard</option>
+                                    <option>Small Parts</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Bin Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g. B-01-A-1" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Capacity</label>
+                                <input type="number" class="form-control" placeholder="100">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-light me-2">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-4">Save Bin</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

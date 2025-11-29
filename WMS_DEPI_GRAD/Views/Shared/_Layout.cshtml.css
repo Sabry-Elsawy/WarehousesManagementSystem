@@ -359,3 +359,53 @@ button.accept-policy:hover {
 
 
 /* Footer now flows naturally at bottom of content */
+
+/* Nested Navigation Styles */
+.nav-link.collapsed .collapse-icon {
+    transform: rotate(0deg);
+}
+
+.collapse-icon {
+    transition: transform 0.3s ease;
+    transform: rotate(90deg);
+    font-size: 0.8rem;
+    margin-left: auto;
+}
+
+.sidebar-content .collapse .nav-link {
+    padding-left: 3.5rem; /* Indent nested items */
+    font-size: 0.95rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    color: #ccc; /* Slightly dimmer text for nested items */
+}
+
+.sidebar-content .collapse .nav-link:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+    border-left-color: var(--light-orange); /* Subtle border for nested */
+}
+
+.sidebar-content .collapse .nav-link .nav-text {
+    font-weight: 400;
+}
+
+/* Ensure the sidebar scroll works with expanded items */
+.sidebar-content {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--dark-orange) var(--sidebar-bg);
+}
+
+.sidebar-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+    background: var(--sidebar-bg);
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+    background-color: var(--dark-orange);
+    border-radius: 20px;
+}
