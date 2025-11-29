@@ -22,7 +22,9 @@ public static class DependencyInjection
             .AddScoped<IWarehouseService, WarehouseService>()
             .AddScoped<IZoneService, ZoneService>()
             .AddScoped<IAisleService, AisleService>()
-            .AddScoped<IRackService, RackService>();
+            .AddScoped<IRackService, RackService>()
+            .AddScoped<IBinService, BinService>()
+            .AddScoped<IBinTypeService, BinTypeService>();
 
 
         return services;

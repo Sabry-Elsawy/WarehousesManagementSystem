@@ -1,5 +1,6 @@
 using WMS.BLL.Interfaces;
 using WMS.DAL;
+using WMS.DAL.Entities;
 using WMS.DAL.UnitOfWork;
 
 namespace WMS.BLL.Services

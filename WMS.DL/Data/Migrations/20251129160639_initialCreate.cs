@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace WMS.DAL.Migrations
+namespace WMS.DAL.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +30,8 @@ namespace WMS.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false, defaultValue: "Unknown"),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false, defaultValue: "!!"),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -49,6 +51,24 @@ namespace WMS.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BinTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BinTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -338,7 +358,7 @@ namespace WMS.DAL.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    WarehouseId = table.Column<int>(type: "int", nullable: true),
+                    WarehouseId = table.Column<int>(type: "int", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -629,8 +649,8 @@ namespace WMS.DAL.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Capacity = table.Column<int>(type: "int", nullable: false),
-                    BinType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     RackId = table.Column<int>(type: "int", nullable: false),
+                    BinTypeId = table.Column<int>(type: "int", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -639,6 +659,12 @@ namespace WMS.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Bins", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Bins_BinTypes_BinTypeId",
+                        column: x => x.BinTypeId,
+                        principalTable: "BinTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Bins_Racks_RackId",
                         column: x => x.RackId,
@@ -842,6 +868,11 @@ namespace WMS.DAL.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bins_BinTypeId",
+                table: "Bins",
+                column: "BinTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Bins_RackId",
                 table: "Bins",
                 column: "RackId");
@@ -1032,6 +1063,9 @@ namespace WMS.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "SalesOrders");
+
+            migrationBuilder.DropTable(
+                name: "BinTypes");
 
             migrationBuilder.DropTable(
                 name: "Racks");
