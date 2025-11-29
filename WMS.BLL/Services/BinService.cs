@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WMS.BLL.Interfaces;
+using WMS.DAL.Contract;
 using WMS.DAL.Entities;
 using WMS.DAL.UnitOfWork;
 
@@ -27,14 +28,14 @@ namespace WMS.BLL.Services
 
         public async Task<Bin?> GetBinByIdAsync(int id)
         {
-            var repo = _unitOfWork.GetRepository<Bin, int>();
-            return await repo.GetByIdAsync(id);
+            var repo = _unitOfWork.GetBinRepository();
+            return await repo.GetBinWithDetailsAsync(id);
         }
 
         public async Task<IReadOnlyList<Bin>> GetAllBinsAsync()
         {
-            var repo = _unitOfWork.GetRepository<Bin, int>();
-            return await repo.GetAllAsync(false); // Assuming false means no tracking or similar
+            var repo = _unitOfWork.GetBinRepository();
+            return await repo.GetAllBinsWithDetailsAsync();
         }
 
         public async Task<Bin> UpdateBinAsync(Bin bin)

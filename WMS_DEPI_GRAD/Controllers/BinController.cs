@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
@@ -36,8 +37,15 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Bin bin)
+        public async Task<IActionResult> Create([Bind("Code,Capacity,RackId,BinTypeId")] Bin bin)
         {
+            // Remove navigation properties from ModelState to prevent validation errors
+            ModelState.Remove("Rack");
+            ModelState.Remove("BinType");
+            ModelState.Remove("Pickings");
+            ModelState.Remove("Inventories");
+            ModelState.Remove("PutawayBins");
+
             if (ModelState.IsValid)
             {
                 try
@@ -66,9 +74,16 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Bin bin)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Capacity,RackId,BinTypeId")] Bin bin)
         {
             if (id != bin.Id) return BadRequest();
+
+            // Remove navigation properties from ModelState to prevent validation errors
+            ModelState.Remove("Rack");
+            ModelState.Remove("BinType");
+            ModelState.Remove("Pickings");
+            ModelState.Remove("Inventories");
+            ModelState.Remove("PutawayBins");
 
             if (ModelState.IsValid)
             {
@@ -122,9 +137,8 @@ namespace WMS_DEPI_GRAD.Controllers
             var racks = await _rackService.GetAllRacksAsync() ?? new List<Rack>();
             var binTypes = await _binTypeService.GetAllBinTypesAsync() ?? new List<BinType>();
 
-            ViewBag.RackId = new SelectList(racks, "Id", "Code");
+            ViewBag.RackId = new SelectList(racks, "Id", "Name");
             ViewBag.BinTypeId = new SelectList(binTypes, "Id", "Name");
         }
-
     }
 }

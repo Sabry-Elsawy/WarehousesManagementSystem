@@ -14,6 +14,8 @@ namespace WMS.DAL.UnitOfWork
             where TEntity : BaseEntity<TKey>
             where TKey : IEquatable<TKey>;
 
+        IBinRepository GetBinRepository();
+
         Task<int> CompleteAsync();
     }
 }

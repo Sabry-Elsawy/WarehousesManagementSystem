@@ -27,6 +27,11 @@ namespace WMS.DAL.UnitOfWork
             return (IGenericRepository<TEntity, TKey>)_repositories.GetOrAdd(typeof(TEntity).Name, _ => new GenericRepository<TEntity, TKey>(_dbContext));
         }
 
+        public IBinRepository GetBinRepository()
+        {
+            return (IBinRepository)_repositories.GetOrAdd("BinRepository", _ => new BinRepository(_dbContext));
+        }
+
         public async Task<int> CompleteAsync()
             => await _dbContext.SaveChangesAsync();
 

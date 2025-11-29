@@ -28,14 +28,14 @@
                             <div class="col-md-6">
                                 <label asp-for="RackId" class="form-label fw-bold">Rack <span class="text-danger">*</span></label>
                                 <select asp-for="RackId" class="form-select" asp-items="ViewBag.RackId" required>
-                                    <option selected disabled>Select Rack...</option>
+                                    <option value="">Select Rack...</option>
                                 </select>
                                 <span asp-validation-for="RackId" class="text-danger small"></span>
                             </div>
                             <div class="col-md-6">
                                 <label asp-for="BinTypeId" class="form-label fw-bold">Bin Type <span class="text-danger">*</span></label>
                                 <select asp-for="BinTypeId" class="form-select" asp-items="ViewBag.BinTypeId" required>
-                                    <option selected disabled>Select Type...</option>
+                                    <option value="">Select Type...</option>
                                 </select>
                                 <span asp-validation-for="BinTypeId" class="text-danger small"></span>
                             </div>
