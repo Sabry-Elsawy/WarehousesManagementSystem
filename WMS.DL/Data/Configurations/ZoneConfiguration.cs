@@ -15,7 +15,6 @@ internal class ZoneConfiguration : BaseAuditableEntityConfiguration<Zone, int>
 
         builder.HasOne(z => z.Warehouse)
             .WithMany(wh => wh.Zones)
-            .HasForeignKey(z => z.WarehouseId)
-            .IsRequired();
+            .HasForeignKey(z => z.WarehouseId);
     }
 }
