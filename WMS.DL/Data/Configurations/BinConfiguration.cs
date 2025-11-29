@@ -1,4 +1,5 @@
 ﻿using WMS.DAL.Data.Configurations._Common;
+using WMS.DAL.Entities;
 
 namespace WMS.DAL;
 

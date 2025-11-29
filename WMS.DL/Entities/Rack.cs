@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using WMS.DAL.Entities;
 using WMS.DAL.Entities._Common;
 
 namespace WMS.DAL;

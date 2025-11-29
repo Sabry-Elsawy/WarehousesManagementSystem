@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using WMS.DAL.Contract;
+using WMS.DAL.Entities;
 using WMS.DAL.Entities._Common;
 using WMS.DAL.Entities._Identity;
 
@@ -30,6 +31,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Rack> Racks { get; set; }  
     public DbSet<Bin> Bins { get; set; }  
     public DbSet<Picking> Pickings { get; set; }
+
+    public DbSet<BinType> BinTypes { get; set; }
 
 
     public DbSet<PurchaseOrder> POs { get; set; }
