@@ -10,16 +10,22 @@ internal class ReceiptItemConfigurations : BaseAuditableEntityConfiguration<Rece
         base.Configure(builder);
         builder.ToTable("ReceiptItems");
 
-        builder.Property(ri => ri.ExpectedQty)
+        builder.Property(ri => ri.QtyExpected)
             .IsRequired();
 
-        builder.Property(ri => ri.ReceivedQty)
+        builder.Property(ri => ri.QtyReceived)
             .IsRequired();
+
+        // Relationship with ASNItem (prevent cascade cycles)
+        builder.HasOne(ri => ri.ASNItem)
+            .WithMany()
+            .HasForeignKey(ri => ri.ASNItemId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(ri => ri.Putaways)
             .WithOne(p => p.ReceiptItem)
             .HasForeignKey(p => p.ReceiptItemId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
     }
 

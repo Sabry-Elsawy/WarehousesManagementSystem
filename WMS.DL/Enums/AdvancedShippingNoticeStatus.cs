@@ -2,8 +2,7 @@
 
 public enum AdvancedShippingNoticeStatus
 {
-    InTransit,
-    Arrived,
-    Delayed,
-    Cancelled
+    Sent,
+    Received,
+    Closed
 }

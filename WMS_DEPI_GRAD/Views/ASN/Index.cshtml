@@ -1,0 +1,78 @@
+@model IEnumerable<WMS_DEPI_GRAD.ViewModels.ASNViewModel>
+
+@{
+    ViewData["Title"] = "Advanced Shipping Notices (ASN)";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-shipping-fast"></i> Advanced Shipping Notices</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New ASN
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ASN Number</th>
+                            <th>PO Number</th>
+                            <th>Expected Arrival</th>
+                            <th>Tracking Number</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td><strong>@item.ASN_Number</strong></td>
+                                <td>@item.PO_Number</td>
+                                <td>@item.ExpectedArrivalDate.ToShortDateString()</td>
+                                <td>@item.TrackingNumber</td>
+                                <td>
+                                    @if (item.Status == WMS.DAL.AdvancedShippingNoticeStatus.Sent)
+                                    {
+                                        <span class="badge bg-info">Sent</span>
+                                    }
+                                    else if (item.Status == WMS.DAL.AdvancedShippingNoticeStatus.Received)
+                                    {
+                                        <span class="badge bg-success">Received</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Closed</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

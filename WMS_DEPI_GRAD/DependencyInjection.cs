@@ -24,7 +24,10 @@ public static class DependencyInjection
             .AddScoped<IAisleService, AisleService>()
             .AddScoped<IRackService, RackService>()
             .AddScoped<IBinService, BinService>()
-            .AddScoped<IBinTypeService, BinTypeService>();
+            .AddScoped<IBinTypeService, BinTypeService>()
+            .AddScoped<IPurchaseOrderService, PurchaseOrderService>()
+            .AddScoped<IASNService, ASNService>()
+            .AddScoped<IReceiptService, ReceiptService>();
 
 
         return services;

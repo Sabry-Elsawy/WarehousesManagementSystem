@@ -4,7 +4,10 @@ namespace WMS.DAL;
 
 public class PurchaseOrderItem : BaseAuditableEntity<int>
 {
-    public int Qty { get; set; }
+    public int QtyOrdered { get; set; }
+    public decimal UnitPrice { get; set; }
+    public int QtyReceived { get; set; }
+    public string LineStatus { get; set; } = "Open";
     public string SKU { get; set; } = null!;
 
 
