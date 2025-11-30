@@ -221,11 +221,18 @@ public class PurchaseOrderController : Controller
 
     [HttpPost]
     //[Authorize(Roles = "Procurement,Admin")]
-    public async Task<IActionResult> AddItem(int poId, PurchaseOrderItem item)
+    public async Task<IActionResult> AddItem([FromBody] ViewModels.AddPurchaseOrderItemRequest request)
     {
         try
         {
-            await _poService.AddItemAsync(poId, item);
+            var item = new PurchaseOrderItem
+            {
+                ProductId = request.Item.ProductId,
+                QtyOrdered = request.Item.QtyOrdered,
+                UnitPrice = request.Item.UnitPrice
+            };
+
+            await _poService.AddItemAsync(request.PoId, item);
             return Json(new { success = true, message = "Item added successfully" });
         }
         catch (Exception ex)

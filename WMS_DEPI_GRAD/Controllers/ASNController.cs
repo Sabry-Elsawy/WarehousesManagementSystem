@@ -217,11 +217,18 @@ public class ASNController : Controller
 
     [HttpPost]
     //[Authorize(Roles = "Procurement,Admin")]
-    public async Task<IActionResult> AddItem(int asnId, AdvancedShippingNoticeItem item)
+    public async Task<IActionResult> AddItem([FromBody] ViewModels.AddASNItemRequest request)
     {
         try
         {
-            await _asnService.AddItemAsync(asnId, item);
+            var item = new AdvancedShippingNoticeItem
+            {
+                ProductId = request.Item.ProductId,
+                QtyShipped = request.Item.QtyShipped,
+                LinkedPOItemId = request.Item.LinkedPOItemId
+            };
+
+            await _asnService.AddItemAsync(request.AsnId, item);
             return Json(new { success = true, message = "Item added successfully" });
         }
         catch (Exception ex)
