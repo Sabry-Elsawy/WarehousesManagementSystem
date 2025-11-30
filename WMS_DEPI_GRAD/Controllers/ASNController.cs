@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WMS.BLL.Interfaces;
+using WMS.BLL.Services;
 using WMS.DAL;
 using WMS.DAL.UnitOfWork;
 
@@ -13,12 +14,14 @@ public class ASNController : Controller
     private readonly IASNService _asnService;
     private readonly IPurchaseOrderService _poService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IProductService _productService;
 
-    public ASNController(IASNService asnService, IPurchaseOrderService poService, IUnitOfWork unitOfWork)
+    public ASNController(IASNService asnService, IPurchaseOrderService poService, IUnitOfWork unitOfWork, IProductService productService)
     {
         _asnService = asnService;
         _poService = poService;
         _unitOfWork = unitOfWork;
+        _productService = productService;
     }
 
     public async Task<IActionResult> Index()
@@ -40,6 +43,47 @@ public class ASNController : Controller
         return View(viewModels);
     }
 
+    //public async Task<IActionResult> Details(int id)
+    //{
+    //    var asn = await _asnService.GetByIdAsync(id);
+    //    if (asn == null)
+    //        return NotFound();
+
+    //    var viewModel = new ASNViewModel
+    //    {
+    //        Id = asn.Id,
+    //        ASN_Number = asn.ASN_Number,
+    //        PurchaseOrderId = asn.PurchaseOrderId,
+    //        PO_Number = asn.PurchaseOrder?.PO_Number ?? "",
+    //        ExpectedArrivalDate = asn.ExpectedArrivalDate,
+    //        TrackingNumber = asn.TrackingNumber,
+    //        Status = asn.Status,
+    //        CreatedOn = asn.CreatedOn,
+    //        CreatedBy = asn.CreatedBy,
+    //        Items = asn.ASNItems.Select(i => new ASNItemViewModel
+    //        {
+    //            Id = i.Id,
+    //            ProductId = i.ProductId,
+    //            ProductName = i.Product?.Name ?? "",
+    //            SKU = i.Product?.Code ?? "",
+    //            QtyShipped = i.QtyShipped,
+    //            QtyOrdered = i.LinkedPOItemId.HasValue ? asn.PurchaseOrder?.POItems.FirstOrDefault(p => p.Id == i.LinkedPOItemId)?.QtyOrdered : null,
+    //            LinkedPOItemId = i.LinkedPOItemId
+    //        }).ToList(),
+    //        POItems = asn.PurchaseOrder?.POItems.Select(p => new PurchaseOrderItemViewModel
+    //        {
+    //            Id = p.Id,
+    //            ProductId = p.ProductId,
+    //            ProductName = p.Product?.Name ?? "",
+    //            QtyOrdered = p.QtyOrdered,
+    //            QtyReceived = p.QtyReceived
+    //        }).ToList() ?? new List<PurchaseOrderItemViewModel>()
+    //    };
+
+    //    return View(viewModel);
+    //}
+
+
     public async Task<IActionResult> Details(int id)
     {
         var asn = await _asnService.GetByIdAsync(id);
@@ -57,6 +101,7 @@ public class ASNController : Controller
             Status = asn.Status,
             CreatedOn = asn.CreatedOn,
             CreatedBy = asn.CreatedBy,
+
             Items = asn.ASNItems.Select(i => new ASNItemViewModel
             {
                 Id = i.Id,
@@ -64,9 +109,12 @@ public class ASNController : Controller
                 ProductName = i.Product?.Name ?? "",
                 SKU = i.Product?.Code ?? "",
                 QtyShipped = i.QtyShipped,
-                QtyOrdered = i.LinkedPOItemId.HasValue ? asn.PurchaseOrder?.POItems.FirstOrDefault(p => p.Id == i.LinkedPOItemId)?.QtyOrdered : null,
+                QtyOrdered = i.LinkedPOItemId.HasValue
+                    ? asn.PurchaseOrder?.POItems.FirstOrDefault(p => p.Id == i.LinkedPOItemId)?.QtyOrdered
+                    : null,
                 LinkedPOItemId = i.LinkedPOItemId
             }).ToList(),
+
             POItems = asn.PurchaseOrder?.POItems.Select(p => new PurchaseOrderItemViewModel
             {
                 Id = p.Id,
@@ -77,8 +125,19 @@ public class ASNController : Controller
             }).ToList() ?? new List<PurchaseOrderItemViewModel>()
         };
 
+        var products = await _productService.GetAllAsync();
+
+        ViewBag.Products = products
+            .Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = $"{p.Code} - {p.Name}"
+            })
+            .ToList();
+
         return View(viewModel);
     }
+
 
     //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Create(int? poId)
