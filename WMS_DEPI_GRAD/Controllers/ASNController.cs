@@ -24,7 +24,20 @@ public class ASNController : Controller
     public async Task<IActionResult> Index()
     {
         var asns = await _asnService.GetAllAsync();
-        return View(asns);
+        var viewModels = asns.Select(asn => new ASNViewModel
+        {
+            Id = asn.Id,
+            ASN_Number = asn.ASN_Number,
+            PurchaseOrderId = asn.PurchaseOrderId,
+            PO_Number = asn.PurchaseOrder?.PO_Number ?? "",
+            ExpectedArrivalDate = asn.ExpectedArrivalDate,
+            TrackingNumber = asn.TrackingNumber,
+            Status = asn.Status,
+            CreatedOn = asn.CreatedOn,
+            CreatedBy = asn.CreatedBy
+        }).ToList();
+
+        return View(viewModels);
     }
 
     public async Task<IActionResult> Details(int id)
@@ -33,7 +46,38 @@ public class ASNController : Controller
         if (asn == null)
             return NotFound();
 
-        return View(asn);
+        var viewModel = new ASNViewModel
+        {
+            Id = asn.Id,
+            ASN_Number = asn.ASN_Number,
+            PurchaseOrderId = asn.PurchaseOrderId,
+            PO_Number = asn.PurchaseOrder?.PO_Number ?? "",
+            ExpectedArrivalDate = asn.ExpectedArrivalDate,
+            TrackingNumber = asn.TrackingNumber,
+            Status = asn.Status,
+            CreatedOn = asn.CreatedOn,
+            CreatedBy = asn.CreatedBy,
+            Items = asn.ASNItems.Select(i => new ASNItemViewModel
+            {
+                Id = i.Id,
+                ProductId = i.ProductId,
+                ProductName = i.Product?.Name ?? "",
+                SKU = i.Product?.Code ?? "",
+                QtyShipped = i.QtyShipped,
+                QtyOrdered = i.LinkedPOItemId.HasValue ? asn.PurchaseOrder?.POItems.FirstOrDefault(p => p.Id == i.LinkedPOItemId)?.QtyOrdered : null,
+                LinkedPOItemId = i.LinkedPOItemId
+            }).ToList(),
+            POItems = asn.PurchaseOrder?.POItems.Select(p => new PurchaseOrderItemViewModel
+            {
+                Id = p.Id,
+                ProductId = p.ProductId,
+                ProductName = p.Product?.Name ?? "",
+                QtyOrdered = p.QtyOrdered,
+                QtyReceived = p.QtyReceived
+            }).ToList() ?? new List<PurchaseOrderItemViewModel>()
+        };
+
+        return View(viewModel);
     }
 
     //[Authorize(Roles = "Procurement,Admin")]
@@ -41,22 +85,32 @@ public class ASNController : Controller
     {
         await LoadLookups();
         
+        var viewModel = new CreateASNViewModel();
         if (poId.HasValue)
-            ViewBag.SelectedPOId = poId.Value;
+            viewModel.PurchaseOrderId = poId.Value;
 
-        return View();
+        return View(viewModel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     //[Authorize(Roles = "Procurement,Admin")]
-    public async Task<IActionResult> Create(int purchaseOrderId, AdvancedShippingNotice asn)
+    public async Task<IActionResult> Create(CreateASNViewModel viewModel)
     {
         if (ModelState.IsValid)
         {
             try
             {
-                await _asnService.CreateFromPOAsync(purchaseOrderId, asn);
+                var asn = new AdvancedShippingNotice
+                {
+                    ASN_Number = viewModel.ASN_Number,
+                    PurchaseOrderId = viewModel.PurchaseOrderId,
+                    TrackingNumber = viewModel.TrackingNumber,
+                    ExpectedArrivalDate = viewModel.ExpectedArrivalDate,
+                    Status = AdvancedShippingNoticeStatus.Sent
+                };
+
+                await _asnService.CreateFromPOAsync(viewModel.PurchaseOrderId, asn);
                 TempData["Success"] = "ASN created successfully!";
                 return RedirectToAction(nameof(Index));
             }
@@ -67,7 +121,7 @@ public class ASNController : Controller
         }
 
         await LoadLookups();
-        return View(asn);
+        return View(viewModel);
     }
 
     public async Task<IActionResult> Edit(int id)
@@ -76,22 +130,43 @@ public class ASNController : Controller
         if (asn == null)
             return NotFound();
 
+        var viewModel = new ASNViewModel
+        {
+            Id = asn.Id,
+            ASN_Number = asn.ASN_Number,
+            PurchaseOrderId = asn.PurchaseOrderId,
+            PO_Number = asn.PurchaseOrder?.PO_Number ?? "",
+            ExpectedArrivalDate = asn.ExpectedArrivalDate,
+            TrackingNumber = asn.TrackingNumber,
+            Status = asn.Status,
+            CreatedOn = asn.CreatedOn,
+            CreatedBy = asn.CreatedBy
+        };
+
         await LoadLookups();
-        return View(asn);
+        return View(viewModel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     //[Authorize(Roles = "Procurement,Admin")]
-    public async Task<IActionResult> Edit(int id, AdvancedShippingNotice asn)
+    public async Task<IActionResult> Edit(int id, ASNViewModel viewModel)
     {
-        if (id != asn.Id)
+        if (id != viewModel.Id)
             return BadRequest();
 
         if (ModelState.IsValid)
         {
             try
             {
+                var asn = await _asnService.GetByIdAsync(id);
+                if (asn == null)
+                    return NotFound();
+
+                asn.ASN_Number = viewModel.ASN_Number;
+                asn.TrackingNumber = viewModel.TrackingNumber;
+                asn.ExpectedArrivalDate = viewModel.ExpectedArrivalDate;
+                
                 await _asnService.UpdateAsync(asn);
                 TempData["Success"] = "ASN updated successfully!";
                 return RedirectToAction(nameof(Index));
@@ -103,7 +178,7 @@ public class ASNController : Controller
         }
 
         await LoadLookups();
-        return View(asn);
+        return View(viewModel);
     }
 
     [HttpPost]

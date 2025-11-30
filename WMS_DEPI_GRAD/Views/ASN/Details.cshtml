@@ -1,4 +1,4 @@
-@model WMS.DAL.AdvancedShippingNotice
+@model WMS_DEPI_GRAD.ViewModels.ASNViewModel
 
 @{
     ViewData["Title"] = "ASN Details";
@@ -61,7 +61,7 @@
                             <th>Purchase Order:</th>
                             <td>
                                 <a asp-controller="PurchaseOrder" asp-action="Details" asp-route-id="@Model.PurchaseOrderId">
-                                    @Model.PurchaseOrder?.PO_Number
+                                    @Model.PO_Number
                                 </a>
                             </td>
                         </tr>
@@ -139,16 +139,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.ASNItems)
+                        @foreach (var item in Model.Items)
                         {
                             <tr>
                                 <td>@item.SKU</td>
-                                <td>@item.Product?.Name</td>
+                                <td>@item.ProductName</td>
                                 <td>@item.QtyShipped</td>
                                 <td>
                                     @if (item.LinkedPOItemId.HasValue)
                                     {
-                                        var poItem = Model.PurchaseOrder?.POItems.FirstOrDefault(p => p.Id == item.LinkedPOItemId.Value);
+                                        var poItem = Model.POItems.FirstOrDefault(p => p.Id == item.LinkedPOItemId.Value);
                                         @(poItem?.QtyOrdered ?? 0)
                                     }
                                     else
@@ -210,9 +210,9 @@
                         <label for="linkedPOItemId" class="form-label">Link to PO Item (Optional)</label>
                         <select id="linkedPOItemId" class="form-select">
                             <option value="">-- Not Linked --</option>
-                            @foreach (var poItem in Model.PurchaseOrder?.POItems ?? Enumerable.Empty<WMS.DAL.PurchaseOrderItem>())
+                            @foreach (var poItem in Model.POItems)
                             {
-                                <option value="@poItem.Id">@poItem.Product?.Name (@poItem.QtyOrdered units)</option>
+                                <option value="@poItem.Id">@poItem.ProductName (@poItem.QtyOrdered units)</option>
                             }
                         </select>
                     </div>

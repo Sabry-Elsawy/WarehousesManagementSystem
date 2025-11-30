@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WMS.DAL.Receipt>
+﻿@model IEnumerable<WMS_DEPI_GRAD.ViewModels.ReceiptViewModel>
 
 @{
     ViewData["Title"] = "Receipts";
@@ -45,14 +45,14 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            var processedItems = item.ReceiptItems.Count(i => i.QtyReceived > 0);
-                            var totalItems = item.ReceiptItems.Count;
-                            var hasDiscrepancies = item.ReceiptItems.Any(i => i.DiscrepancyType != WMS.DAL.DiscrepancyType.None);
+                            var processedItems = item.ProcessedItems;
+                            var totalItems = item.TotalItems;
+                            var hasDiscrepancies = item.ItemsWithDiscrepancy > 0;
                             
                             <tr>
                                 <td><strong>@item.ReceiptNumber</strong></td>
-                                <td>@item.AdvancedShippingNotice?.ASN_Number</td>
-                                <td>@item.Warehouse?.Name</td>
+                                <td>@item.ASN_Number</td>
+                                <td>@item.WarehouseName</td>
                                 <td>@item.ReceivedDate.ToShortDateString()</td>
                                 <td>
                                     @if (item.Status == WMS.DAL.ReceiptStatus.Open)

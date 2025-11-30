@@ -1,4 +1,4 @@
-@model WMS.DAL.Receipt
+@model WMS_DEPI_GRAD.ViewModels.ReceiptViewModel
 
 @{
     ViewData["Title"] = "Scan Receipt Items";
@@ -44,9 +44,9 @@
                 </div>
                 <div class="card-body">
                     @{
-                        var totalItems = Model.ReceiptItems.Count;
-                        var processedItems = Model.ReceiptItems.Count(i => i.QtyReceived > 0);
-                        var itemsWithDiscrepancy = Model.ReceiptItems.Count(i => i.DiscrepancyType != WMS.DAL.DiscrepancyType.None);
+                        var totalItems = Model.TotalItems;
+                        var processedItems = Model.ProcessedItems;
+                        var itemsWithDiscrepancy = Model.ItemsWithDiscrepancy;
                         var progressPercent = totalItems > 0 ? (processedItems * 100 / totalItems) : 0;
                     }
                     <table class="table table-borderless mb-0">
@@ -93,11 +93,11 @@
                                 </tr>
                             </thead>
                             <tbody id="itemsTable">
-                                @foreach (var item in Model.ReceiptItems)
+                                @foreach (var item in Model.Items)
                                 {
                                     <tr data-sku="@item.SKU" class="@(item.DiscrepancyType != WMS.DAL.DiscrepancyType.None ? "table-danger" : "")">
                                         <td><strong>@item.SKU</strong></td>
-                                        <td>@item.Product?.Name</td>
+                                        <td>@item.ProductName</td>
                                         <td>@item.QtyExpected</td>
                                         <td class="qty-received">
                                             <strong>@item.QtyReceived</strong>

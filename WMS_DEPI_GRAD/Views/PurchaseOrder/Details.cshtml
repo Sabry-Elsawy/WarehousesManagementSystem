@@ -1,4 +1,4 @@
-@model WMS.DAL.PurchaseOrder
+@model WMS_DEPI_GRAD.ViewModels.PurchaseOrderViewModel
 
 @{
     ViewData["Title"] = "Purchase Order Details";
@@ -62,11 +62,11 @@
                         </tr>
                         <tr>
                             <th>Vendor:</th>
-                            <td>@Model.Vendor?.Name</td>
+                            <td>@Model.VendorName</td>
                         </tr>
                         <tr>
                             <th>Warehouse:</th>
-                            <td>@Model.Warehouse?.Name</td>
+                            <td>@Model.WarehouseName</td>
                         </tr>
                         <tr>
                             <th>Order Date:</th>
@@ -155,11 +155,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.POItems)
+                        @foreach (var item in Model.Items)
                         {
                             <tr>
                                 <td>@item.SKU</td>
-                                <td>@item.Product?.Name</td>
+                                <td>@item.ProductName</td>
                                 <td>@item.QtyOrdered</td>
                                 <td>@item.UnitPrice.ToString("C")</td>
                                 <td>@item.QtyReceived</td>
@@ -184,7 +184,7 @@
                     <tfoot>
                         <tr>
                             <th colspan="5" class="text-end">Total:</th>
-                            <th>@Model.POItems.Sum(i => i.QtyOrdered * i.UnitPrice).ToString("C")</th>
+                            <th>@Model.Items.Sum(i => i.QtyOrdered * i.UnitPrice).ToString("C")</th>
                             <th></th>
                         </tr>
                     </tfoot>

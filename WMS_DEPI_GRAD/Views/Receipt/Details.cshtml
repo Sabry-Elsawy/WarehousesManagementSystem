@@ -1,4 +1,4 @@
-@model WMS.DAL.Receipt
+@model WMS_DEPI_GRAD.ViewModels.ReceiptViewModel
 
 @{
     ViewData["Title"] = "Receipt Details";
@@ -54,13 +54,13 @@
                             <th>ASN:</th>
                             <td>
                                 <a asp-controller="ASN" asp-action="Details" asp-route-id="@Model.AdvancedShippingNoticeId">
-                                    @Model.AdvancedShippingNotice?.ASN_Number
+                                    @Model.ASN_Number
                                 </a>
                             </td>
                         </tr>
                         <tr>
                             <th>Warehouse:</th>
-                            <td>@Model.Warehouse?.Name</td>
+                            <td>@Model.WarehouseName</td>
                         </tr>
                         <tr>
                             <th>Received Date:</th>
@@ -91,9 +91,9 @@
                 </div>
                 <div class="card-body">
                     @{
-                        var totalItems = Model.ReceiptItems.Count;
-                        var processedItems =Model.ReceiptItems.Count(i => i.QtyReceived > 0);
-                        var itemsWithDiscrepancy = Model.ReceiptItems.Count(i => i.DiscrepancyType != WMS.DAL.DiscrepancyType.None);
+                        var totalItems = Model.TotalItems;
+                        var processedItems = Model.ProcessedItems;
+                        var itemsWithDiscrepancy = Model.ItemsWithDiscrepancy;
                     }
                     <table class="table table-borderless">
                         <tr>
@@ -145,13 +145,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.ReceiptItems)
+                        @foreach (var item in Model.Items)
                         {
-                            var variance = item.QtyReceived - item.QtyExpected;
+                            var variance = item.Variance;
                             
                             <tr class="@(item.DiscrepancyType != WMS.DAL.DiscrepancyType.None ? "table-danger" : "")">
                                 <td>@item.SKU</td>
-                                <td>@item.Product?.Name</td>
+                                <td>@item.ProductName</td>
                                 <td>@item.QtyExpected</td>
                                 <td>
                                     <strong>@item.QtyReceived</strong>

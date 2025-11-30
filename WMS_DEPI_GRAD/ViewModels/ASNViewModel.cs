@@ -28,6 +28,8 @@ public class ASNViewModel
 
     public DateTime CreatedOn { get; set; }
     public string? CreatedBy { get; set; }
+
+    public List<PurchaseOrderItemViewModel> POItems { get; set; } = new();
 }
 
 public class ASNItemViewModel

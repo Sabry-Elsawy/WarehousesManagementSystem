@@ -24,7 +24,34 @@ public class ReceiptController : Controller
     public async Task<IActionResult> Index()
     {
         var receipts = await _receiptService.GetAllAsync();
-        return View(receipts);
+        var viewModels = receipts.Select(r => new ReceiptViewModel
+        {
+            Id = r.Id,
+            ReceiptNumber = r.ReceiptNumber,
+            AdvancedShippingNoticeId = r.AdvancedShippingNoticeId,
+            ASN_Number = r.AdvancedShippingNotice?.ASN_Number ?? "",
+            WarehouseId = r.WarehouseId,
+            WarehouseName = r.Warehouse?.Name ?? "",
+            ReceivedDate = r.ReceivedDate,
+            Status = r.Status,
+            CreatedOn = r.CreatedOn,
+            CreatedBy = r.CreatedBy,
+            Items = r.ReceiptItems.Select(i => new ReceiptItemViewModel
+            {
+                Id = i.Id,
+                ReceiptId = i.ReceiptId,
+                ASNItemId = i.ASNItemId,
+                ProductId = i.ProductId,
+                ProductName = i.Product?.Name ?? "",
+                SKU = i.Product?.Code ?? "",
+                QtyExpected = i.QtyExpected,
+                QtyReceived = i.QtyReceived,
+                DiscrepancyType = i.DiscrepancyType,
+                Notes = i.Notes
+            }).ToList()
+        }).ToList();
+
+        return View(viewModels);
     }
 
     public async Task<IActionResult> Details(int id)
@@ -33,7 +60,34 @@ public class ReceiptController : Controller
         if (receipt == null)
             return NotFound();
 
-        return View(receipt);
+        var viewModel = new ReceiptViewModel
+        {
+            Id = receipt.Id,
+            ReceiptNumber = receipt.ReceiptNumber,
+            AdvancedShippingNoticeId = receipt.AdvancedShippingNoticeId,
+            ASN_Number = receipt.AdvancedShippingNotice?.ASN_Number ?? "",
+            WarehouseId = receipt.WarehouseId,
+            WarehouseName = receipt.Warehouse?.Name ?? "",
+            ReceivedDate = receipt.ReceivedDate,
+            Status = receipt.Status,
+            CreatedOn = receipt.CreatedOn,
+            CreatedBy = receipt.CreatedBy,
+            Items = receipt.ReceiptItems.Select(i => new ReceiptItemViewModel
+            {
+                Id = i.Id,
+                ReceiptId = i.ReceiptId,
+                ASNItemId = i.ASNItemId,
+                ProductId = i.ProductId,
+                ProductName = i.Product?.Name ?? "",
+                SKU = i.Product?.Code ?? "",
+                QtyExpected = i.QtyExpected,
+                QtyReceived = i.QtyReceived,
+                DiscrepancyType = i.DiscrepancyType,
+                Notes = i.Notes
+            }).ToList()
+        };
+
+        return View(viewModel);
     }
 
     //[Authorize(Roles = "Warehouse,Admin")]
@@ -41,29 +95,34 @@ public class ReceiptController : Controller
     {
         await LoadLookups();
         
+        var viewModel = new CreateReceiptViewModel();
         if (asnId.HasValue)
-            ViewBag.SelectedASNId = asnId.Value;
+            viewModel.ASNId = asnId.Value;
 
-        return View();
+        return View(viewModel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     //[Authorize(Roles = "Warehouse,Admin")]
-    public async Task<IActionResult> Create(int asnId, int warehouseId)
+    public async Task<IActionResult> Create(CreateReceiptViewModel viewModel)
     {
-        try
+        if (ModelState.IsValid)
         {
-            var receipt = await _receiptService.CreateFromASNAsync(asnId, warehouseId);
-            TempData["Success"] = "Receipt created successfully!";
-            return RedirectToAction(nameof(Details), new { id = receipt.Id });
+            try
+            {
+                var receipt = await _receiptService.CreateFromASNAsync(viewModel.ASNId, viewModel.WarehouseId);
+                TempData["Success"] = "Receipt created successfully!";
+                return RedirectToAction(nameof(Details), new { id = receipt.Id });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
         }
-        catch (Exception ex)
-        {
-            TempData["Error"] = ex.Message;
-            await LoadLookups();
-            return View();
-        }
+
+        await LoadLookups();
+        return View(viewModel);
     }
 
     //[Authorize(Roles = "Warehouse,Admin")]
@@ -73,7 +132,34 @@ public class ReceiptController : Controller
         if (receipt == null)
             return NotFound();
 
-        return View(receipt);
+        var viewModel = new ReceiptViewModel
+        {
+            Id = receipt.Id,
+            ReceiptNumber = receipt.ReceiptNumber,
+            AdvancedShippingNoticeId = receipt.AdvancedShippingNoticeId,
+            ASN_Number = receipt.AdvancedShippingNotice?.ASN_Number ?? "",
+            WarehouseId = receipt.WarehouseId,
+            WarehouseName = receipt.Warehouse?.Name ?? "",
+            ReceivedDate = receipt.ReceivedDate,
+            Status = receipt.Status,
+            CreatedOn = receipt.CreatedOn,
+            CreatedBy = receipt.CreatedBy,
+            Items = receipt.ReceiptItems.Select(i => new ReceiptItemViewModel
+            {
+                Id = i.Id,
+                ReceiptId = i.ReceiptId,
+                ASNItemId = i.ASNItemId,
+                ProductId = i.ProductId,
+                ProductName = i.Product?.Name ?? "",
+                SKU = i.Product?.Code ?? "",
+                QtyExpected = i.QtyExpected,
+                QtyReceived = i.QtyReceived,
+                DiscrepancyType = i.DiscrepancyType,
+                Notes = i.Notes
+            }).ToList()
+        };
+
+        return View(viewModel);
     }
 
     [HttpPost]

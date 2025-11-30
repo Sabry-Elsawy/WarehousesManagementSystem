@@ -1,4 +1,4 @@
-@model IEnumerable<WMS.DAL.AdvancedShippingNotice>
+@model IEnumerable<WMS_DEPI_GRAD.ViewModels.ASNViewModel>
 
 @{
     ViewData["Title"] = "Advanced Shipping Notices (ASN)";
@@ -46,7 +46,7 @@
                         {
                             <tr>
                                 <td><strong>@item.ASN_Number</strong></td>
-                                <td>@item.PurchaseOrder?.PO_Number</td>
+                                <td>@item.PO_Number</td>
                                 <td>@item.ExpectedArrivalDate.ToShortDateString()</td>
                                 <td>@item.TrackingNumber</td>
                                 <td>
