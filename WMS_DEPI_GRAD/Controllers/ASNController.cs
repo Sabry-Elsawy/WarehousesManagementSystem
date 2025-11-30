@@ -7,7 +7,7 @@ using WMS.DAL.UnitOfWork;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-[Authorize]
+//[Authorize]
 public class ASNController : Controller
 {
     private readonly IASNService _asnService;
@@ -36,7 +36,7 @@ public class ASNController : Controller
         return View(asn);
     }
 
-    [Authorize(Roles = "Procurement,Admin")]
+    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Create(int? poId)
     {
         await LoadLookups();
@@ -49,7 +49,7 @@ public class ASNController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Procurement,Admin")]
+    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Create(int purchaseOrderId, AdvancedShippingNotice asn)
     {
         if (ModelState.IsValid)
@@ -82,7 +82,7 @@ public class ASNController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Procurement,Admin")]
+    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Edit(int id, AdvancedShippingNotice asn)
     {
         if (id != asn.Id)
@@ -107,7 +107,7 @@ public class ASNController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Warehouse,Admin")]
+    //[Authorize(Roles = "Warehouse,Admin")]
     public async Task<IActionResult> MarkReceived(int id)
     {
         try
@@ -124,7 +124,7 @@ public class ASNController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Warehouse,Admin")]
+    //[Authorize(Roles = "Warehouse,Admin")]
     public async Task<IActionResult> Close(int id)
     {
         try
@@ -141,7 +141,7 @@ public class ASNController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Procurement,Admin")]
+    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> AddItem(int asnId, AdvancedShippingNoticeItem item)
     {
         try

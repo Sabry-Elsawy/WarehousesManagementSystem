@@ -7,7 +7,7 @@ using WMS.DAL.UnitOfWork;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-[Authorize]
+//[Authorize]
 public class PurchaseOrderController : Controller
 {
     private readonly IPurchaseOrderService _poService;
@@ -42,7 +42,7 @@ public class PurchaseOrderController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Procurement,Admin")]
+    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Create(PurchaseOrder purchaseOrder)
     {
         if (ModelState.IsValid)
@@ -75,7 +75,7 @@ public class PurchaseOrderController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Procurement,Admin")]
+    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Edit(int id, PurchaseOrder purchaseOrder)
     {
         if (id != purchaseOrder.Id)
@@ -100,7 +100,7 @@ public class PurchaseOrderController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Procurement,Admin")]
+    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Approve(int id)
     {
         try
@@ -117,7 +117,7 @@ public class PurchaseOrderController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Procurement,Admin")]
+    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Close(int id)
     {
         try
@@ -134,7 +134,7 @@ public class PurchaseOrderController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Procurement,Admin")]
+    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> AddItem(int poId, PurchaseOrderItem item)
     {
         try

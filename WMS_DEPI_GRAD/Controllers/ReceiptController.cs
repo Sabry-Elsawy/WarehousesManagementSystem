@@ -7,7 +7,7 @@ using WMS.DAL.UnitOfWork;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-[Authorize]
+//[Authorize]
 public class ReceiptController : Controller
 {
     private readonly IReceiptService _receiptService;
@@ -36,7 +36,7 @@ public class ReceiptController : Controller
         return View(receipt);
     }
 
-    [Authorize(Roles = "Warehouse,Admin")]
+    //[Authorize(Roles = "Warehouse,Admin")]
     public async Task<IActionResult> Create(int? asnId)
     {
         await LoadLookups();
@@ -49,7 +49,7 @@ public class ReceiptController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Warehouse,Admin")]
+    //[Authorize(Roles = "Warehouse,Admin")]
     public async Task<IActionResult> Create(int asnId, int warehouseId)
     {
         try
@@ -66,7 +66,7 @@ public class ReceiptController : Controller
         }
     }
 
-    [Authorize(Roles = "Warehouse,Admin")]
+    //[Authorize(Roles = "Warehouse,Admin")]
     public async Task<IActionResult> Scan(int id)
     {
         var receipt = await _receiptService.GetByIdAsync(id);
@@ -106,7 +106,7 @@ public class ReceiptController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Warehouse,Admin")]
+    //[Authorize(Roles = "Warehouse,Admin")]
     public async Task<IActionResult> Close(int id)
     {
         try
@@ -123,7 +123,7 @@ public class ReceiptController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Warehouse,Admin")]
+    //[Authorize(Roles = "Warehouse,Admin")]
     public async Task<IActionResult> HandleDiscrepancy(int receiptItemId, string notes)
     {
         try
