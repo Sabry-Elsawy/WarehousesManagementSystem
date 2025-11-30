@@ -7,6 +7,12 @@ namespace WMS.DAL.Contract
 		where TKey : IEquatable<TKey>
 	{
 		Task<IReadOnlyList<TEntity>> GetAllAsync(bool WithTracking = false);
+        Task<(IReadOnlyList<TEntity> Items, int TotalCount)> GetPagedListAsync(
+            int pageNumber, 
+            int pageSize, 
+            System.Linq.Expressions.Expression<Func<TEntity, bool>>? filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+            string includeProperties = "");
 		Task<TEntity?> GetByIdAsync(TKey id);
 
 		Task AddAsync(TEntity entity);

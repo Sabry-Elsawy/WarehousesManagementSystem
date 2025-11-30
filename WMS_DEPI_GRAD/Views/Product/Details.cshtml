@@ -1,0 +1,87 @@
+@model WMS_DEPI_GRAD.ViewModels.ProductViewModel
+
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-box"></i> Product Details</h2>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5>@Model.Name</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th>Product Code:</th>
+                            <td>@Model.Code</td>
+                        </tr>
+                        <tr>
+                            <th>Name:</th>
+                            <td>@Model.Name</td>
+                        </tr>
+                        <tr>
+                            <th>Description:</th>
+                            <td>@Model.Description</td>
+                        </tr>
+                        <tr>
+                            <th>Unit of Measure:</th>
+                            <td>@Model.UnitOfMeasure</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th>Weight:</th>
+                            <td>@Model.Weight kg</td>
+                        </tr>
+                        <tr>
+                            <th>Volume:</th>
+                            <td>@Model.Volume m³</td>
+                        </tr>
+                        <tr>
+                            <th>Barcode:</th>
+                            <td>@Model.Barcode</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Created On:</strong> @Model.CreatedOn.ToShortDateString()</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Created By:</strong> @Model.CreatedBy</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
