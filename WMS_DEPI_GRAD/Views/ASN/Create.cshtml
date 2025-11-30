@@ -1,0 +1,69 @@
+@model WMS_DEPI_GRAD.ViewModels.CreateASNViewModel
+
+@{
+    ViewData["Title"] = "Create ASN";
+    var poId = ViewBag.SelectedPOId as int?;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-shipping-fast"></i> Create Advanced Shipping Notice</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" name="purchaseOrderId" value="@poId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="PurchaseOrderId" class="form-label"></label>
+                            <select asp-for="PurchaseOrderId" class="form-select" asp-items="ViewBag.PurchaseOrders">
+                                <option value="">-- Select Purchase Order --</option>
+                            </select>
+                            <span asp-validation-for="PurchaseOrderId" class="text-danger"></span>
+                            <small class="form-text text-muted">Only Approved Purchase Orders are shown</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ASN_Number" class="form-label"></label>
+                            <input asp-for="ASN_Number" class="form-control" />
+                            <span asp-validation-for="ASN_Number" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TrackingNumber" class="form-label"></label>
+                            <input asp-for="TrackingNumber" class="form-control" />
+                            <span asp-validation-for="TrackingNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ExpectedArrivalDate" class="form-label"></label>
+                            <input asp-for="ExpectedArrivalDate" class="form-control" type="date" />
+                            <span asp-validation-for="ExpectedArrivalDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Note:</strong> After creating the ASN, you can add items from the PO.
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Create ASN
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

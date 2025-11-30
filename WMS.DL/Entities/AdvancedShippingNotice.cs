@@ -4,8 +4,9 @@ namespace WMS.DAL;
 
 public class AdvancedShippingNotice : BaseAuditableEntity<int>
 {
+    public string ASN_Number { get; set; } = null!;
     public DateTime ExpectedArrivalDate { get; set; }
-    public string SKU { get; set; } = null!;
+    public string TrackingNumber { get; set; } = null!;
     public AdvancedShippingNoticeStatus Status { get; set; }
 
 

@@ -1,0 +1,272 @@
+@model WMS.DAL.PurchaseOrder
+
+@{
+    ViewData["Title"] = "Purchase Order Details";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-file-invoice"></i> PO: @Model.PO_Number</h2>
+        <div>
+            @if (Model.Status == WMS.DAL.PurchaseOrderStatus.Open)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <form asp-action="Approve" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                </form>
+            }
+            @if (Model.Status == WMS.DAL.PurchaseOrderStatus.Approved)
+            {
+                <a asp-controller="ASN" asp-action="Create" asp-route-poId="@Model.Id" class="btn btn-info">
+                    <i class="fas fa-shipping-fast"></i> Create ASN
+                </a>
+                <form asp-action="Close" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-lock"></i> Close PO
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5>PO Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th>PO Number:</th>
+                            <td>@Model.PO_Number</td>
+                        </tr>
+                        <tr>
+                            <th>Vendor:</th>
+                            <td>@Model.Vendor?.Name</td>
+                        </tr>
+                        <tr>
+                            <th>Warehouse:</th>
+                            <td>@Model.Warehouse?.Name</td>
+                        </tr>
+                        <tr>
+                            <th>Order Date:</th>
+                            <td>@Model.OrderDate.ToShortDateString()</td>
+                        </tr>
+                        <tr>
+                            <th>Expected Arrival:</th>
+                            <td>@Model.ExpectedArrivalDate.ToShortDateString()</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                @if (Model.Status == WMS.DAL.PurchaseOrderStatus.Open)
+                                {
+                                    <span class="badge bg-warning text-dark">Open</span>
+                                }
+                                else if (Model.Status == WMS.DAL.PurchaseOrderStatus.Approved)
+                                {
+                                    <span class="badge bg-success">Approved</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Closed</span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5>Audit Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th>Created On:</th>
+                            <td>@Model.CreatedOn</td>
+                        </tr>
+                        <tr>
+                            <th>Created By:</th>
+                            <td>@Model.CreatedBy</td>
+                        </tr>
+                        @if (Model.LastModifiedOn.HasValue)
+                        {
+                            <tr>
+                                <th>Last Modified:</th>
+                                <td>@Model.LastModifiedOn</td>
+                            </tr>
+                            <tr>
+                                <th>Modified By:</th>
+                                <td>@Model.LastModifiedBy</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+            <h5>PO Line Items</h5>
+            @if (Model.Status == WMS.DAL.PurchaseOrderStatus.Open)
+            {
+                <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                    <i class="fas fa-plus"></i> Add Item
+                </button>
+            }
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Product</th>
+                            <th>Qty Ordered</th>
+                            <th>Unit Price</th>
+                            <th>Qty Received</th>
+                            <th>Line Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.POItems)
+                        {
+                            <tr>
+                                <td>@item.SKU</td>
+                                <td>@item.Product?.Name</td>
+                                <td>@item.QtyOrdered</td>
+                                <td>@item.UnitPrice.ToString("C")</td>
+                                <td>@item.QtyReceived</td>
+                                <td>@((item.QtyOrdered * item.UnitPrice).ToString("C"))</td>
+                                <td>
+                                    @if (item.QtyReceived >= item.QtyOrdered)
+                                    {
+                                        <span class="badge bg-success">Complete</span>
+                                    }
+                                    else if (item.QtyReceived > 0)
+                                    {
+                                        <span class="badge bg-warning text-dark">Partial</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Pending</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="5" class="text-end">Total:</th>
+                            <th>@Model.POItems.Sum(i => i.QtyOrdered * i.UnitPrice).ToString("C")</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add PO Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addItemForm">
+                    <input type="hidden" id="poId" value="@Model.Id" />
+                    <div class="mb-3">
+                        <label for="productId" class="form-label">Product</label>
+                        <select id="productId" class="form-select">
+                            <option value="">-- Select Product --</option>
+                            @foreach (var product in ViewBag.Products as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)
+                            {
+                                <option value="@product.Value">@product.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="qtyOrdered" class="form-label">Quantity</label>
+                        <input type="number" id="qtyOrdered" class="form-control" min="1" value="1" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="unitPrice" class="form-label">Unit Price</label>
+                        <input type="number" id="unitPrice" class="form-control" min="0.01" step="0.01" value="0" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addItem()">Add Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function addItem() {
+            const data = {
+                poId: parseInt($('#poId').val()),
+                item: {
+                    productId: parseInt($('#productId').val()),
+                    qtyOrdered: parseInt($('#qtyOrdered').val()),
+                    unitPrice: parseFloat($('#unitPrice').val())
+                }
+            };
+
+            $.ajax({
+                url: '@Url.Action("AddItem")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (result) {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                },
+                error: function () {
+                    alert('Error adding item');
+                }
+            });
+        }
+    </script>
+}

@@ -9,8 +9,12 @@ internal class PurchaseOrderConfigurations : BaseAuditableEntityConfiguration<Pu
     {
         base.Configure(builder);
 
+        builder.Property(po => po.PO_Number)
+            .IsRequired()
+            .HasMaxLength(50);
+
         builder.Property(po => po.OrderDate)
-    .IsRequired();
+            .IsRequired();
         builder.Property(po => po.Status)
             .IsRequired();
 

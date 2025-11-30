@@ -5,7 +5,9 @@ namespace WMS.DAL;
 
 public class PurchaseOrder : BaseAuditableEntity<int>
 {
-    public DateTime OrderDate { get; set; } 
+    public string PO_Number { get; set; } = null!;
+    public DateTime OrderDate { get; set; }
+    public DateTime ExpectedArrivalDate { get; set; } 
 
     public PurchaseOrderStatus Status { get; set; }
 
