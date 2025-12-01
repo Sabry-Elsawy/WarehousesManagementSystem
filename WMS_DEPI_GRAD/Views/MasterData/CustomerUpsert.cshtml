@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Create Customer";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary-orange fw-bold mb-0">
+                <i class="fas fa-plus-circle me-2"></i>Create Customer
+            </h2>
+            <p class="text-muted mb-0">Add a new customer profile</p>
+        </div>
+        <a asp-action="CustomerList" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Customer Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g. CUST-001" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g. Global Retailers" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Address</label>
+                                <input type="text" class="form-control" placeholder="e.g. 123 Business Rd">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Contact Person</label>
+                                <input type="text" class="form-control" placeholder="e.g. John Doe">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Contact Email</label>
+                                <input type="email" class="form-control" placeholder="contact@example.com">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-light me-2">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-4">Save Customer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

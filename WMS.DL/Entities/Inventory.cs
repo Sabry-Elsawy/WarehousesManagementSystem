@@ -1,4 +1,5 @@
-﻿using WMS.DAL.Entities._Common;
+﻿using WMS.DAL.Entities;
+using WMS.DAL.Entities._Common;
 
 namespace WMS.DAL;
 

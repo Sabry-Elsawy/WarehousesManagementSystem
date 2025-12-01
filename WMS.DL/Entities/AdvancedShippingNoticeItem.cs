@@ -4,7 +4,8 @@ namespace WMS.DAL;
 
 public class AdvancedShippingNoticeItem : BaseAuditableEntity<int>
 {
-    public int Qty { get; set; }
+    public int QtyShipped { get; set; }
+    public int? LinkedPOItemId { get; set; }
     public string SKU { get; set; } = null!;
 
     // Navigation Properties

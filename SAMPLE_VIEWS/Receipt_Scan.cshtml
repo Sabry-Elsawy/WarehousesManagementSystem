@@ -1,0 +1,157 @@
+@model WMS.DAL.Receipt
+
+@{
+    ViewData["Title"] = "Scan Receipt Items";
+}
+
+<div class="container-fluid">
+    <h2><i class="fas fa-barcode"></i> Scan Receipt: @Model.ReceiptNumber</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5>Scan Item</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="productCode" class="form-label">Product Code / Barcode</label>
+                        <input type="text" id="productCode" class="form-control form-control-lg" 
+                               placeholder="Scan or enter SKU" autofocus />
+                    </div>
+                    <div class="mb-3">
+                        <label for="qty" class="form-label">Quantity</label>
+                        <input type="number" id="qty" class="form-control form-control-lg" 
+                               value="1" min="1" />
+                    </div>
+                    <button type="button" id="btnScan" class="btn btn-success btn-lg w-100">
+                        <i class="fas fa-check"></i> Scan Item
+                    </button>
+                </div>
+            </div>
+
+            <div id="scanResult" class="alert" style="display:none;"></div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5>Expected Items</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Product</th>
+                                <th>Expected</th>
+                                <th>Received</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTable">
+                            @foreach (var item in Model.ReceiptItems)
+                            {
+                                <tr data-sku="@item.SKU">
+                                    <td><strong>@item.SKU</strong></td>
+                                    <td>@item.Product?.Name</td>
+                                    <td>@item.QtyExpected</td>
+                                    <td class="qty-received">@item.QtyReceived</td>
+                                    <td>
+                                        @if (item.DiscrepancyType == WMS.DAL.DiscrepancyType.None)
+                                        {
+                                            <span class="badge bg-success">OK</span>
+                                        }
+                                        else if (item.DiscrepancyType == WMS.DAL.DiscrepancyType.Shortage)
+                                        {
+                                            <span class="badge bg-warning">Shortage</span>
+                                        }
+                                        else if (item.DiscrepancyType == WMS.DAL.DiscrepancyType.Overage)
+                                        {
+                                            <span class="badge bg-danger">Overage</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Receipt
+        </a>
+        <form asp-action="Close" asp-route-id="@Model.Id" method="post" class="d-inline">
+            <button type="submit" class="btn btn-primary" 
+                    onclick="return confirm('Close this receipt? All items should be processed.')">
+                <i class="fas fa-check-circle"></i> Close Receipt
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#btnScan').click(function() {
+                var receiptId = @Model.Id;
+                var productCode = $('#productCode').val();
+                var qty = parseInt($('#qty').val());
+
+                if (!productCode) {
+                    showResult('Please enter a product code', 'danger');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/receipt/scan',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        receiptId: receiptId,
+                        productCodeOrBarcode: productCode,
+                        qty: qty
+                    }),
+                    success: function(response) {
+                        if (response.success) {
+                            showResult(response.message, 'success');
+                            $('#productCode').val('').focus();
+                            $('#qty').val(1);
+                            
+                            // Refresh page to update quantities
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            showResult(response.message, 'danger');
+                        }
+                    },
+                    error: function() {
+                        showResult('Error scanning item', 'danger');
+                    }
+                });
+            });
+
+            $('#productCode').keypress(function(e) {
+                if (e.which == 13) { // Enter key
+                    $('#btnScan').click();
+                }
+            });
+
+            function showResult(message, type) {
+                $('#scanResult')
+                    .removeClass('alert-success alert-danger')
+                    .addClass('alert-' + type)
+                    .text(message)
+                    .show();
+                
+                setTimeout(function() {
+                    $('#scanResult').fadeOut();
+                }, 3000);
+            }
+        });
+    </script>
+}

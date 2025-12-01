@@ -1,0 +1,52 @@
+@{
+    ViewData["Title"] = "Create Rack";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary-orange fw-bold mb-0">
+                <i class="fas fa-plus-circle me-2"></i>Create Rack
+            </h2>
+            <p class="text-muted mb-0">Add a new rack to an aisle</p>
+        </div>
+        <a asp-action="RackList" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Zone <span class="text-danger">*</span></label>
+                                <select class="form-select" required>
+                                    <option selected disabled>Select Zone...</option>
+                                    <option>Zone A</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Aisle <span class="text-danger">*</span></label>
+                                <select class="form-select" required>
+                                    <option selected disabled>Select Aisle...</option>
+                                    <option>A-01</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Rack Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g. R-01-A" required>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-light me-2">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-4">Save Rack</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

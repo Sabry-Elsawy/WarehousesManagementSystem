@@ -1,0 +1,75 @@
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary-orange fw-bold mb-0">
+                <i class="fas fa-boxes me-2"></i>Products
+            </h2>
+            <p class="text-muted mb-0">Manage product catalog and specifications</p>
+        </div>
+        <a asp-action="ProductUpsert" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus me-2"></i>Create New
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option selected>All UOMs</option>
+                        <option>Pcs</option>
+                        <option>Kg</option>
+                        <option>Box</option>
+                    </select>
+                </div>
+                <div class="col-md-4 ms-auto">
+                    <input type="text" class="form-control" placeholder="Search products...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase text-muted small">
+                        <tr>
+                            <th class="ps-4 py-3">Code</th>
+                            <th class="py-3">Name</th>
+                            <th class="py-3">UOM</th>
+                            <th class="py-3">Weight (kg)</th>
+                            <th class="py-3">Volume (m³)</th>
+                            <th class="py-3 text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-primary-orange">@item.Code</td>
+                                <td class="fw-bold text-dark">@item.Name</td>
+                                <td><span class="badge bg-light text-dark border">@item.UOM</span></td>
+                                <td>@item.Weight</td>
+                                <td>@item.Volume</td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-light text-primary-orange"><i class="fas fa-eye"></i></button>
+                                        <a asp-action="ProductUpsert" asp-route-id="@item.Id" class="btn btn-sm btn-light text-primary-orange"><i class="fas fa-edit"></i></a>
+                                        <button class="btn btn-sm btn-light text-danger"><i class="fas fa-trash-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

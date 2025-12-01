@@ -4,7 +4,9 @@ namespace WMS.DAL;
 
 public class Receipt : BaseAuditableEntity<int>
 {
-    public DateTime RecievedDate { get; set; }
+    public string ReceiptNumber { get; set; } = null!;
+    public DateTime ReceivedDate { get; set; }
+    public ReceiptStatus Status { get; set; }
 
 
 

@@ -13,9 +13,12 @@ internal class AdvancedShippingNoticeConfigurations : BaseAuditableEntityConfigu
         builder.Property(asn => asn.ExpectedArrivalDate)
             .IsRequired();
 
-        builder.Property(asn => asn.SKU)
+        builder.Property(asn => asn.ASN_Number)
             .IsRequired()
             .HasMaxLength(50);
+
+        builder.Property(asn => asn.TrackingNumber)
+            .HasMaxLength(100);
 
         builder.Property(asn => asn.Status)
             .IsRequired();

@@ -1,0 +1,12 @@
+﻿namespace WMS_DEPI_GRAD.ViewModels.PutawayCircle;
+
+public class BinVM
+{
+    public int BinId { get; set; }
+    public string Code { get; set; }
+    public int Capacity { get; set; }
+    public int Used { get; set; }
+
+    public int Available => Capacity - Used;
+    public bool HasEnoughSpace(int requiredQty) => Available >= requiredQty;
+}

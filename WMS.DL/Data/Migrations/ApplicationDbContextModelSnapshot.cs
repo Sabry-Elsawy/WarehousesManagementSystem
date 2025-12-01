@@ -163,6 +163,11 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ASN_Number")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -181,13 +186,13 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("PurchaseOrderId")
                         .HasColumnType("int");
 
-                    b.Property<string>("SKU")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("TrackingNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -219,10 +224,13 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("LinkedPOItemId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Qty")
+                    b.Property<int>("QtyShipped")
                         .HasColumnType("int");
 
                     b.Property<string>("SKU")
@@ -233,6 +241,8 @@ namespace WMS.DAL.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AdvancedShippingNoticeId");
+
+                    b.HasIndex("LinkedPOItemId");
 
                     b.HasIndex("ProductId");
 
@@ -271,10 +281,10 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("ZoneId");
 
-                    b.ToTable("Aisles");
+                    b.ToTable("Aisles", (string)null);
                 });
 
-            modelBuilder.Entity("WMS.DAL.Bin", b =>
+            modelBuilder.Entity("WMS.DAL.Entities.Bin", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -282,10 +292,8 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BinType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("BinTypeId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
@@ -312,9 +320,44 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BinTypeId");
+
                     b.HasIndex("RackId");
 
-                    b.ToTable("Bins");
+                    b.ToTable("Bins", (string)null);
+                });
+
+            modelBuilder.Entity("WMS.DAL.Entities.BinType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BinTypes", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.Entities._Identity.Address", b =>
@@ -373,13 +416,17 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("Unknown");
 
                     b.Property<string>("LastName")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("!!");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -415,6 +462,7 @@ namespace WMS.DAL.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -481,7 +529,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Inventories");
+                    b.ToTable("Inventories", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.Picking", b =>
@@ -529,7 +577,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("SO_ItemId");
 
-                    b.ToTable("Pickings");
+                    b.ToTable("Pickings", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.Product", b =>
@@ -580,7 +628,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.PurchaseOrder", b =>
@@ -597,6 +645,9 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("ExpectedArrivalDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -605,6 +656,11 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("PO_Number")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -621,7 +677,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("POs");
+                    b.ToTable("POs", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.PurchaseOrderItem", b =>
@@ -644,13 +700,20 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("LineStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<int>("PurchaseOrderId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Qty")
+                    b.Property<int>("QtyOrdered")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QtyReceived")
                         .HasColumnType("int");
 
                     b.Property<string>("SKU")
@@ -658,13 +721,16 @@ namespace WMS.DAL.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PO_Items");
+                    b.ToTable("PO_Items", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.Putaway", b =>
@@ -738,7 +804,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("PutawayId");
 
-                    b.ToTable("Putaway_Bins");
+                    b.ToTable("Putaway_Bins", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.Rack", b =>
@@ -773,7 +839,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("AisleId");
 
-                    b.ToTable("Racks");
+                    b.ToTable("Racks", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.Receipt", b =>
@@ -799,10 +865,18 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("RecievedDate")
+                    b.Property<string>("ReceiptNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("ReceivedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("int");
@@ -825,13 +899,16 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("ASNItemId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ExpectedQty")
+                    b.Property<int>("DiscrepancyType")
                         .HasColumnType("int");
 
                     b.Property<string>("LastModifiedBy")
@@ -840,13 +917,19 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReceiptId")
+                    b.Property<int>("QtyExpected")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReceivedQty")
+                    b.Property<int>("QtyReceived")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReceiptId")
                         .HasColumnType("int");
 
                     b.Property<string>("SKU")
@@ -854,6 +937,8 @@ namespace WMS.DAL.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ASNItemId");
 
                     b.HasIndex("ProductId");
 
@@ -905,7 +990,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("SalesOrderId");
 
-                    b.ToTable("SO_Items");
+                    b.ToTable("SO_Items", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.SalesOrder", b =>
@@ -948,7 +1033,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("SalesOrders");
+                    b.ToTable("SalesOrders", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.TransferOrder", b =>
@@ -986,7 +1071,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("SourceWarehouseId");
 
-                    b.ToTable("TransferOrders");
+                    b.ToTable("TransferOrders", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.TransferOrderItem", b =>
@@ -1063,7 +1148,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vendors");
+                    b.ToTable("Vendors", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.Warehouse", b =>
@@ -1116,7 +1201,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Warehouses");
+                    b.ToTable("Warehouses", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.Zone", b =>
@@ -1151,7 +1236,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("Zones");
+                    b.ToTable("Zones", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1224,6 +1309,11 @@ namespace WMS.DAL.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("WMS.DAL.PurchaseOrderItem", null)
+                        .WithMany()
+                        .HasForeignKey("LinkedPOItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("WMS.DAL.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
@@ -1246,13 +1336,21 @@ namespace WMS.DAL.Data.Migrations
                     b.Navigation("Zone");
                 });
 
-            modelBuilder.Entity("WMS.DAL.Bin", b =>
+            modelBuilder.Entity("WMS.DAL.Entities.Bin", b =>
                 {
+                    b.HasOne("WMS.DAL.Entities.BinType", "BinType")
+                        .WithMany("Bins")
+                        .HasForeignKey("BinTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("WMS.DAL.Rack", "Rack")
                         .WithMany("Bins")
                         .HasForeignKey("RackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("BinType");
 
                     b.Navigation("Rack");
                 });
@@ -1270,7 +1368,7 @@ namespace WMS.DAL.Data.Migrations
 
             modelBuilder.Entity("WMS.DAL.Inventory", b =>
                 {
-                    b.HasOne("WMS.DAL.Bin", "Bin")
+                    b.HasOne("WMS.DAL.Entities.Bin", "Bin")
                         .WithMany("Inventories")
                         .HasForeignKey("BinId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1289,7 +1387,7 @@ namespace WMS.DAL.Data.Migrations
 
             modelBuilder.Entity("WMS.DAL.Picking", b =>
                 {
-                    b.HasOne("WMS.DAL.Bin", "Bin")
+                    b.HasOne("WMS.DAL.Entities.Bin", "Bin")
                         .WithMany("Pickings")
                         .HasForeignKey("BinId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1357,7 +1455,7 @@ namespace WMS.DAL.Data.Migrations
                     b.HasOne("WMS.DAL.ReceiptItem", "ReceiptItem")
                         .WithMany("Putaways")
                         .HasForeignKey("ReceiptItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ReceiptItem");
@@ -1365,7 +1463,7 @@ namespace WMS.DAL.Data.Migrations
 
             modelBuilder.Entity("WMS.DAL.PutawayBin", b =>
                 {
-                    b.HasOne("WMS.DAL.Bin", "Bin")
+                    b.HasOne("WMS.DAL.Entities.Bin", "Bin")
                         .WithMany("PutawayBins")
                         .HasForeignKey("BinId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1414,6 +1512,12 @@ namespace WMS.DAL.Data.Migrations
 
             modelBuilder.Entity("WMS.DAL.ReceiptItem", b =>
                 {
+                    b.HasOne("WMS.DAL.AdvancedShippingNoticeItem", "ASNItem")
+                        .WithMany()
+                        .HasForeignKey("ASNItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("WMS.DAL.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
@@ -1425,6 +1529,8 @@ namespace WMS.DAL.Data.Migrations
                         .HasForeignKey("ReceiptId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ASNItem");
 
                     b.Navigation("Product");
 
@@ -1520,13 +1626,18 @@ namespace WMS.DAL.Data.Migrations
                     b.Navigation("Racks");
                 });
 
-            modelBuilder.Entity("WMS.DAL.Bin", b =>
+            modelBuilder.Entity("WMS.DAL.Entities.Bin", b =>
                 {
                     b.Navigation("Inventories");
 
                     b.Navigation("Pickings");
 
                     b.Navigation("PutawayBins");
+                });
+
+            modelBuilder.Entity("WMS.DAL.Entities.BinType", b =>
+                {
+                    b.Navigation("Bins");
                 });
 
             modelBuilder.Entity("WMS.DAL.Entities._Identity.ApplicationUser", b =>

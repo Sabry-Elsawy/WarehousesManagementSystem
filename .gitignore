@@ -745,3 +745,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+!WMS_DEPI_GRAD/Views/Bin/

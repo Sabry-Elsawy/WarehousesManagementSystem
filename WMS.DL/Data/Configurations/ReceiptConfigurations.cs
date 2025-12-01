@@ -11,7 +11,11 @@ internal class ReceiptConfigurations : BaseAuditableEntityConfiguration<Receipt,
 
         builder.ToTable("Receipts");
 
-        builder.Property(r => r.RecievedDate)
+        builder.Property(r => r.ReceiptNumber)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.Property(r => r.ReceivedDate)
             .IsRequired()
             .HasDefaultValueSql("GETUTCDATE()");
 

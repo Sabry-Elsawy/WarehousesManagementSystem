@@ -4,8 +4,12 @@ namespace WMS.DAL;
 
 public class ReceiptItem : BaseAuditableEntity<int>
 {
-    public int ExpectedQty { get; set; }
-    public int ReceivedQty { get; set; }
+    public int QtyExpected { get; set; }
+    public int QtyReceived { get; set; }
+    public DiscrepancyType DiscrepancyType { get; set; }
+    public string? Notes { get; set; }
+    public int ASNItemId { get; set; }
+    public AdvancedShippingNoticeItem ASNItem { get; set; } = null!;
     public string SKU { get; set; } = null!;
 
 

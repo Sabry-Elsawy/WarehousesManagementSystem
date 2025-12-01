@@ -8,16 +8,27 @@ namespace WMS_DEPI_GRAD.Extensions
     {
         public static IServiceCollection AddIdentityService(this IServiceCollection services)
         {
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.Configure<IdentityOptions>(identityOptions =>
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
-                identityOptions.User.RequireUniqueEmail = true;
-                identityOptions.SignIn.RequireConfirmedEmail = true;
-                identityOptions.Lockout.MaxFailedAccessAttempts = 4;
-                identityOptions.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                identityOptions.Lockout.AllowedForNewUsers = true;
+                options.SignIn.RequireConfirmedEmail = false;  
+
+                options.User.RequireUniqueEmail = true;
+                options.Lockout.MaxFailedAccessAttempts = 4;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.AllowedForNewUsers = true;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.ExpireTimeSpan = TimeSpan.FromDays(14);
+                options.SlidingExpiration = true;
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
             });
+
             return services;
         }
     }

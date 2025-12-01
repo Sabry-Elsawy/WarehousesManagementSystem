@@ -16,8 +16,11 @@ internal class PurchaseOrderItemConfigurations : BaseAuditableEntityConfiguratio
         builder.Property(poi => poi.ProductId)
                .IsRequired();
 
-        builder.Property(poi => poi.Qty)
+        builder.Property(poi => poi.QtyOrdered)
                .IsRequired();
+
+        builder.Property(poi => poi.UnitPrice)
+               .HasColumnType("decimal(18,2)");
 
         builder.Property(poi => poi.SKU)
                  .IsRequired()
