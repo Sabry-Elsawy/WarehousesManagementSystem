@@ -1,0 +1,105 @@
+﻿@model IEnumerable<WMS_DEPI_GRAD.ViewModels.PutawayCircle.PutawayListVM>
+
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Putaway Tasks</h2>
+
+        <a asp-controller="Inventory" asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="input-group">
+                <input type="text" id="searchBox" class="form-control" placeholder="Search SKU or Product Name..." />
+                <button class="btn btn-primary" type="button" onclick="searchTable()">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Pending Putaway Items</h5>
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0" id="putawayTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>SKU</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Created On</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                No pending putaway tasks found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.SKU</td>
+                                <td>@item.ProductName</td>
+                                <td>@item.Qty</td>
+
+                                <td>
+                                    @if (item.Status == "Pending")
+                                    {
+                                        <span class="badge bg-warning text-dark">@item.Status</span>
+                                    }
+                                    else if (item.Status == "InProgress")
+                                    {
+                                        <span class="badge bg-info">@item.Status</span>
+                                    }
+                                    else if (item.Status == "Completed")
+                                    {
+                                        <span class="badge bg-success">@item.Status</span>
+                                    }
+                                </td>
+
+                                <td>@item.CreatedOn.ToString("dd MMM yyyy")</td>
+
+                                <td class="text-center">
+                                    <a asp-action="Assign"
+                                       asp-route-id="@item.PutawayId"
+                                       class="btn btn-primary btn-sm">
+                                        Start Putaway
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function searchTable() {
+        let input = document.getElementById("searchBox").value.toLowerCase();
+        let rows = document.querySelectorAll("#putawayTable tbody tr");
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(input) ? "" : "none";
+        });
+    }
+</script>

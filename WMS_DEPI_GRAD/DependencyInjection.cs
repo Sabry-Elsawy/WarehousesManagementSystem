@@ -1,9 +1,7 @@
 ﻿
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WMS.DAL;
 using WMS.DAL.Contract;
-using WMS.DAL.Entities._Identity;
 using WMS.DAL.UnitOfWork;
 using WMS.BLL.Interfaces;
 using WMS.BLL.Services;
@@ -27,7 +25,8 @@ public static class DependencyInjection
             .AddScoped<IBinTypeService, BinTypeService>()
             .AddScoped<IPurchaseOrderService, PurchaseOrderService>()
             .AddScoped<IASNService, ASNService>()
-            .AddScoped<IReceiptService, ReceiptService>();
+            .AddScoped<IReceiptService, ReceiptService>()
+            .AddScoped<IPutawayService, PutawayService>();
 
         // Master Data Services
         services.AddScoped<IProductService, ProductService>();
