@@ -1,0 +1,60 @@
+@model WMS_DEPI_GRAD.ViewModels.SupplierViewModel
+
+@{
+    ViewData["Title"] = "Toggle Supplier Status";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4><i class="fas fa-toggle-off"></i> Toggle Supplier Status</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Are you sure you want to toggle the status of this supplier?</strong>
+                    </div>
+
+                    <dl class="row">
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Name)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ContactEmail)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.ContactEmail)</dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ContactPhone)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.ContactPhone)</dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.IsActive)</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                                <span class="text-muted">→ Will become Inactive</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                                <span class="text-muted">→ Will become Active</span>
+                            }
+                        </dd>
+                    </dl>
+
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-toggle-off"></i> Confirm Toggle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

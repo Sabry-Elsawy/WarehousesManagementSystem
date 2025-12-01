@@ -51,49 +51,89 @@
     <div class="row">
         <div class="col-md-6">
             <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h5>PO Information</h5>
+                    @if (Model.Status == WMS.DAL.PurchaseOrderStatus.Open)
+                    {
+                        <button type="submit" form="updateHeaderForm" class="btn btn-sm btn-light">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    }
                 </div>
                 <div class="card-body">
-                    <table class="table table-borderless">
-                        <tr>
-                            <th>PO Number:</th>
-                            <td>@Model.PO_Number</td>
-                        </tr>
-                        <tr>
-                            <th>Vendor:</th>
-                            <td>@Model.VendorName</td>
-                        </tr>
-                        <tr>
-                            <th>Warehouse:</th>
-                            <td>@Model.WarehouseName</td>
-                        </tr>
-                        <tr>
-                            <th>Order Date:</th>
-                            <td>@Model.OrderDate.ToShortDateString()</td>
-                        </tr>
-                        <tr>
-                            <th>Expected Arrival:</th>
-                            <td>@Model.ExpectedArrivalDate.ToShortDateString()</td>
-                        </tr>
-                        <tr>
-                            <th>Status:</th>
-                            <td>
-                                @if (Model.Status == WMS.DAL.PurchaseOrderStatus.Open)
-                                {
-                                    <span class="badge bg-warning text-dark">Open</span>
-                                }
-                                else if (Model.Status == WMS.DAL.PurchaseOrderStatus.Approved)
-                                {
-                                    <span class="badge bg-success">Approved</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Closed</span>
-                                }
-                            </td>
-                        </tr>
-                    </table>
+                    @if (Model.Status == WMS.DAL.PurchaseOrderStatus.Open)
+                    {
+                        <form id="updateHeaderForm" asp-action="Edit" method="post">
+                            <input type="hidden" asp-for="Id" />
+                            <input type="hidden" asp-for="OrderDate" />
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>PO Number:</th>
+                                    <td><input asp-for="PO_Number" class="form-control" /></td>
+                                </tr>
+                                <tr>
+                                    <th>Vendor:</th>
+                                    <td><select asp-for="VendorId" asp-items="ViewBag.Vendors" class="form-select"></select></td>
+                                </tr>
+                                <tr>
+                                    <th>Warehouse:</th>
+                                    <td><select asp-for="WarehouseId" asp-items="ViewBag.Warehouses" class="form-select"></select></td>
+                                </tr>
+                                <tr>
+                                    <th>Order Date:</th>
+                                    <td>@Model.OrderDate.ToShortDateString()</td>
+                                </tr>
+                                <tr>
+                                    <th>Expected Arrival:</th>
+                                    <td><input asp-for="ExpectedArrivalDate" type="date" class="form-control" /></td>
+                                </tr>
+                                <tr>
+                                    <th>Status:</th>
+                                    <td>
+                                        <span class="badge bg-warning text-dark">Open</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    }
+                    else
+                    {
+                        <table class="table table-borderless">
+                            <tr>
+                                <th>PO Number:</th>
+                                <td>@Model.PO_Number</td>
+                            </tr>
+                            <tr>
+                                <th>Vendor:</th>
+                                <td>@Model.VendorName</td>
+                            </tr>
+                            <tr>
+                                <th>Warehouse:</th>
+                                <td>@Model.WarehouseName</td>
+                            </tr>
+                            <tr>
+                                <th>Order Date:</th>
+                                <td>@Model.OrderDate.ToShortDateString()</td>
+                            </tr>
+                            <tr>
+                                <th>Expected Arrival:</th>
+                                <td>@Model.ExpectedArrivalDate.ToShortDateString()</td>
+                            </tr>
+                            <tr>
+                                <th>Status:</th>
+                                <td>
+                                    @if (Model.Status == WMS.DAL.PurchaseOrderStatus.Approved)
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Closed</span>
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+                    }
                 </div>
             </div>
         </div>

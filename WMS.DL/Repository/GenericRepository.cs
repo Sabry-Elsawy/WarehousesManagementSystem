@@ -20,14 +20,39 @@ namespace WMS.DAL.Repository
         => withTracking ?
         await _dbSet.ToListAsync() : await _dbSet.AsNoTracking().ToListAsync();
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync(bool withTracking = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
+        public async Task<(IReadOnlyList<TEntity> Items, int TotalCount)> GetPagedListAsync(
+            int pageNumber,
+            int pageSize,
+            System.Linq.Expressions.Expression<Func<TEntity, bool>>? filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+            string includeProperties = "")
         {
-            IQueryable<TEntity> query = withTracking ? _dbSet : _dbSet.AsNoTracking();
+            IQueryable<TEntity> query = _dbSet;
 
-            if (include != null)
-                query = include(query);
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
 
-            return await query.ToListAsync();
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            int totalCount = await query.CountAsync();
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return (items, totalCount);
         }
 
         public async Task<TEntity?> GetByIdAsync(TKey id)

@@ -28,6 +28,11 @@ public static class DependencyInjection
             .AddScoped<IReceiptService, ReceiptService>()
             .AddScoped<IPutawayService, PutawayService>();
 
+        // Master Data Services
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<ISupplierService, SupplierService>();
+        services.AddScoped<ICustomerService, CustomerService>();
+
 
         return services;
     }

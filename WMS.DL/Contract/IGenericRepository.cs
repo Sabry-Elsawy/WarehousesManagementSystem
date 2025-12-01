@@ -2,12 +2,18 @@
 
 namespace WMS.DAL.Contract
 {
-    public interface IGenericRepository<TEntity, TKey>
-        where TEntity : BaseEntity<TKey>
-        where TKey : IEquatable<TKey>
-    {
-        Task<IEnumerable<TEntity>> GetAllAsync(bool withTracking,Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
-        Task<IReadOnlyList<TEntity>> GetAllAsync(bool WithTracking = false);
+    public interface IGenericRepository<TEntity,TKey>
+		where TEntity : BaseEntity<TKey>
+		where TKey : IEquatable<TKey>
+	{
+		Task<IReadOnlyList<TEntity>> GetAllAsync(bool WithTracking = false);
+        Task<(IReadOnlyList<TEntity> Items, int TotalCount)> GetPagedListAsync(
+            int pageNumber, 
+            int pageSize, 
+            System.Linq.Expressions.Expression<Func<TEntity, bool>>? filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+            string includeProperties = "");
+		Task<TEntity?> GetByIdAsync(TKey id);
 
         Task<TEntity?> GetByIdAsync(TKey id, Func<IQueryable<TEntity>, IQueryable<TEntity>> include);
         Task<TEntity?> GetByIdAsync(TKey id);

@@ -45,6 +45,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<TransferOrder> TransferOrders { get; set; }
     public DbSet<TransferOrderItem> TO_Items { get; set; }
     public DbSet<Vendor> Vendors { get; set; }
+    public DbSet<Customer> Customers { get; set; }
     public DbSet<PutawayBin> Putaway_Bins { get; set; }
 
     public DbSet<Address> Addresses { get; set; }

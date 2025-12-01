@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WMS.DAL;
 
@@ -11,9 +12,11 @@ using WMS.DAL;
 namespace WMS.DAL.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251130124316_AddMasterDataUpdates")]
+    partial class AddMasterDataUpdates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -281,7 +284,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("ZoneId");
 
-                    b.ToTable("Aisles", (string)null);
+                    b.ToTable("Aisles");
                 });
 
             modelBuilder.Entity("WMS.DAL.Customer", b =>
@@ -368,7 +371,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("RackId");
 
-                    b.ToTable("Bins", (string)null);
+                    b.ToTable("Bins");
                 });
 
             modelBuilder.Entity("WMS.DAL.Entities.BinType", b =>
@@ -401,7 +404,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BinTypes", (string)null);
+                    b.ToTable("BinTypes");
                 });
 
             modelBuilder.Entity("WMS.DAL.Entities._Identity.Address", b =>
@@ -573,7 +576,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Inventories", (string)null);
+                    b.ToTable("Inventories");
                 });
 
             modelBuilder.Entity("WMS.DAL.Picking", b =>
@@ -621,7 +624,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("SO_ItemId");
 
-                    b.ToTable("Pickings", (string)null);
+                    b.ToTable("Pickings");
                 });
 
             modelBuilder.Entity("WMS.DAL.Product", b =>
@@ -679,7 +682,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("WMS.DAL.PurchaseOrder", b =>
@@ -728,7 +731,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("POs", (string)null);
+                    b.ToTable("POs");
                 });
 
             modelBuilder.Entity("WMS.DAL.PurchaseOrderItem", b =>
@@ -781,7 +784,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PO_Items", (string)null);
+                    b.ToTable("PO_Items");
                 });
 
             modelBuilder.Entity("WMS.DAL.Putaway", b =>
@@ -855,7 +858,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("PutawayId");
 
-                    b.ToTable("Putaway_Bins", (string)null);
+                    b.ToTable("Putaway_Bins");
                 });
 
             modelBuilder.Entity("WMS.DAL.Rack", b =>
@@ -890,7 +893,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("AisleId");
 
-                    b.ToTable("Racks", (string)null);
+                    b.ToTable("Racks");
                 });
 
             modelBuilder.Entity("WMS.DAL.Receipt", b =>
@@ -1041,7 +1044,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("SalesOrderId");
 
-                    b.ToTable("SO_Items", (string)null);
+                    b.ToTable("SO_Items");
                 });
 
             modelBuilder.Entity("WMS.DAL.SalesOrder", b =>
@@ -1084,7 +1087,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("SalesOrders", (string)null);
+                    b.ToTable("SalesOrders");
                 });
 
             modelBuilder.Entity("WMS.DAL.TransferOrder", b =>
@@ -1122,7 +1125,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("SourceWarehouseId");
 
-                    b.ToTable("TransferOrders", (string)null);
+                    b.ToTable("TransferOrders");
                 });
 
             modelBuilder.Entity("WMS.DAL.TransferOrderItem", b =>
@@ -1206,7 +1209,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vendors", (string)null);
+                    b.ToTable("Vendors");
                 });
 
             modelBuilder.Entity("WMS.DAL.Warehouse", b =>
@@ -1259,7 +1262,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Warehouses", (string)null);
+                    b.ToTable("Warehouses");
                 });
 
             modelBuilder.Entity("WMS.DAL.Zone", b =>
@@ -1294,7 +1297,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("Zones", (string)null);
+                    b.ToTable("Zones");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
