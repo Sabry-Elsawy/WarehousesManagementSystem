@@ -15,11 +15,14 @@ namespace WMS.DAL.Contract
             string includeProperties = "");
 		Task<TEntity?> GetByIdAsync(TKey id);
 
-		Task AddAsync(TEntity entity);
-		Task AddRangeAsync(IEnumerable<TEntity> entity);
+        Task<TEntity?> GetByIdAsync(TKey id, Func<IQueryable<TEntity>, IQueryable<TEntity>> include);
+        Task<TEntity?> GetByIdAsync(TKey id);
+         
+        Task AddAsync(TEntity entity);
+        Task AddRangeAsync(IEnumerable<TEntity> entity);
 
-		void Update(TEntity entity);
+        void Update(TEntity entity);
 
-		void Delete(TEntity entity);
-	}
+        void Delete(TEntity entity);
+    }
 }
