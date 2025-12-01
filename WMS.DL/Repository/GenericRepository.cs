@@ -1,26 +1,50 @@
-﻿using WMS.DAL.Contract;
+﻿using System.Linq.Expressions;
+using WMS.DAL.Contract;
 using WMS.DAL.Entities._Common;
 
 namespace WMS.DAL.Repository
 {
-    public class GenericRepository<TEntity , TKey> : IGenericRepository<TEntity, TKey>
-		where TEntity : BaseEntity<TKey>
-		where TKey : IEquatable<TKey>
-	{
-		private readonly ApplicationDbContext _DbContext;
-		private readonly DbSet<TEntity> _dbSet;
-		public GenericRepository(ApplicationDbContext DbContext)
-		{
-			_DbContext = DbContext;
-			_dbSet = _DbContext.Set<TEntity>();
-		}
+    public class GenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey>
+        where TEntity : BaseEntity<TKey>
+        where TKey : IEquatable<TKey>
+    {
+        private readonly ApplicationDbContext _DbContext;
+        private readonly DbSet<TEntity> _dbSet;
+        public GenericRepository(ApplicationDbContext DbContext)
+        {
+            _DbContext = DbContext;
+            _dbSet = _DbContext.Set<TEntity>();
+        }
 
         public async Task<IReadOnlyList<TEntity>> GetAllAsync(bool withTracking = false)
         => withTracking ?
         await _dbSet.ToListAsync() : await _dbSet.AsNoTracking().ToListAsync();
 
+        public async Task<IEnumerable<TEntity>> GetAllAsync(bool withTracking = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
+        {
+            IQueryable<TEntity> query = withTracking ? _dbSet : _dbSet.AsNoTracking();
+
+            if (include != null)
+                query = include(query);
+
+            return await query.ToListAsync();
+        }
+
         public async Task<TEntity?> GetByIdAsync(TKey id)
             => await _dbSet.FindAsync(id);
+
+        public async Task<TEntity?> GetByIdAsync(
+            TKey id,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> include)
+        {
+            IQueryable<TEntity> query = _dbSet.AsNoTracking();
+
+            if (include != null)
+                query = include(query);
+
+            return await query.FirstOrDefaultAsync(e => e.Id!.Equals(id));
+        }
+
 
         public async Task AddAsync(TEntity entity)
             => await _dbSet.AddAsync(entity);
