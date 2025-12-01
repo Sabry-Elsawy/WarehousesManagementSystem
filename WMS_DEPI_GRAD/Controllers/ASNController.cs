@@ -278,6 +278,11 @@ public class ASNController : Controller
     //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> AddItem([FromBody] ViewModels.AddASNItemRequest request)
     {
+        if (request == null || request.Item == null)
+        {
+            return Json(new { success = false, message = "Invalid request data." });
+        }
+
         try
         {
             var item = new AdvancedShippingNoticeItem

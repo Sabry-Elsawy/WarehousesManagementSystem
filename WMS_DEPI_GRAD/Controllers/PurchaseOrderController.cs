@@ -89,19 +89,20 @@ public class PurchaseOrderController : Controller
         if (po == null)
             return NotFound();
 
-        // المنتجات
+        await LoadLookups();
+
+        // We need products list for mapping names and SKUs in the items list
+        // LoadLookups puts them in ViewBag as SelectListItems, which might not have SKU easily accessible if we only put "Code - Name" in Text.
+        // So let's fetch products again or use the service.
         var products = await _productService.GetAllAsync();
-        ViewBag.Products = products.Select(p => new SelectListItem
-        {
-            Value = p.Id.ToString(),
-            Text = $"{p.Code} - {p.Name}"
-        }).ToList();
 
         var model = new PurchaseOrderViewModel
         {
             Id = po.Id,
             PO_Number = po.PO_Number,
+            VendorId = po.VendorId,
             VendorName = po.Vendor?.Name ?? "",
+            WarehouseId = po.WarehouseId,
             WarehouseName = po.Warehouse?.Name ?? "",
             OrderDate = po.OrderDate,
             ExpectedArrivalDate = po.ExpectedArrivalDate,
@@ -267,6 +268,11 @@ public class PurchaseOrderController : Controller
     //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> AddItem([FromBody] ViewModels.AddPurchaseOrderItemRequest request)
     {
+        if (request == null || request.Item == null)
+        {
+            return Json(new { success = false, message = "Invalid request data." });
+        }
+
         try
         {
             var item = new PurchaseOrderItem
