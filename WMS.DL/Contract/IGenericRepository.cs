@@ -7,6 +7,7 @@ namespace WMS.DAL.Contract
 		where TKey : IEquatable<TKey>
 	{
 		Task<IReadOnlyList<TEntity>> GetAllAsync(bool WithTracking = false);
+        Task<IEnumerable<TEntity>> GetAllWithIncludeAsync(bool withTracking = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
         Task<(IReadOnlyList<TEntity> Items, int TotalCount)> GetPagedListAsync(
             int pageNumber, 
             int pageSize, 
@@ -16,7 +17,6 @@ namespace WMS.DAL.Contract
 		Task<TEntity?> GetByIdAsync(TKey id);
 
         Task<TEntity?> GetByIdAsync(TKey id, Func<IQueryable<TEntity>, IQueryable<TEntity>> include);
-        Task<TEntity?> GetByIdAsync(TKey id);
          
         Task AddAsync(TEntity entity);
         Task AddRangeAsync(IEnumerable<TEntity> entity);
