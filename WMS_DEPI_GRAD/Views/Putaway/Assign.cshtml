@@ -1,0 +1,87 @@
+﻿@model WMS_DEPI_GRAD.ViewModels.PutawayCircle.PutawayAssignVM
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold mb-3">Assign Putaway Location</h2>
+
+    <!-- Product Summary -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <h4>@Model.ProductName</h4>
+            <p class="text-muted">SKU: @Model.SKU</p>
+
+            <p>
+                <strong>Quantity to Store:</strong> @Model.Qty
+            </p>
+
+        </div>
+    </div>
+
+    <!-- Bins Table -->
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Available Bins</h5>
+        </div>
+
+        <div class="card-body p-0">
+
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Bin</th>
+                        <th>Capacity</th>
+                        <th>Used</th>
+                        <th>Available</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var bin in Model.Bins)
+                    {
+                        <tr>
+                            <td>@bin.Code</td>
+                            <td>@bin.Capacity</td>
+                            <td>@bin.Used</td>
+                            <td>@bin.Available</td>
+
+                            <td class="text-center">
+
+                                @if (bin.HasEnoughSpace(Model.Qty))
+                                {
+                                    <form asp-action="AssignPost" method="post" class="d-inline">
+                                        <input type="hidden" name="putawayId" value="@Model.PutawayId" />
+                                        <input type="hidden" name="binId" value="@bin.BinId" />
+                                        <input type="hidden" name="qty" value="@Model.Qty" />
+
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            Assign Here
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    @if (bin.Available > 0)
+                                    {
+                                        <span class="badge bg-warning text-dark">Not enough space</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Full</span>
+                                    }
+                                }
+
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</div>

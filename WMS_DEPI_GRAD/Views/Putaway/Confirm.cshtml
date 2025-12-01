@@ -1,0 +1,34 @@
+﻿@model WMS_DEPI_GRAD.ViewModels.PutawayCircle.PutawayConfirmVM
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+
+            <h3 class="fw-bold text-success mb-3">Confirm Putaway</h3>
+
+            <p>
+                Product <strong>@Model.ProductName</strong> (SKU: @Model.SKU)
+            </p>
+
+            <p>
+                Quantity: <strong>@Model.Qty</strong>
+            </p>
+
+            <p>
+                Bin: <strong>@Model.BinCode</strong>
+            </p>
+
+            <form asp-action="ConfirmPost" method="post">
+                <input type="hidden" name="id" value="@Model.PutawayId" />
+                <button class="btn btn-success px-4 mt-4" type="submit">
+                    Complete Putaway
+                </button>
+            </form>
+
+            <a asp-action="Index" class="btn btn-secondary mt-3 px-4">
+                Cancel
+            </a>
+
+        </div>
+    </div>
+</div>
