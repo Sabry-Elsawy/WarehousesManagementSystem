@@ -20,6 +20,16 @@ namespace WMS.DAL.Repository
         => withTracking ?
         await _dbSet.ToListAsync() : await _dbSet.AsNoTracking().ToListAsync();
 
+        public async Task<IEnumerable<TEntity>> GetAllWithIncludeAsync(bool withTracking = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
+        {
+            IQueryable<TEntity> query = withTracking ? _dbSet : _dbSet.AsNoTracking();
+
+            if (include != null)
+                query = include(query);
+
+            return await query.ToListAsync();
+        }
+
         public async Task<(IReadOnlyList<TEntity> Items, int TotalCount)> GetPagedListAsync(
             int pageNumber,
             int pageSize,

@@ -325,7 +325,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("WMS.DAL.Entities.Bin", b =>

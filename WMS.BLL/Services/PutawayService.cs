@@ -20,7 +20,7 @@ namespace WMS.BLL.Services
         {
             var repo = _unitOfWork.GetRepository<Putaway, int>();
 
-            return await repo.GetAllAsync(
+            return await repo.GetAllWithIncludeAsync(
                 withTracking: false,
                 include: q => q
                     .Include(p => p.ReceiptItem)
@@ -47,7 +47,7 @@ namespace WMS.BLL.Services
                 return Enumerable.Empty<BinDTO>();
 
             var bins = await _unitOfWork.GetRepository<Bin, int>()
-                .GetAllAsync(false, q => q.Include(b => b.Inventories));
+                .GetAllWithIncludeAsync(false, q => q.Include(b => b.Inventories));
 
             return bins.Select(b =>
             {
@@ -107,7 +107,7 @@ namespace WMS.BLL.Services
                 throw new InvalidOperationException("Putaway not found");
 
             var linksRepo = _unitOfWork.GetRepository<PutawayBin, int>();
-            var links = await linksRepo.GetAllAsync(
+            var links = await linksRepo.GetAllWithIncludeAsync(
                 withTracking: false,
                 include: q => q.Where(l => l.PutawayId == putawayId)
             );
