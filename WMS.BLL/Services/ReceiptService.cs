@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
 using WMS.DAL.UnitOfWork;
@@ -16,20 +17,26 @@ public class ReceiptService : IReceiptService
     public async Task<Receipt?> GetByIdAsync(int id)
     {
         var repo = _unitOfWork.GetRepository<Receipt, int>();
-        return await repo.GetByIdAsync(id);
+        return await repo.GetByIdAsync(id, query => query
+            .Include(r => r.ReceiptItems)
+                .ThenInclude(ri => ri.Product)
+            .Include(r => r.AdvancedShippingNotice)
+            .Include(r => r.Warehouse));
     }
 
     public async Task<IEnumerable<Receipt>> GetAllAsync()
     {
         var repo = _unitOfWork.GetRepository<Receipt, int>();
-        return await repo.GetAllAsync(WithTracking: false);
+        return await repo.GetAllWithIncludeAsync(withTracking: false, query => query
+            .Include(r => r.AdvancedShippingNotice)
+            .Include(r => r.Warehouse));
     }
 
     public async Task<Receipt> CreateFromASNAsync(int asnId, int warehouseId)
     {
         // Validate ASN exists
         var asnRepo = _unitOfWork.GetRepository<AdvancedShippingNotice, int>();
-        var asn = await asnRepo.GetByIdAsync(asnId);
+        var asn = await asnRepo.GetByIdAsync(asnId, query => query.Include(a => a.ASNItems));
 
         if (asn == null)
             throw new InvalidOperationException("ASN not found");
@@ -51,13 +58,8 @@ public class ReceiptService : IReceiptService
         await receiptRepo.AddAsync(receipt);
         await _unitOfWork.CompleteAsync();
 
-        // Create receipt items from ASN items
-        var asnItemRepo = _unitOfWork.GetRepository<AdvancedShippingNoticeItem, int>();
-        var asnItems = await asnItemRepo.GetAllAsync(WithTracking: false);
-        var filteredItems = asnItems.Where(ai => ai.AdvancedShippingNoticeId == asnId);
-
         var receiptItemRepo = _unitOfWork.GetRepository<ReceiptItem, int>();
-        foreach (var asnItem in filteredItems)
+        foreach (var asnItem in asn.ASNItems)
         {
             var receiptItem = new ReceiptItem
             {
@@ -93,18 +95,20 @@ public class ReceiptService : IReceiptService
         if (receipt.Status == ReceiptStatus.Closed)
             throw new InvalidOperationException("Cannot scan items for a closed receipt");
 
-        // Find product by SKU or code
+        // Find product by SKU or code efficiently
         var productRepo = _unitOfWork.GetRepository<Product, int>();
-        var allProducts = await productRepo.GetAllAsync(WithTracking: false);
-        var product = allProducts.FirstOrDefault(p => p.Code == productCodeOrBarcode);
+        var products = await productRepo.GetAllAsync(WithTracking: false);
+        var product = products.FirstOrDefault(p => p.Code == productCodeOrBarcode);
 
         if (product == null)
             throw new InvalidOperationException($"Product not found with code: {productCodeOrBarcode}");
 
-        // Find the receipt item for this product
+        // Find the receipt item for this product efficiently
         var receiptItemRepo = _unitOfWork.GetRepository<ReceiptItem, int>();
-        var allReceiptItems = await receiptItemRepo.GetAllAsync(WithTracking: true);
-        var receiptItem = allReceiptItems.FirstOrDefault(ri => ri.ReceiptId == receiptId && ri.ProductId == product.Id);
+        var receiptItems = await receiptItemRepo.GetAllWithIncludeAsync(withTracking: true, query => query
+            .Where(ri => ri.ReceiptId == receiptId && ri.ProductId == product.Id));
+        
+        var receiptItem = receiptItems.FirstOrDefault();
 
         if (receiptItem == null)
             throw new InvalidOperationException($"Product {productCodeOrBarcode} is not expected in this receipt");
@@ -127,7 +131,6 @@ public class ReceiptService : IReceiptService
         }
 
         receiptItemRepo.Update(receiptItem);
-        await _unitOfWork.CompleteAsync();
 
         // Update PO item QtyReceived
         var asnItemRepo = _unitOfWork.GetRepository<AdvancedShippingNoticeItem, int>();
@@ -142,9 +145,10 @@ public class ReceiptService : IReceiptService
             {
                 poItem.QtyReceived += qty;
                 poItemRepo.Update(poItem);
-                await _unitOfWork.CompleteAsync();
             }
         }
+        
+        await _unitOfWork.CompleteAsync();
 
         return true;
     }
