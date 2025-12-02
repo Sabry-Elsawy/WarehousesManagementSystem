@@ -42,7 +42,9 @@ public class PurchaseOrderService : IPurchaseOrderService
     public async Task<IEnumerable<PurchaseOrder>> GetAllAsync()
     {
         var repo = _unitOfWork.GetRepository<PurchaseOrder, int>();
-        return await repo.GetAllAsync(WithTracking: false);
+        return await repo.GetAllWithIncludeAsync(withTracking: false, query => query
+            .Include(p => p.Vendor)
+            .Include(p => p.Warehouse));
     }
 
     public async Task<PurchaseOrder> CreateAsync(PurchaseOrder purchaseOrder)

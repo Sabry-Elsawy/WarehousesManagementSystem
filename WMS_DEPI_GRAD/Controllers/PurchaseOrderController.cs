@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WMS.BLL.Interfaces;
 using WMS.BLL.Services;
 using WMS.DAL;
+using WMS.DAL.Entities._Identity;
 using WMS.DAL.UnitOfWork;
 
 namespace WMS_DEPI_GRAD.Controllers;
@@ -14,32 +16,55 @@ public class PurchaseOrderController : Controller
     private readonly IPurchaseOrderService _poService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IProductService _productService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public PurchaseOrderController(IPurchaseOrderService poService, IUnitOfWork unitOfWork, IProductService productService)
+    public PurchaseOrderController(IPurchaseOrderService poService, IUnitOfWork unitOfWork, IProductService productService, UserManager<ApplicationUser> userManager)
     {
         _poService = poService;
         _unitOfWork = unitOfWork;
         _productService = productService;
+        _userManager = userManager;
     }
 
     public async Task<IActionResult> Index()
     {
         var purchaseOrders = await _poService.GetAllAsync();
+        
+        // Get all unique user IDs
+        var userIds = purchaseOrders.Select(p => p.CreatedBy)
+            .Union(purchaseOrders.Select(p => p.LastModifiedBy))
+            .Where(id => !string.IsNullOrEmpty(id))
+            .Distinct()
+            .ToList();
+
+        // Fetch users dictionary for fast lookup
+        var users = new Dictionary<string, string>();
+        foreach (var userId in userIds)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                users[userId] = $"{user.FirstName} {user.LastName}";
+            }
+        }
+
         var viewModels = purchaseOrders.Select(po => new PurchaseOrderViewModel
         {
             Id = po.Id,
             PO_Number = po.PO_Number,
             VendorId = po.VendorId,
-            VendorName = po.Vendor?.Name ?? "",
+            VendorName = po.Vendor?.Name ?? "N/A",
             WarehouseId = po.WarehouseId,
-            WarehouseName = po.Warehouse?.Name ?? "",
+            WarehouseName = po.Warehouse?.Name ?? "N/A",
             OrderDate = po.OrderDate,
             ExpectedArrivalDate = po.ExpectedArrivalDate,
             Status = po.Status,
             CreatedOn = po.CreatedOn,
             CreatedBy = po.CreatedBy,
+            CreatedByName = !string.IsNullOrEmpty(po.CreatedBy) && users.ContainsKey(po.CreatedBy) ? users[po.CreatedBy] : po.CreatedBy,
             LastModifiedOn = po.LastModifiedOn,
-            LastModifiedBy = po.LastModifiedBy
+            LastModifiedBy = po.LastModifiedBy,
+            LastModifiedByName = !string.IsNullOrEmpty(po.LastModifiedBy) && users.ContainsKey(po.LastModifiedBy) ? users[po.LastModifiedBy] : po.LastModifiedBy
         }).ToList();
 
         return View(viewModels);
