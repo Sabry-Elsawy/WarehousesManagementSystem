@@ -1,0 +1,68 @@
+@model WMS_DEPI_GRAD.ViewModels.SupplierViewModel
+
+@{
+    ViewData["Title"] = "Supplier Details";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4><i class="fas fa-truck"></i> Supplier Details</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Name)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ContactEmail)</dt>
+                        <dd class="col-sm-9">
+                            <a href="mailto:@Model.ContactEmail">@Model.ContactEmail</a>
+                        </dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ContactPhone)</dt>
+                        <dd class="col-sm-9">
+                            <a href="tel:@Model.ContactPhone">@Model.ContactPhone</a>
+                        </dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Address)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.Address)</dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.IsActive)</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Created On</dt>
+                        <dd class="col-sm-9">@Model.CreatedOn.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                        <dt class="col-sm-3">Created By</dt>
+                        <dd class="col-sm-9">@Model.CreatedBy</dd>
+                    </dl>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </a>
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                                <i class="fas fa-toggle-off"></i> Toggle Status
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

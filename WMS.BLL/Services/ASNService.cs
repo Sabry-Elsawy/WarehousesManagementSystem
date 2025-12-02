@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
 using WMS.DAL.UnitOfWork;
@@ -16,13 +17,19 @@ public class ASNService : IASNService
     public async Task<AdvancedShippingNotice?> GetByIdAsync(int id)
     {
         var repo = _unitOfWork.GetRepository<AdvancedShippingNotice, int>();
-        return await repo.GetByIdAsync(id);
+        return await repo.GetByIdAsync(id, query => query
+            .Include(asn => asn.PurchaseOrder)
+                .ThenInclude(po => po.POItems)
+                    .ThenInclude(poi => poi.Product)
+            .Include(asn => asn.ASNItems)
+                .ThenInclude(item => item.Product));
     }
 
     public async Task<IEnumerable<AdvancedShippingNotice>> GetAllAsync()
     {
         var repo = _unitOfWork.GetRepository<AdvancedShippingNotice, int>();
-        return await repo.GetAllAsync(WithTracking: false);
+        return await repo.GetAllWithIncludeAsync(withTracking: false, query => query
+            .Include(asn => asn.PurchaseOrder));
     }
 
     public async Task<AdvancedShippingNotice> CreateFromPOAsync(int purchaseOrderId, AdvancedShippingNotice asn)

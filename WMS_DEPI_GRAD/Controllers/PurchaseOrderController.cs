@@ -1,8 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WMS.BLL.Interfaces;
+using WMS.BLL.Services;
 using WMS.DAL;
+using WMS.DAL.Entities._Identity;
 using WMS.DAL.UnitOfWork;
 
 namespace WMS_DEPI_GRAD.Controllers;
@@ -12,35 +15,98 @@ public class PurchaseOrderController : Controller
 {
     private readonly IPurchaseOrderService _poService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IProductService _productService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public PurchaseOrderController(IPurchaseOrderService poService, IUnitOfWork unitOfWork)
+    public PurchaseOrderController(IPurchaseOrderService poService, IUnitOfWork unitOfWork, IProductService productService, UserManager<ApplicationUser> userManager)
     {
         _poService = poService;
         _unitOfWork = unitOfWork;
+        _productService = productService;
+        _userManager = userManager;
     }
 
     public async Task<IActionResult> Index()
     {
         var purchaseOrders = await _poService.GetAllAsync();
+        
+        // Get all unique user IDs
+        var userIds = purchaseOrders.Select(p => p.CreatedBy)
+            .Union(purchaseOrders.Select(p => p.LastModifiedBy))
+            .Where(id => !string.IsNullOrEmpty(id))
+            .Distinct()
+            .ToList();
+
+        // Fetch users dictionary for fast lookup
+        var users = new Dictionary<string, string>();
+        foreach (var userId in userIds)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                users[userId] = $"{user.FirstName} {user.LastName}";
+            }
+        }
+
         var viewModels = purchaseOrders.Select(po => new PurchaseOrderViewModel
         {
             Id = po.Id,
             PO_Number = po.PO_Number,
             VendorId = po.VendorId,
-            VendorName = po.Vendor?.Name ?? "",
+            VendorName = po.Vendor?.Name ?? "N/A",
             WarehouseId = po.WarehouseId,
-            WarehouseName = po.Warehouse?.Name ?? "",
+            WarehouseName = po.Warehouse?.Name ?? "N/A",
             OrderDate = po.OrderDate,
             ExpectedArrivalDate = po.ExpectedArrivalDate,
             Status = po.Status,
             CreatedOn = po.CreatedOn,
-            CreatedBy = po.CreatedBy,
+            //CreatedBy = po.CreatedBy,
+            CreatedBy = !string.IsNullOrEmpty(po.CreatedBy) && users.ContainsKey(po.CreatedBy) ? users[po.CreatedBy] : po.CreatedBy,
             LastModifiedOn = po.LastModifiedOn,
-            LastModifiedBy = po.LastModifiedBy
+            //LastModifiedBy = po.LastModifiedBy,
+            LastModifiedBy = !string.IsNullOrEmpty(po.LastModifiedBy) && users.ContainsKey(po.LastModifiedBy) ? users[po.LastModifiedBy] : po.LastModifiedBy
         }).ToList();
 
         return View(viewModels);
     }
+
+    //public async Task<IActionResult> Details(int id)
+    //{
+    //    var po = await _poService.GetByIdAsync(id);
+    //    if (po == null)
+    //        return NotFound();
+
+    //    var viewModel = new PurchaseOrderViewModel
+    //    {
+    //        Id = po.Id,
+    //        PO_Number = po.PO_Number,
+    //        VendorId = po.VendorId,
+    //        VendorName = po.Vendor?.Name ?? "",
+    //        WarehouseId = po.WarehouseId,
+    //        WarehouseName = po.Warehouse?.Name ?? "",
+    //        OrderDate = po.OrderDate,
+    //        ExpectedArrivalDate = po.ExpectedArrivalDate,
+    //        Status = po.Status,
+    //        CreatedOn = po.CreatedOn,
+    //        CreatedBy = po.CreatedBy,
+    //        LastModifiedOn = po.LastModifiedOn,
+    //        LastModifiedBy = po.LastModifiedBy,
+    //        Items = po.POItems.Select(i => new PurchaseOrderItemViewModel
+    //        {
+    //            Id = i.Id,
+    //            ProductId = i.ProductId,
+    //            ProductName = i.Product?.Name ?? "",
+    //            SKU = i.Product?.Code ?? "", // Assuming Code is SKU
+    //            QtyOrdered = i.QtyOrdered,
+    //            UnitPrice = i.UnitPrice,
+    //            QtyReceived = i.QtyReceived,
+    //            LineStatus = i.QtyReceived >= i.QtyOrdered ? "Complete" : (i.QtyReceived > 0 ? "Partial" : "Open")
+    //        }).ToList()
+    //    };
+
+    //    return View(viewModel);
+    //}
+
 
     public async Task<IActionResult> Details(int id)
     {
@@ -48,7 +114,14 @@ public class PurchaseOrderController : Controller
         if (po == null)
             return NotFound();
 
-        var viewModel = new PurchaseOrderViewModel
+        await LoadLookups();
+
+        // We need products list for mapping names and SKUs in the items list
+        // LoadLookups puts them in ViewBag as SelectListItems, which might not have SKU easily accessible if we only put "Code - Name" in Text.
+        // So let's fetch products again or use the service.
+        var products = await _productService.GetAllAsync();
+
+        var model = new PurchaseOrderViewModel
         {
             Id = po.Id,
             PO_Number = po.PO_Number,
@@ -63,20 +136,17 @@ public class PurchaseOrderController : Controller
             CreatedBy = po.CreatedBy,
             LastModifiedOn = po.LastModifiedOn,
             LastModifiedBy = po.LastModifiedBy,
-            Items = po.POItems.Select(i => new PurchaseOrderItemViewModel
+            Items = po.POItems?.Select(i => new PurchaseOrderItemViewModel
             {
-                Id = i.Id,
-                ProductId = i.ProductId,
-                ProductName = i.Product?.Name ?? "",
-                SKU = i.Product?.Code ?? "", // Assuming Code is SKU
+                ProductName = products.FirstOrDefault(p => p.Id == i.ProductId)?.Name ?? "",
+                SKU = products.FirstOrDefault(p => p.Id == i.ProductId)?.Code ?? "",
                 QtyOrdered = i.QtyOrdered,
-                UnitPrice = i.UnitPrice,
                 QtyReceived = i.QtyReceived,
-                LineStatus = i.QtyReceived >= i.QtyOrdered ? "Complete" : (i.QtyReceived > 0 ? "Partial" : "Open")
-            }).ToList()
+                UnitPrice = i.UnitPrice
+            }).ToList() ?? new List<PurchaseOrderItemViewModel>()
         };
 
-        return View(viewModel);
+        return View(model);
     }
 
     public async Task<IActionResult> Create()
@@ -157,27 +227,36 @@ public class PurchaseOrderController : Controller
         {
             try
             {
-                // We need to get the existing PO to update it, or create a new object with just the updated fields
-                // The service likely expects a full object or handles partial updates. 
-                // Assuming we map back to a domain object.
-                
+                // Get the existing PO entity from database
                 var purchaseOrder = await _poService.GetByIdAsync(id);
                 if (purchaseOrder == null)
+                {
+                    TempData["Error"] = "Purchase Order not found.";
                     return NotFound();
+                }
 
+                // Only update editable fields - do NOT touch:
+                // - Status (updated via Approve/Close actions)
+                // - CreatedOn, CreatedBy (set at creation)
+                // - LastModifiedOn, LastModifiedBy (handled by service layer)
+                // - POItems collection (managed via AddItem action)
                 purchaseOrder.PO_Number = viewModel.PO_Number;
                 purchaseOrder.VendorId = viewModel.VendorId;
                 purchaseOrder.WarehouseId = viewModel.WarehouseId;
                 purchaseOrder.ExpectedArrivalDate = viewModel.ExpectedArrivalDate;
-                // Status is usually not updated via Edit, but via transitions
 
                 await _poService.UpdateAsync(purchaseOrder);
                 TempData["Success"] = "Purchase Order updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
                 ModelState.AddModelError("", ex.Message);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while updating the Purchase Order.");
+                // Log the exception details here if you have a logging framework
             }
         }
 
@@ -221,11 +300,32 @@ public class PurchaseOrderController : Controller
 
     [HttpPost]
     //[Authorize(Roles = "Procurement,Admin")]
-    public async Task<IActionResult> AddItem(int poId, PurchaseOrderItem item)
+    public async Task<IActionResult> AddItem([FromBody] ViewModels.AddPurchaseOrderItemRequest request)
     {
+        if (request == null || request.Item == null)
+        {
+            return Json(new { success = false, message = "Invalid request data." });
+        }
+
         try
         {
-            await _poService.AddItemAsync(poId, item);
+            // Fetch the product to get the SKU
+            var product = await _productService.GetByIdAsync(request.Item.ProductId);
+            if (product == null)
+            {
+                return Json(new { success = false, message = "Product not found." });
+            }
+
+            // Create the PO item with all required fields including SKU
+            var item = new PurchaseOrderItem
+            {
+                ProductId = request.Item.ProductId,
+                QtyOrdered = request.Item.QtyOrdered,
+                UnitPrice = request.Item.UnitPrice,
+                SKU = product.Code // Set SKU from Product.Code
+            };
+
+            await _poService.AddItemAsync(request.PoId, item);
             return Json(new { success = true, message = "Item added successfully" });
         }
         catch (Exception ex)
@@ -238,10 +338,19 @@ public class PurchaseOrderController : Controller
     {
         var vendorRepo = _unitOfWork.GetRepository<Vendor, int>();
         var warehouseRepo = _unitOfWork.GetRepository<Warehouse, int>();
-        var productRepo = _unitOfWork.GetRepository<Product, int>();
 
         ViewBag.Vendors = new SelectList(await vendorRepo.GetAllAsync(), "Id", "Name");
         ViewBag.Warehouses = new SelectList(await warehouseRepo.GetAllAsync(), "Id", "Name");
-        ViewBag.Products = new SelectList(await productRepo.GetAllAsync(), "Id", "Name");
+
+        // ✔️ المنتجـات من ProductService مش من UnitOfWork
+        var products = await _productService.GetAllAsync();
+        ViewBag.Products = products
+            .Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = $"{p.Code} - {p.Name}"
+            })
+            .ToList();
     }
+
 }

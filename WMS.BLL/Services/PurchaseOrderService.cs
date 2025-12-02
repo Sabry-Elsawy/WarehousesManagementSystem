@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
 using WMS.DAL.UnitOfWork;
@@ -13,17 +14,37 @@ public class PurchaseOrderService : IPurchaseOrderService
         _unitOfWork = unitOfWork;
     }
 
+    //public async Task<PurchaseOrder?> GetByIdAsync(int id)
+    //{
+    //    var repo = _unitOfWork.GetRepository<PurchaseOrder, int>();
+    //    var po = await repo.GetByIdAsync(id);
+    //    return po;
+    //}
+
     public async Task<PurchaseOrder?> GetByIdAsync(int id)
     {
         var repo = _unitOfWork.GetRepository<PurchaseOrder, int>();
-        var po = await repo.GetByIdAsync(id);
+
+        var po = await repo.GetByIdAsync(
+            id,
+            include: q => q
+                .Include(p => p.POItems)
+                    .ThenInclude(i => i.Product)
+                .Include(p => p.Vendor)
+                .Include(p => p.Warehouse)
+        );
+
         return po;
     }
+
+
 
     public async Task<IEnumerable<PurchaseOrder>> GetAllAsync()
     {
         var repo = _unitOfWork.GetRepository<PurchaseOrder, int>();
-        return await repo.GetAllAsync(WithTracking: false);
+        return await repo.GetAllWithIncludeAsync(withTracking: false, query => query
+            .Include(p => p.Vendor)
+            .Include(p => p.Warehouse));
     }
 
     public async Task<PurchaseOrder> CreateAsync(PurchaseOrder purchaseOrder)

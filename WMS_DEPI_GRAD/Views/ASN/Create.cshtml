@@ -5,59 +5,109 @@
     var poId = ViewBag.SelectedPOId as int?;
 }
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4><i class="fas fa-shipping-fast"></i> Create Advanced Shipping Notice</h4>
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <!-- Page Header -->
+            <div class="mb-4">
+                <h2 class="mb-1">
+                    <i class="fas fa-shipping-fast text-primary me-2"></i>
+                    Create Advanced Shipping Notice
+                </h2>
+                <p class="text-muted mb-0">Create a new ASN for an approved purchase order</p>
+            </div>
+
+            <!-- Create Form Card -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>ASN Information
+                    </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <form asp-action="Create" method="post">
-                        <input type="hidden" name="purchaseOrderId" value="@poId" />
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3" role="alert"></div>
 
-                        <div class="mb-3">
-                            <label asp-for="PurchaseOrderId" class="form-label"></label>
-                            <select asp-for="PurchaseOrderId" class="form-select" asp-items="ViewBag.PurchaseOrders">
-                                <option value="">-- Select Purchase Order --</option>
-                            </select>
-                            <span asp-validation-for="PurchaseOrderId" class="text-danger"></span>
-                            <small class="form-text text-muted">Only Approved Purchase Orders are shown</small>
+                        <div class="row g-3">
+                            <!-- Purchase Order -->
+                            <div class="col-md-12">
+                                <label asp-for="PurchaseOrderId" class="form-label fw-semibold">
+                                    <i class="fas fa-file-invoice text-primary me-1"></i>
+                                    Purchase Order
+                                </label>
+                                <select asp-for="PurchaseOrderId" class="form-select form-select-lg" asp-items="ViewBag.PurchaseOrders">
+                                    <option value="">-- Select Purchase Order --</option>
+                                </select>
+                                <span asp-validation-for="PurchaseOrderId" class="text-danger small"></span>
+                                <small class="form-text text-muted d-block mt-1">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Only Approved Purchase Orders are shown
+                                </small>
+                            </div>
+
+                            <!-- ASN Number -->
+                            <div class="col-md-6">
+                                <label asp-for="ASN_Number" class="form-label fw-semibold">
+                                    <i class="fas fa-hashtag text-primary me-1"></i>
+                                    ASN Number
+                                </label>
+                                <input asp-for="ASN_Number" class="form-control form-control-lg" placeholder="Enter ASN number" />
+                                <span asp-validation-for="ASN_Number" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Tracking Number -->
+                            <div class="col-md-6">
+                                <label asp-for="TrackingNumber" class="form-label fw-semibold">
+                                    <i class="fas fa-barcode text-primary me-1"></i>
+                                    Tracking Number
+                                </label>
+                                <input asp-for="TrackingNumber" class="form-control form-control-lg" placeholder="Enter tracking number" />
+                                <span asp-validation-for="TrackingNumber" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Expected Arrival Date -->
+                            <div class="col-md-12">
+                                <label asp-for="ExpectedArrivalDate" class="form-label fw-semibold">
+                                    <i class="fas fa-calendar-alt text-primary me-1"></i>
+                                    Expected Arrival Date
+                                </label>
+                                <input asp-for="ExpectedArrivalDate" class="form-control form-control-lg" type="date" />
+                                <span asp-validation-for="ExpectedArrivalDate" class="text-danger small"></span>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="ASN_Number" class="form-label"></label>
-                            <input asp-for="ASN_Number" class="form-control" />
-                            <span asp-validation-for="ASN_Number" class="text-danger"></span>
+                        <!-- Info Box -->
+                        <div class="alert alert-info border-0 mt-4 d-flex align-items-start" role="alert">
+                            <i class="fas fa-info-circle me-2 mt-1"></i>
+                            <div>
+                                <strong>Next Steps:</strong> After creating the ASN, you can add shipped items from the selected Purchase Order in the Details view. 
+                                The ASN will be created with a <strong>Sent</strong> status.
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="TrackingNumber" class="form-label"></label>
-                            <input asp-for="TrackingNumber" class="form-control" />
-                            <span asp-validation-for="TrackingNumber" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="ExpectedArrivalDate" class="form-label"></label>
-                            <input asp-for="ExpectedArrivalDate" class="form-control" type="date" />
-                            <span asp-validation-for="ExpectedArrivalDate" class="text-danger"></span>
-                        </div>
-
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i>
-                            <strong>Note:</strong> After creating the ASN, you can add items from the PO.
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to List
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-lg btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to List
                             </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Create ASN
+                            <button type="submit" class="btn btn-lg btn-primary px-5 shadow">
+                                <i class="fas fa-save me-2"></i>Create ASN
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="card shadow-sm border-0 mt-3">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">
+                        <i class="fas fa-question-circle me-2"></i>What is an ASN?
+                    </h6>
+                    <p class="text-muted small mb-0">
+                        An Advanced Shipping Notice (ASN) is a notification sent by the supplier indicating that goods have been shipped. 
+                        It includes details about the shipment's contents and expected arrival date.
+                    </p>
                 </div>
             </div>
         </div>
