@@ -202,27 +202,36 @@ public class PurchaseOrderController : Controller
         {
             try
             {
-                // We need to get the existing PO to update it, or create a new object with just the updated fields
-                // The service likely expects a full object or handles partial updates. 
-                // Assuming we map back to a domain object.
-                
+                // Get the existing PO entity from database
                 var purchaseOrder = await _poService.GetByIdAsync(id);
                 if (purchaseOrder == null)
+                {
+                    TempData["Error"] = "Purchase Order not found.";
                     return NotFound();
+                }
 
+                // Only update editable fields - do NOT touch:
+                // - Status (updated via Approve/Close actions)
+                // - CreatedOn, CreatedBy (set at creation)
+                // - LastModifiedOn, LastModifiedBy (handled by service layer)
+                // - POItems collection (managed via AddItem action)
                 purchaseOrder.PO_Number = viewModel.PO_Number;
                 purchaseOrder.VendorId = viewModel.VendorId;
                 purchaseOrder.WarehouseId = viewModel.WarehouseId;
                 purchaseOrder.ExpectedArrivalDate = viewModel.ExpectedArrivalDate;
-                // Status is usually not updated via Edit, but via transitions
 
                 await _poService.UpdateAsync(purchaseOrder);
                 TempData["Success"] = "Purchase Order updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
                 ModelState.AddModelError("", ex.Message);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while updating the Purchase Order.");
+                // Log the exception details here if you have a logging framework
             }
         }
 
@@ -275,11 +284,20 @@ public class PurchaseOrderController : Controller
 
         try
         {
+            // Fetch the product to get the SKU
+            var product = await _productService.GetByIdAsync(request.Item.ProductId);
+            if (product == null)
+            {
+                return Json(new { success = false, message = "Product not found." });
+            }
+
+            // Create the PO item with all required fields including SKU
             var item = new PurchaseOrderItem
             {
                 ProductId = request.Item.ProductId,
                 QtyOrdered = request.Item.QtyOrdered,
-                UnitPrice = request.Item.UnitPrice
+                UnitPrice = request.Item.UnitPrice,
+                SKU = product.Code // Set SKU from Product.Code
             };
 
             await _poService.AddItemAsync(request.PoId, item);
