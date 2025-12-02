@@ -1,38 +1,120 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WMS_DEPI_GRAD.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using WMS.BLL.Interfaces;
+using WMS.DAL;
+using WMS_DEPI_GRAD.ViewModels;
 
-namespace WMS_DEPI_GRAD.Controllers;
-public class TransferOrdersController : Controller
+namespace WMS_DEPI_GRAD.Controllers
 {
-    private static List<TransferOrderModel> _transferOrders = new()
+    public class TransferOrdersController : Controller
     {
-        new TransferOrderModel { Id = 1, TransferId = "TO-2024-001", SKU = "SKU-1001", Quantity = 50, FromLocation = "A-01-02-03", ToLocation = "B-02-03-01", Status = "completed", CreatedDate = new DateTime(2024, 1, 14) },
-        new TransferOrderModel { Id = 2, TransferId = "TO-2024-002", SKU = "SKU-1003", Quantity = 25, FromLocation = "C-01-01-04", ToLocation = "A-03-02-01", Status = "in-progress", CreatedDate = new DateTime(2024, 1, 15) },
-        new TransferOrderModel { Id = 3, TransferId = "TO-2024-003", SKU = "SKU-1002", Quantity = 100, FromLocation = "B-02-01-02", ToLocation = "C-01-04-03", Status = "pending", CreatedDate = new DateTime(2024, 1, 16) }
-    };
+        private readonly ITransferOrderService _transferOrderService;
+        private readonly IWarehouseService _warehouseService;
+        private readonly IProductService _productService;
 
-    public IActionResult Index()
-    {
-        return View(_transferOrders.OrderByDescending(t => t.CreatedDate).ToList());
-    }
-
-    [HttpPost]
-    public IActionResult Create(string sku, int quantity, string fromLocation, string toLocation)
-    {
-        var newOrder = new TransferOrderModel
+        public TransferOrdersController(
+            ITransferOrderService transferOrderService,
+            IWarehouseService warehouseService,
+            IProductService productService)
         {
-            Id = _transferOrders.Max(t => t.Id) + 1,
-            TransferId = $"TO-{DateTime.UtcNow.Year}-{_transferOrders.Max(t => t.Id) + 1:D3}",
-            SKU = sku,
-            Quantity = quantity,
-            FromLocation = fromLocation,
-            ToLocation = toLocation,
-            Status = "pending",
-            CreatedDate = DateTime.UtcNow
-        };
+            _transferOrderService = transferOrderService;
+            _warehouseService = warehouseService;
+            _productService = productService;
+        }
 
-        _transferOrders.Add(newOrder);
-        TempData["Success"] = $"Transfer Order {newOrder.TransferId} created successfully!";
-        return RedirectToAction(nameof(Index));
+        public async Task<IActionResult> Index(int page = 1, string search = null)
+        {
+            var (items, totalCount) = await _transferOrderService.GetPagedListAsync(page, 10, search);
+
+            var viewModels = items.Select(x => new TransferOrderViewModel
+            {
+                Id = x.Id,
+                Status = x.Status.ToString(),
+                CreatedOn = x.CreatedOn,
+                SourceWarehouse = x.SourceWarehouse?.Name ?? "Unknown",
+                DestinationWarehouse = x.DestinationWarehouse?.Name ?? "Unknown",
+                ItemCount = x.TransferOrderItems?.Count ?? 0
+            }).ToList();
+
+            // Simple pagination handling for now (can be improved with a PagedListViewModel)
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalCount / 10.0);
+            ViewBag.SearchTerm = search;
+
+            return View(viewModels);
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var order = await _transferOrderService.GetByIdAsync(id);
+            if (order == null) return NotFound();
+
+            var viewModel = new TransferOrderDetailsViewModel
+            {
+                Id = order.Id,
+                Status = order.Status.ToString(),
+                CreatedOn = order.CreatedOn,
+                SourceWarehouse = order.SourceWarehouse?.Name ?? "Unknown",
+                DestinationWarehouse = order.DestinationWarehouse?.Name ?? "Unknown",
+                Items = order.TransferOrderItems.Select(i => new TransferOrderItemDetailsViewModel
+                {
+                    ProductName = i.Product?.Name ?? "Unknown",
+                    SKU = i.Product?.Code ?? "Unknown",
+                    Quantity = i.Qty
+                }).ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            var warehouses = await _warehouseService.GetAllWarehousesAsync();
+            var products = await _productService.GetAllAsync();
+
+            ViewBag.Warehouses = new SelectList(warehouses, "Id", "Name");
+            ViewBag.Products = products.Select(p => new { p.Id, Name = $"{p.Name} ({p.Code})" }).ToList();
+
+            return View(new CreateTransferOrderViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CreateTransferOrderViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var transferOrder = new TransferOrder
+                    {
+                        SourceWarehouseId = model.SourceWarehouseId,
+                        DestinationWarehouseId = model.DestinationWarehouseId,
+                        TransferOrderItems = model.Items.Select(i => new TransferOrderItem
+                        {
+                            ProductId = i.ProductId,
+                            Qty = i.Quantity
+                        }).ToList()
+                    };
+
+                    await _transferOrderService.CreateAsync(transferOrder);
+                    TempData["Success"] = "Transfer Order created successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", ex.Message);
+                }
+            }
+
+            // Reload dropdowns if failed
+            var warehouses = await _warehouseService.GetAllWarehousesAsync();
+            var products = await _productService.GetAllAsync();
+            ViewBag.Warehouses = new SelectList(warehouses, "Id", "Name");
+            ViewBag.Products = products.Select(p => new { p.Id, Name = $"{p.Name} ({p.Code})" }).ToList();
+
+            return View(model);
+        }
     }
 }

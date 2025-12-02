@@ -1,138 +1,98 @@
-﻿@model List<WMS_DEPI_GRAD.Models.TransferOrderModel>
+﻿@model List<WMS_DEPI_GRAD.ViewModels.TransferOrderViewModel>
 
 @{
     ViewData["Title"] = "Transfer Orders";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string searchTerm = ViewBag.SearchTerm as string;
 }
 
-<div class="container py-4">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active">Transfer Orders</li>
-        </ol>
-    </nav>
-
-    <!-- Header -->
+<div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 fw-bold text-dark">Transfer Orders</h1>
-            <p class="text-muted">Manage internal transfers</p>
-        </div>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTransferModal">
-            <i class="fa-solid fa-plus me-1"></i> Create Transfer
-        </button>
+        <h2><i class="fas fa-exchange-alt"></i> Transfer Orders</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create Transfer Order
+        </a>
     </div>
 
-    <!-- Stats Card -->
-    <div class="row mb-4">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="text-muted mb-1">Pending Transfers</p>
-                        <h3 class="fw-bold">@Model.Count(t => t.Status == "pending")</h3>
-                    </div>
-                    <div class="bg-warning bg-opacity-25 rounded-circle p-3 text-warning d-flex align-items-center justify-content-center">
-                        <i class="fa-solid fa-right-left fs-3"></i>
-                    </div>
-                </div>
-            </div>
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    </div>
+    }
 
-    <!-- Table -->
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <h5 class="mb-0">All Transfer Orders</h5>
-        </div>
+    <div class="card">
         <div class="card-body">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Transfer ID</th>
-                        <th>SKU</th>
-                        <th>Quantity</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Status</th>
-                        <th>Created Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var t in Model)
-                    {
+            <form method="get" class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" value="@searchTerm" class="form-control" placeholder="Search by ID..." />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-secondary w-100">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <td class="font-monospace fw-medium">@t.Id</td>
-                            <td class="font-monospace text-muted">@t.SKU</td>
-                            <td><strong>@t.Quantity</strong></td>
-                            <td class="text-muted">@t.FromLocation</td>
-                            <td class="text-muted">@t.ToLocation</td>
-                            <td>
-                                @if (t.Status == "completed")
-                                {
-                                    <span class="badge bg-success bg-opacity-25 text-success border border-success">Completed</span>
-                                }
-                                else if (t.Status == "in-progress")
-                                {
-                                    <span class="badge bg-info bg-opacity-25 text-info border border-info">In Progress</span>
-                                }
-                                else if (t.Status == "pending")
-                                {
-                                    <span class="badge bg-warning bg-opacity-25 text-warning border border-warning">Pending</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary text-dark">Unknown</span>
-                                }
-                            </td>
-                            <td>@t.CreatedDate.ToString("yyyy-MM-dd")</td>
+                            <th>ID</th>
+                            <th>Source Warehouse</th>
+                            <th>Destination Warehouse</th>
+                            <th>Items</th>
+                            <th>Status</th>
+                            <th>Created On</th>
+                            <th>Actions</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.SourceWarehouse</td>
+                                <td>@item.DestinationWarehouse</td>
+                                <td>@item.ItemCount</td>
+                                <td>
+                                    <span class="badge bg-@(item.Status == "Pending" ? "warning" : "success")">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td>@item.CreatedOn.ToString("g")</td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (totalPages > 1)
+            {
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-route-page="@(currentPage - 1)" asp-route-search="@searchTerm">Previous</a>
+                        </li>
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(i == currentPage ? "active" : "")">
+                                <a class="page-link" asp-route-page="@i" asp-route-search="@searchTerm">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                            <a class="page-link" asp-route-page="@(currentPage + 1)" asp-route-search="@searchTerm">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
         </div>
-    </div>
-</div>
-
-<!-- Create Transfer Modal -->
-<div class="modal fade" id="createTransferModal" tabindex="-1" aria-labelledby="createTransferModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form asp-action="Create" method="post" class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createTransferModalLabel">Create Transfer Order</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">From Location</label>
-                    <input name="fromLocation" class="form-control" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">To Location</label>
-                    <input name="toLocation" class="form-control" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">SKU</label>
-                    <input name="sku" class="form-control" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Quantity</label>
-                    <input name="quantity" type="number" class="form-control" min="1" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Reason (optional)</label>
-                    <textarea name="reason" class="form-control" rows="2"></textarea>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Create Transfer</button>
-            </div>
-        </form>
     </div>
 </div>

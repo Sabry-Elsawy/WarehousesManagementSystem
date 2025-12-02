@@ -1,0 +1,116 @@
+@model WMS_DEPI_GRAD.ViewModels.CreateTransferOrderViewModel
+
+@{
+    ViewData["Title"] = "Create Transfer Order";
+    var products = ViewBag.Products as IEnumerable<dynamic>;
+}
+
+<div class="container">
+    <h2>Create Transfer Order</h2>
+    <hr />
+
+    <form asp-action="Create" method="post" id="createForm">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="SourceWarehouseId" class="form-label"></label>
+                <select asp-for="SourceWarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
+                    <option value="">-- Select Source Warehouse --</option>
+                </select>
+                <span asp-validation-for="SourceWarehouseId" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="DestinationWarehouseId" class="form-label"></label>
+                <select asp-for="DestinationWarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
+                    <option value="">-- Select Destination Warehouse --</option>
+                </select>
+                <span asp-validation-for="DestinationWarehouseId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <h4>Items</h4>
+        <table class="table table-bordered" id="itemsTable">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Items will be added here dynamically -->
+            </tbody>
+        </table>
+
+        <button type="button" class="btn btn-secondary mb-3" id="addItemBtn">
+            <i class="fas fa-plus"></i> Add Item
+        </button>
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Create Transfer Order</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+            let itemIndex = 0;
+            const products = @Html.Raw(Json.Serialize(products));
+
+            function addItemRow() {
+                let options = '<option value="">-- Select Product --</option>';
+                products.forEach(p => {
+                    options += `<option value="${p.id}">${p.name}</option>`;
+                });
+
+                const row = `
+                    <tr>
+                        <td>
+                            <select name="Items[${itemIndex}].ProductId" class="form-select" required>
+                                ${options}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="Items[${itemIndex}].Quantity" class="form-control" min="1" value="1" required />
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm remove-row">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                $('#itemsTable tbody').append(row);
+                itemIndex++;
+            }
+
+            $('#addItemBtn').click(addItemRow);
+
+            $(document).on('click', '.remove-row', function () {
+                $(this).closest('tr').remove();
+                // Note: Index re-ordering might be needed for complex binding, 
+                // but for simple list binding, gaps in indices *might* cause issues depending on binder.
+                // For a robust solution, we'd re-index. For this demo, we'll assume standard binder handles it or we just append.
+                // Actually, standard MVC binder DOES NOT like gaps if using list index syntax.
+                // We should re-index.
+                reIndexRows();
+            });
+
+            function reIndexRows() {
+                $('#itemsTable tbody tr').each(function (index) {
+                    $(this).find('select').attr('name', `Items[${index}].ProductId`);
+                    $(this).find('input[type="number"]').attr('name', `Items[${index}].Quantity`);
+                });
+                itemIndex = $('#itemsTable tbody tr').length;
+            }
+
+            // Add initial row
+            addItemRow();
+        });
+    </script>
+}
