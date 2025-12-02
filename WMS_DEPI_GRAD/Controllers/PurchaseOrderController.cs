@@ -60,11 +60,11 @@ public class PurchaseOrderController : Controller
             ExpectedArrivalDate = po.ExpectedArrivalDate,
             Status = po.Status,
             CreatedOn = po.CreatedOn,
-            CreatedBy = po.CreatedBy,
-            CreatedByName = !string.IsNullOrEmpty(po.CreatedBy) && users.ContainsKey(po.CreatedBy) ? users[po.CreatedBy] : po.CreatedBy,
+            //CreatedBy = po.CreatedBy,
+            CreatedBy = !string.IsNullOrEmpty(po.CreatedBy) && users.ContainsKey(po.CreatedBy) ? users[po.CreatedBy] : po.CreatedBy,
             LastModifiedOn = po.LastModifiedOn,
-            LastModifiedBy = po.LastModifiedBy,
-            LastModifiedByName = !string.IsNullOrEmpty(po.LastModifiedBy) && users.ContainsKey(po.LastModifiedBy) ? users[po.LastModifiedBy] : po.LastModifiedBy
+            //LastModifiedBy = po.LastModifiedBy,
+            LastModifiedBy = !string.IsNullOrEmpty(po.LastModifiedBy) && users.ContainsKey(po.LastModifiedBy) ? users[po.LastModifiedBy] : po.LastModifiedBy
         }).ToList();
 
         return View(viewModels);
