@@ -285,11 +285,20 @@ public class ASNController : Controller
 
         try
         {
+            // Fetch the product to get the SKU
+            var product = await _productService.GetByIdAsync(request.Item.ProductId);
+            if (product == null)
+            {
+                return Json(new { success = false, message = "Product not found." });
+            }
+
+            // Create the ASN item with all required fields including SKU
             var item = new AdvancedShippingNoticeItem
             {
                 ProductId = request.Item.ProductId,
                 QtyShipped = request.Item.QtyShipped,
-                LinkedPOItemId = request.Item.LinkedPOItemId
+                LinkedPOItemId = request.Item.LinkedPOItemId,
+                SKU = product.Code // Set SKU from Product.Code
             };
 
             await _asnService.AddItemAsync(request.AsnId, item);
