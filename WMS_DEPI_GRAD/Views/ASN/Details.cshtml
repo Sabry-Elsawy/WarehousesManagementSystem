@@ -4,166 +4,297 @@
     ViewData["Title"] = "ASN Details";
 }
 
-<div class="container-fluid">
+<div class="container-fluid py-4">
+    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-shipping-fast"></i> ASN: @Model.ASN_Number</h2>
         <div>
+            <h2 class="mb-1">
+                <i class="fas fa-shipping-fast text-primary me-2"></i>
+                ASN: <span class="text-primary">@Model.ASN_Number</span>
+            </h2>
+            <p class="text-muted mb-0">Advanced shipping notice details and items</p>
+        </div>
+        <div class="d-flex gap-2">
             @if (Model.Status == WMS.DAL.AdvancedShippingNoticeStatus.Sent)
             {
                 <form asp-action="MarkReceived" asp-route-id="@Model.Id" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-check-circle"></i> Mark as Received
+                    <button type="submit" class="btn btn-success shadow-sm">
+                        <i class="fas fa-check-circle me-2"></i>Mark as Received
                     </button>
                 </form>
             }
             @if (Model.Status == WMS.DAL.AdvancedShippingNoticeStatus.Received)
             {
-                <a asp-controller="Receipt" asp-action="Create" asp-route-asnId="@Model.Id" class="btn btn-primary">
-                    <i class="fas fa-box-open"></i> Create Receipt
+                <a asp-controller="Receipt" asp-action="Create" asp-route-asnId="@Model.Id" class="btn btn-primary shadow-sm">
+                    <i class="fas fa-box-open me-2"></i>Create Receipt
                 </a>
                 <form asp-action="Close" asp-route-id="@Model.Id" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-secondary">
-                        <i class="fas fa-lock"></i> Close ASN
+                    <button type="submit" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-lock me-2"></i>Close ASN
                     </button>
                 </form>
             }
         </div>
     </div>
 
+    <!-- Alert Messages -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
             @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
             @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5>ASN Information</h5>
+    <!-- Two Column Layout for ASN Info and Audit Info -->
+    <div class="row g-4 mb-4">
+        <!-- ASN Information Card -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>ASN Information
+                    </h5>
                 </div>
-                <div class="card-body">
-                    <table class="table table-borderless">
-                        <tr>
-                            <th>ASN Number:</th>
-                            <td>@Model.ASN_Number</td>
-                        </tr>
-                        <tr>
-                            <th>Purchase Order:</th>
-                            <td>
-                                <a asp-controller="PurchaseOrder" asp-action="Details" asp-route-id="@Model.PurchaseOrderId">
-                                    @Model.PO_Number
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Expected Arrival:</th>
-                            <td>@Model.ExpectedArrivalDate.ToShortDateString()</td>
-                        </tr>
-                        <tr>
-                            <th>Tracking Number:</th>
-                            <td>@Model.TrackingNumber</td>
-                        </tr>
-                        <tr>
-                            <th>Status:</th>
-                            <td>
-                                @if (Model.Status == WMS.DAL.AdvancedShippingNoticeStatus.Sent)
-                                {
-                                    <span class="badge bg-info">Sent</span>
-                                }
-                                else if (Model.Status == WMS.DAL.AdvancedShippingNoticeStatus.Received)
-                                {
-                                    <span class="badge bg-success">Received</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Closed</span>
-                                }
-                            </td>
-                        </tr>
-                    </table>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-muted small">
+                            <i class="fas fa-hashtag me-1"></i>ASN NUMBER
+                        </label>
+                        <div class="fs-5 fw-bold text-dark">@Model.ASN_Number</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-muted small">
+                            <i class="fas fa-file-invoice me-1"></i>PURCHASE ORDER
+                        </label>
+                        <div class="fs-5">
+                            <a asp-controller="PurchaseOrder" asp-action="Details" asp-route-id="@Model.PurchaseOrderId" 
+                               class="text-decoration-none">
+                                <i class="fas fa-external-link-alt me-1"></i>@Model.PO_Number
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-muted small">
+                            <i class="fas fa-calendar-alt me-1"></i>EXPECTED ARRIVAL
+                        </label>
+                        <div class="fs-5">@Model.ExpectedArrivalDate.ToShortDateString()</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-muted small">
+                            <i class="fas fa-barcode me-1"></i>TRACKING NUMBER
+                        </label>
+                        <div class="fs-5">
+                            @if (!string.IsNullOrEmpty(Model.TrackingNumber))
+                            {
+                                <code class="bg-light px-3 py-2 rounded">@Model.TrackingNumber</code>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not provided</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold text-muted small">
+                            <i class="fas fa-flag me-1"></i>STATUS
+                        </label>
+                        <div>
+                            @if (Model.Status == WMS.DAL.AdvancedShippingNoticeStatus.Sent)
+                            {
+                                <span class="badge bg-info fs-6 px-3 py-2">
+                                    <i class="fas fa-paper-plane me-1"></i>Sent
+                                </span>
+                            }
+                            else if (Model.Status == WMS.DAL.AdvancedShippingNoticeStatus.Received)
+                            {
+                                <span class="badge bg-success fs-6 px-3 py-2">
+                                    <i class="fas fa-check-circle me-1"></i>Received
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary fs-6 px-3 py-2">
+                                    <i class="fas fa-lock me-1"></i>Closed
+                                </span>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h5>Audit Information</h5>
+        <!-- Audit Information Card -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-info text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Audit Information
+                    </h5>
                 </div>
-                <div class="card-body">
-                    <table class="table table-borderless">
-                        <tr>
-                            <th>Created On:</th>
-                            <td>@Model.CreatedOn</td>
-                        </tr>
-                        <tr>
-                            <th>Created By:</th>
-                            <td>@Model.CreatedBy</td>
-                        </tr>
-                    </table>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-muted small">
+                            <i class="fas fa-clock me-1"></i>CREATED ON
+                        </label>
+                        <div class="fs-5">@Model.CreatedOn</div>
+                    </div>
+
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold text-muted small">
+                            <i class="fas fa-user me-1"></i>CREATED BY
+                        </label>
+                        <div class="fs-5">
+                            <span class="badge bg-light text-dark border px-3 py-2">
+                                @Model.CreatedBy
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-            <h5>ASN Items</h5>
+    <!-- ASN Items Card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">
+                <i class="fas fa-boxes me-2"></i>ASN Shipped Items
+            </h5>
             @if (Model.Status == WMS.DAL.AdvancedShippingNoticeStatus.Sent)
             {
                 <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#addItemModal">
-                    <i class="fas fa-plus"></i> Add Item
+                    <i class="fas fa-plus me-1"></i>Add Item
                 </button>
             }
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark">
                         <tr>
-                            <th>SKU</th>
-                            <th>Product</th>
-                            <th>Qty Shipped</th>
-                            <th>Qty Ordered (PO)</th>
-                            <th>Linked PO Item</th>
+                            <th class="px-4 py-3">SKU</th>
+                            <th class="py-3">Product Name</th>
+                            <th class="py-3 text-center">Qty Shipped</th>
+                            <th class="py-3 text-center">Qty Ordered (PO)</th>
+                            <th class="py-3 text-center">Link Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model.Items)
                         {
                             <tr>
-                                <td>@item.SKU</td>
-                                <td>@item.ProductName</td>
-                                <td>@item.QtyShipped</td>
+                                <td class="px-4">
+                                    <code class="bg-light px-2 py-1 rounded">@item.SKU</code>
+                                </td>
                                 <td>
+                                    <strong>@item.ProductName</strong>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-info px-3 py-2">@item.QtyShipped</span>
+                                </td>
+                                <td class="text-center">
                                     @if (item.LinkedPOItemId.HasValue)
                                     {
                                         var poItem = Model.POItems.FirstOrDefault(p => p.Id == item.LinkedPOItemId.Value);
-                                        @(poItem?.QtyOrdered ?? 0)
+                                        <span class="badge bg-primary px-3 py-2">@(poItem?.QtyOrdered ?? 0)</span>
                                     }
                                     else
                                     {
-                                        <span class="text-muted">N/A</span>
+                                        <span class="text-muted">—</span>
                                     }
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     @if (item.LinkedPOItemId.HasValue)
                                     {
-                                        <span class="badge bg-success"><i class="fas fa-link"></i> Linked</span>
+                                        <span class="badge bg-success px-3 py-2">
+                                            <i class="fas fa-link me-1"></i>Linked
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning text-dark">Not Linked</span>
+                                        <span class="badge bg-warning text-dark px-3 py-2">
+                                            <i class="fas fa-unlink me-1"></i>Not Linked
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (!Model.Items.Any())
+            {
+                <div class="p-5 text-center">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-3">No items added to this shipment yet</p>
+                    @if (Model.Status == WMS.DAL.AdvancedShippingNoticeStatus.Sent)
+                    {
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                            <i class="fas fa-plus me-2"></i>Add Your First Item
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Reference: Purchase Order Items -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-light border-bottom py-3">
+            <h6 class="mb-0 text-dark">
+                <i class="fas fa-list me-2"></i>Reference: Purchase Order Items
+            </h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4 py-2">Product</th>
+                            <th class="py-2 text-center">Qty Ordered</th>
+                            <th class="py-2 text-center">Qty Received</th>
+                            <th class="py-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var poItem in Model.POItems)
+                        {
+                            <tr>
+                                <td class="px-4">
+                                    <small><strong>@poItem.ProductName</strong></small>
+                                </td>
+                                <td class="text-center">
+                                    <small class="badge bg-light text-dark border">@poItem.QtyOrdered</small>
+                                </td>
+                                <td class="text-center">
+                                    <small class="badge bg-light text-dark border">@poItem.QtyReceived</small>
+                                </td>
+                                <td>
+                                    @if (poItem.QtyReceived >= poItem.QtyOrdered)
+                                    {
+                                        <small class="badge bg-success">Complete</small>
+                                    }
+                                    else if (poItem.QtyReceived > 0)
+                                    {
+                                        <small class="badge bg-warning text-dark">Partial</small>
+                                    }
+                                    else
+                                    {
+                                        <small class="badge bg-secondary">Pending</small>
                                     }
                                 </td>
                             </tr>
@@ -174,53 +305,81 @@
         </div>
     </div>
 
-    <div class="mt-3">
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to List
+    <!-- Back Button -->
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-lg btn-outline-secondary shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
         </a>
     </div>
 </div>
 
 <!-- Add Item Modal -->
-<div class="modal fade" id="addItemModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add ASN Item</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addItemModalLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Add Shipped Item to ASN
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <form id="addItemForm">
                     <input type="hidden" id="asnId" value="@Model.Id" />
+                    
                     <div class="mb-3">
-                        <label for="productId" class="form-label">Product</label>
-                        <select id="productId" class="form-select">
+                        <label for="productId" class="form-label fw-semibold">
+                            <i class="fas fa-box me-1 text-primary"></i>Product
+                            <span class="text-danger">*</span>
+                        </label>
+                        <select id="productId" class="form-select form-select-lg" required>
                             <option value="">-- Select Product --</option>
                             @foreach (var product in ViewBag.Products as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)
                             {
                                 <option value="@product.Value">@product.Text</option>
                             }
                         </select>
+                        <small class="text-muted">Select the product being shipped</small>
                     </div>
+
                     <div class="mb-3">
-                        <label for="qtyShipped" class="form-label">Quantity Shipped</label>
-                        <input type="number" id="qtyShipped" class="form-control" min="1" value="1" />
+                        <label for="qtyShipped" class="form-label fw-semibold">
+                            <i class="fas fa-sort-numeric-up me-1 text-primary"></i>Quantity Shipped
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" id="qtyShipped" class="form-control form-control-lg" min="1" value="1" required />
+                        <small class="text-muted">Must be at least 1</small>
                     </div>
+
                     <div class="mb-3">
-                        <label for="linkedPOItemId" class="form-label">Link to PO Item (Optional)</label>
-                        <select id="linkedPOItemId" class="form-select">
+                        <label for="linkedPOItemId" class="form-label fw-semibold">
+                            <i class="fas fa-link me-1 text-primary"></i>Link to PO Item
+                            <span class="badge bg-secondary ms-1">Optional</span>
+                        </label>
+                        <select id="linkedPOItemId" class="form-select form-select-lg">
                             <option value="">-- Not Linked --</option>
                             @foreach (var poItem in Model.POItems)
                             {
-                                <option value="@poItem.Id">@poItem.ProductName (@poItem.QtyOrdered units)</option>
+                                <option value="@poItem.Id">@poItem.ProductName (@poItem.QtyOrdered units ordered)</option>
                             }
                         </select>
+                        <small class="text-muted">Link this item to a PO line item if applicable</small>
+                    </div>
+
+                    <!-- Validation Alert (Hidden by default) -->
+                    <div id="validationAlert" class="alert alert-danger d-none" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="validationMessage"></span>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="addItem()">Add Item</button>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary px-4" onclick="addItem()">
+                    <i class="fas fa-plus me-2"></i>Add Item
+                </button>
             </div>
         </div>
     </div>
@@ -228,17 +387,60 @@
 
 @section Scripts {
     <script>
+        function showValidationError(message) {
+            $('#validationMessage').text(message);
+            $('#validationAlert').removeClass('d-none');
+        }
+
+        function hideValidationError() {
+            $('#validationAlert').addClass('d-none');
+        }
+
         function addItem() {
+            // Hide previous validation errors
+            hideValidationError();
+
+            // Get form values
+            const productId = $('#productId').val();
+            const qtyShipped = parseInt($('#qtyShipped').val());
             const linkedPOItemValue = $('#linkedPOItemId').val();
+
+            // Client-side validation
+            if (!productId || productId === '') {
+                showValidationError('Please select a product.');
+                $('#productId').focus();
+                return;
+            }
+
+            if (!qtyShipped || qtyShipped <= 0) {
+                showValidationError('Quantity shipped must be greater than 0.');
+                $('#qtyShipped').focus();
+                return;
+            }
+
+            if (isNaN(qtyShipped)) {
+                showValidationError('Quantity shipped must be a valid number.');
+                $('#qtyShipped').focus();
+                return;
+            }
+
+            // Prepare data
             const data = {
                 asnId: parseInt($('#asnId').val()),
                 item: {
-                    productId: parseInt($('#productId').val()),
-                    qtyShipped: parseInt($('#qtyShipped').val()),
+                    productId: parseInt(productId),
+                    qtyShipped: qtyShipped,
                     linkedPOItemId: linkedPOItemValue ? parseInt(linkedPOItemValue) : null
                 }
             };
 
+            // Disable button during submission
+            const submitBtn = event.target;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+
+            // AJAX call
             $.ajax({
                 url: '@Url.Action("AddItem")',
                 type: 'POST',
@@ -246,15 +448,35 @@
                 data: JSON.stringify(data),
                 success: function (result) {
                     if (result.success) {
+                        // Success - reload page
                         location.reload();
                     } else {
-                        alert(result.message);
+                        // Server-side validation error
+                        showValidationError(result.message || 'Error adding item');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
                     }
                 },
-                error: function () {
-                    alert('Error adding item');
+                error: function (xhr, status, error) {
+                    showValidationError('An error occurred while adding the item: ' + error);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
                 }
             });
         }
+
+        // Allow Enter key to submit modal form
+        $('#addItemForm').on('keypress', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                addItem();
+            }
+        });
+
+        // Reset form and hide validation when modal is closed
+        $('#addItemModal').on('hidden.bs.modal', function () {
+            $('#addItemForm')[0].reset();
+            hideValidationError();
+        });
     </script>
 }

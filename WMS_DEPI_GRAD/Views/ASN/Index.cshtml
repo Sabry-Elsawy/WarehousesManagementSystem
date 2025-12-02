@@ -4,67 +4,113 @@
     ViewData["Title"] = "Advanced Shipping Notices (ASN)";
 }
 
-<div class="container-fluid">
+<div class="container-fluid py-4">
+    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-shipping-fast"></i> Advanced Shipping Notices</h2>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Create New ASN
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-shipping-fast text-primary me-2"></i>
+                Advanced Shipping Notices
+            </h2>
+            <p class="text-muted mb-0">Manage incoming shipments and track deliveries</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+            <i class="fas fa-plus me-2"></i>Create New ASN
         </a>
     </div>
 
+    <!-- Alert Messages -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
             @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
             @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <div class="card">
-        <div class="card-body">
+    <!-- ASN Table Card -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="mb-0 text-dark">
+                <i class="fas fa-list me-2"></i>All Shipping Notices
+            </h5>
+        </div>
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th>ASN Number</th>
-                            <th>PO Number</th>
-                            <th>Expected Arrival</th>
-                            <th>Tracking Number</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="px-4 py-3">ASN Number</th>
+                            <th class="py-3">PO Number</th>
+                            <th class="py-3">Expected Arrival</th>
+                            <th class="py-3">Tracking Number</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td><strong>@item.ASN_Number</strong></td>
-                                <td>@item.PO_Number</td>
-                                <td>@item.ExpectedArrivalDate.ToShortDateString()</td>
-                                <td>@item.TrackingNumber</td>
+                                <td class="px-4">
+                                    <strong class="text-dark">@item.ASN_Number</strong>
+                                </td>
                                 <td>
-                                    @if (item.Status == WMS.DAL.AdvancedShippingNoticeStatus.Sent)
+                                    <a asp-controller="PurchaseOrder" asp-action="Details" asp-route-id="@item.PurchaseOrderId" 
+                                       class="text-decoration-none">
+                                        @item.PO_Number
+                                    </a>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        <i class="far fa-calendar-alt me-1"></i>
+                                        @item.ExpectedArrivalDate.ToShortDateString()
+                                    </small>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.TrackingNumber))
                                     {
-                                        <span class="badge bg-info">Sent</span>
-                                    }
-                                    else if (item.Status == WMS.DAL.AdvancedShippingNoticeStatus.Received)
-                                    {
-                                        <span class="badge bg-success">Received</span>
+                                        <code class="bg-light px-2 py-1 rounded">@item.TrackingNumber</code>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary">Closed</span>
+                                        <span class="text-muted">—</span>
                                     }
                                 </td>
                                 <td>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="View Details">
+                                    @if (item.Status == WMS.DAL.AdvancedShippingNoticeStatus.Sent)
+                                    {
+                                        <span class="badge bg-info px-3 py-2">
+                                            <i class="fas fa-paper-plane me-1"></i>Sent
+                                        </span>
+                                    }
+                                    else if (item.Status == WMS.DAL.AdvancedShippingNoticeStatus.Received)
+                                    {
+                                        <span class="badge bg-success px-3 py-2">
+                                            <i class="fas fa-check-circle me-1"></i>Received
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary px-3 py-2">
+                                            <i class="fas fa-lock me-1"></i>Closed
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a asp-action="Details" asp-route-id="@item.Id" 
+                                       class="btn btn-sm btn-info text-white" 
+                                       title="View Details"
+                                       data-bs-toggle="tooltip">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                 </td>
@@ -74,5 +120,25 @@
                 </table>
             </div>
         </div>
+        @if (!Model.Any())
+        {
+            <div class="card-body text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="text-muted mb-3">No shipping notices found</p>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create Your First ASN
+                </a>
+            </div>
+        }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Initialize Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+}

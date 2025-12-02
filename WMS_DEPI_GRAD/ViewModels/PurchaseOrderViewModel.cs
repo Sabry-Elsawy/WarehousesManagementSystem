@@ -38,8 +38,10 @@ public class PurchaseOrderViewModel
 
     public DateTime CreatedOn { get; set; }
     public string? CreatedBy { get; set; }
+    public string? CreatedByName { get; set; } // Added for User Name display
     public DateTime? LastModifiedOn { get; set; }
     public string? LastModifiedBy { get; set; }
+    public string? LastModifiedByName { get; set; } // Added for User Name display
 }
 
 public class PurchaseOrderItemViewModel
