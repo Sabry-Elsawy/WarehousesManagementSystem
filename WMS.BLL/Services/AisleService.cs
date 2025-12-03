@@ -34,7 +34,12 @@ namespace WMS.BLL.Services
         public async Task<Aisle?> GetAisleByIdAsync(int id)
         {
             var aisleRepository = _unitOfWork.GetRepository<Aisle, int>();
-            return await aisleRepository.GetByIdAsync(id);
+            return await aisleRepository.GetByIdAsync(
+                id,
+                include: query => query
+                    .Include(a => a.Zone)
+                    .ThenInclude(z => z.Warehouse)
+            );
         }
 
         public async Task<IReadOnlyList<Aisle>> GetAllAislesAsync()

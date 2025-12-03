@@ -35,7 +35,13 @@ namespace WMS.BLL.Services
         public async Task<Rack?> GetRackByIdAsync(int id)
         {
             var rackRepository = _unitOfWork.GetRepository<Rack, int>();
-            return await rackRepository.GetByIdAsync(id);
+            return await rackRepository.GetByIdAsync(
+                id,
+                include: query => query
+                    .Include(r => r.Aisle)
+                    .ThenInclude(a => a.Zone)
+                    .ThenInclude(z => z.Warehouse)
+            );
         }
 
         public async Task<IReadOnlyList<Rack>> GetAllRacksAsync()
