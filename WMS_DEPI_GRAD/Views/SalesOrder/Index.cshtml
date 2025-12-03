@@ -1,39 +1,91 @@
-﻿@using WMS_DEPI_GRAD.Models
+﻿@model IEnumerable<WMS_DEPI_GRAD.ViewModels.SalesOrderViewModel>
 
+@{
+    ViewData["Title"] = "Sales Orders";
+}
 
-@model IEnumerable<SalesOrderModel>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-cart-check"></i> Sales Orders</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New Sales Order
+        </a>
+    </div>
 
-
-
-<h1 class="mt-4">Today's Sales Orders <span class="text-primary-orange" >@DateTime.Now.ToString("MM/dd/yyyy")</span></h1>
-<p class="mt-4">Total Sales Orders: @Model.Count()</p>
-
-<table class="table table-striped my-4">
-    <thead class="bg-dark text-secondary-orange">
-        <tr>
-            <th >#Sales Order ID</th>
-            <th >Customer Name</th>
-            <th >Order Date</th>
-            <th ></th>
-            
-        </tr>
-        </tr>
-       
-    </thead>
-    <tbody>
-    @foreach (var receipt in Model)
+    @if (TempData["Success"] != null)
     {
-        <tr>
-            <td>#@receipt.Id</td>
-            <td>@receipt.CustomerName</td>
-            <td>@receipt.OrderDate.ToString("MM/dd/yyyy")</td>
-            <td class="task-process text-end">
-                <a asp-action="GetSalesOrder" asp-route-id="@receipt.Id" class="p-1 border-radius-0 btn-hero-secondary">Order Details</a>
-            </td>
-        </tr>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
     }
-    </tbody>
-</table>
 
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
-
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>SO Number</th>
+                            <th>Customer</th>
+                            <th>Warehouse</th>
+                            <th>Order Date</th>
+                            <th>Status</th>
+                            <th>Created On</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td><strong>@item.SO_Number</strong></td>
+                                <td>@item.CustomerName</td>
+                                <td>@item.WarehouseName</td>
+                                <td>@item.OrderDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    @if (item.Status == WMS.DAL.SalesOrderStatus.Draft)
+                                    {
+                                        <span class="badge bg-secondary">Draft</span>
+                                    }
+                                    else if (item.Status == WMS.DAL.SalesOrderStatus.Submitted)
+                                    {
+                                        <span class="badge bg-info">Submitted</span>
+                                    }
+                                    else if (item.Status == WMS.DAL.SalesOrderStatus.Picked)
+                                    {
+                                        <span class="badge bg-warning">Picked</span>
+                                    }
+                                    else if (item.Status == WMS.DAL.SalesOrderStatus.Shipped)
+                                    {
+                                        <span class="badge bg-success">Shipped</span>
+                                    }
+                                </td>
+                                <td>@item.CreatedOn.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    @if (item.Status == WMS.DAL.SalesOrderStatus.Draft)
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

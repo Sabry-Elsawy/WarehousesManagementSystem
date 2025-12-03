@@ -1,0 +1,64 @@
+@model WMS_DEPI_GRAD.ViewModels.SalesOrderViewModel
+
+@{
+    ViewData["Title"] = "Edit Sales Order";
+}
+
+<div class="container-fluid">
+    <h2><i class="bi bi-pencil"></i> Edit Sales Order</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="SO_Number" class="form-label"></label>
+                            <input asp-for="SO_Number" class="form-control" />
+                            <span asp-validation-for="SO_Number" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CustomerId" class="form-label"></label>
+                            <select asp-for="CustomerId" class="form-select" asp-items="ViewBag.Customers">
+                                <option value="">-- Select Customer --</option>
+                            </select>
+                            <span asp-validation-for="CustomerId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="WarehouseId" class="form-label"></label>
+                            <select asp-for="WarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
+                                <option value="">-- Select Warehouse --</option>
+                            </select>
+                            <span asp-validation-for="WarehouseId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="OrderDate" class="form-label"></label>
+                            <input asp-for="OrderDate" class="form-control" type="date" />
+                            <span asp-validation-for="OrderDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Update Sales Order
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -33,6 +33,11 @@ public static class DependencyInjection
         services.AddScoped<ISupplierService, SupplierService>();
         services.AddScoped<ICustomerService, CustomerService>();
 
+        // Outbound Cycle Services
+        services.AddScoped<ISalesOrderService, SalesOrderService>();
+        services.AddScoped<IPickingService, PickingService>();
+        services.AddScoped<IShippingService, ShippingService>();
+
 
         return services;
     }
