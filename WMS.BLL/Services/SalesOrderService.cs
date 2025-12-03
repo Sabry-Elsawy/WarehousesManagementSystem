@@ -225,11 +225,11 @@ public class SalesOrderService : ISalesOrderService
 
         // Check for linked picking tasks
         var pickingRepo = _unitOfWork.GetRepository<Picking, int>();
-        var pickings = await pickingRepo.GetAllAsync(withTracking: false);
+        var pickings = await pickingRepo.GetAllAsync(false);
 
         // Get all SO_Items for this SO
         var itemRepo = _unitOfWork.GetRepository<SO_Item, int>();
-        var items = await itemRepo.GetAllAsync(withTracking: false);
+        var items = await itemRepo.GetAllAsync(false);
         var soItemIds = items.Where(i => i.SalesOrderId == id).Select(i => i.Id).ToList();
 
         if (pickings.Any(p => soItemIds.Contains(p.SO_ItemId)))

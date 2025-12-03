@@ -31,7 +31,7 @@ public class PickingController : Controller
             CustomerName = p.SO_Item?.SalesOrder?.Customer?.Name ?? "N/A",
             ProductName = p.Product?.Name ?? "",
             SKU = p.Product?.Code ?? "",
-            BinLocation = p.Bin?.BinLocation ?? "",
+            BinLocation = p.Bin?.Code ?? "",
             QuantityToPick = p.QuantityToPick,
             QuantityPicked = p.QuantityPicked,
             Status = p.Status,
@@ -72,7 +72,7 @@ public class PickingController : Controller
             CustomerName = salesOrder.Customer?.Name ?? "",
             ProductName = p.Product?.Name ?? "",
             SKU = p.Product?.Code ?? "",
-            BinLocation = p.Bin?.BinLocation ?? "",
+            BinLocation = p.Bin?.Code ?? "",
             QuantityToPick = p.QuantityToPick,
             QuantityPicked = p.QuantityPicked,
             Status = p.Status,
@@ -91,7 +91,7 @@ public class PickingController : Controller
         var viewModel = new ConfirmPickingViewModel
         {
             PickingTaskId = picking.Id,
-            BinLocation = picking.Bin?.BinLocation ?? "",
+            BinLocation = picking.Bin?.Code ?? "",
             ProductName = picking.Product?.Name ?? "",
             SKU = picking.Product?.Code ?? "",
             QuantityToPick = picking.QuantityToPick,

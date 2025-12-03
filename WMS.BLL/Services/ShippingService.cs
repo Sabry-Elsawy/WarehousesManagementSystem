@@ -42,10 +42,10 @@ public class ShippingService : IShippingService
         var pickingRepo = _unitOfWork.GetRepository<Picking, int>();
         var itemRepo = _unitOfWork.GetRepository<SO_Item, int>();
         
-        var items = await itemRepo.GetAllAsync(withTracking: false);
+        var items = await itemRepo.GetAllAsync(false);
         var soItemIds = items.Where(i => i.SalesOrderId == salesOrderId).Select(i => i.Id).ToList();
 
-        var allPickings = await pickingRepo.GetAllAsync(withTracking: false);
+        var allPickings = await pickingRepo.GetAllAsync(false);
         var pickingsForSO = allPickings.Where(p => soItemIds.Contains(p.SO_ItemId)).ToList();
 
         if (pickingsForSO.Any(p => p.Status != PickingStatus.Picked && p.Status != PickingStatus.Cancelled))

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
+using WMS.DAL.Entities;
 using WMS.DAL.UnitOfWork;
 
 namespace WMS.BLL.Services;
@@ -31,7 +32,7 @@ public class PickingService : IPickingService
         var itemRepo = _unitOfWork.GetRepository<SO_Item, int>();
 
         // Get all items for this SO
-        var items = await itemRepo.GetAllAsync(withTracking: false);
+        var items = await itemRepo.GetAllAsync(false);
         var soItemIds = items.Where(i => i.SalesOrderId == soId).Select(i => i.Id).ToList();
 
         // Get all pickings for these items
@@ -81,7 +82,7 @@ public class PickingService : IPickingService
             var qtyNeeded = soItem.QtyOrdered;
 
             // Get available inventory for this product, ordered by BinId (simple FIFO)
-            var inventoryRecords = await inventoryRepo.GetAllAsync(withTracking: true);
+            var inventoryRecords = await inventoryRepo.GetAllAsync(true);
             var availableInventory = inventoryRecords
                 .Where(inv => inv.ProductId == soItem.ProductId && inv.Quantity > 0)
                 .OrderBy(inv => inv.BinId)
@@ -168,7 +169,7 @@ public class PickingService : IPickingService
 
         // Reduce inventory
         var inventoryRepo = _unitOfWork.GetRepository<Inventory, int>();
-        var inventoryRecords = await inventoryRepo.GetAllAsync(withTracking: true);
+        var inventoryRecords = await inventoryRepo.GetAllAsync(true);
         var inventory = inventoryRecords.FirstOrDefault(inv => inv.BinId == picking.BinId && inv.ProductId == picking.ProductId);
 
         if (inventory != null)
