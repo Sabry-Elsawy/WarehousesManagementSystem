@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
 using WMS.DAL.Entities;
@@ -40,7 +41,14 @@ namespace WMS.BLL.Services
         public async Task<IReadOnlyList<Rack>> GetAllRacksAsync()
         {
             var rackRepository = _unitOfWork.GetRepository<Rack, int>();
-            return await rackRepository.GetAllAsync(false);
+            var racks = await rackRepository.GetAllWithIncludeAsync(
+                withTracking: false,
+                include: query => query
+                    .Include(r => r.Aisle)
+                    .ThenInclude(a => a.Zone)
+                    .ThenInclude(z => z.Warehouse)
+            );
+            return racks.ToList();
         }
 
         public async Task<IReadOnlyList<Rack>> GetRacksByAisleIdAsync(int aisleId)
