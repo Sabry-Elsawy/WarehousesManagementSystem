@@ -1,0 +1,110 @@
+@model IEnumerable<WMS_DEPI_GRAD.ViewModels.PickingTaskViewModel>
+
+@{
+    ViewData["Title"] = "Picking Tasks - " + ViewBag.SalesOrder.SO_Number;
+    var so = ViewBag.SalesOrder as WMS_DEPI_GRAD.ViewModels.SalesOrderViewModel;
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-list-check"></i> Picking Tasks for @so.SO_Number</h2>
+        <a asp-controller="SalesOrder" asp-action="Details" asp-route-id="@so.Id" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Sales Order
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Customer:</strong> @so.CustomerName
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Warehouse:</strong> @so.WarehouseName
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Order Date:</strong> @so.OrderDate.ToString("yyyy-MM-dd")
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Status:</strong>
+                            @if (so.Status == WMS.DAL.SalesOrderStatus.Submitted)
+                            {
+                                <span class="badge bg-info">Submitted</span>
+                            }
+                            else if (so.Status == WMS.DAL.SalesOrderStatus.Picked)
+                            {
+                                <span class="badge bg-warning">Picked</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Picking Tasks</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Bin Location</th>
+                            <th>Qty to Pick</th>
+                            <th>Qty Picked</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.ProductName</td>
+                                <td>@item.SKU</td>
+                                <td><strong class="text-primary">@item.BinLocation</strong></td>
+                                <td>@item.QuantityToPick</td>
+                                <td>@item.QuantityPicked</td>
+                                <td>
+                                    @if (item.Status == WMS.DAL.PickingStatus.Pending)
+                                    {
+                                        <span class="badge bg-warning">Pending</span>
+                                    }
+                                    else if (item.Status == WMS.DAL.PickingStatus.InProgress)
+                                    {
+                                        <span class="badge bg-info">In Progress</span>
+                                    }
+                                    else if (item.Status == WMS.DAL.PickingStatus.Picked)
+                                    {
+                                        <span class="badge bg-success">Picked</span>
+                                    }
+                                    else if (item.Status == WMS.DAL.PickingStatus.Cancelled)
+                                    {
+                                        <span class="badge bg-secondary">Cancelled</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.Status == WMS.DAL.PickingStatus.Pending || item.Status == WMS.DAL.PickingStatus.InProgress)
+                                    {
+                                        <a asp-action="Confirm" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-check-circle"></i> Confirm
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

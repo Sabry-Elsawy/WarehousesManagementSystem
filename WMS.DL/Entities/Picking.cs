@@ -5,16 +5,17 @@ namespace WMS.DAL;
 
 public class Picking : BaseAuditableEntity<int>
 {
-    public int Qty { get; set; }
-    public string Status { get; set; }
+    public int QuantityToPick { get; set; }
+    public int QuantityPicked { get; set; }
+    public PickingStatus Status { get; set; }
 
-
+    // Foreign Keys
     public int SO_ItemId { get; set; }
-    public SO_Item SO_Item { get; set; }  
-
     public int ProductId { get; set; }
-    public Product Product { get; set; }  
-
     public int BinId { get; set; }
-    public Bin Bin { get; set; }  
+
+    // Navigation Properties
+    public SO_Item SO_Item { get; set; } = null!;
+    public Product Product { get; set; } = null!;
+    public Bin Bin { get; set; } = null!;
 }

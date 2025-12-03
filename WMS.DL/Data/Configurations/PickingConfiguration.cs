@@ -9,11 +9,13 @@ internal class PickingConfiguration : BaseAuditableEntityConfiguration<Picking, 
     {
         base.Configure(builder);
 
-        builder.Property(p => p.Qty)
-       .IsRequired();
+        builder.Property(p => p.QuantityToPick)
+               .IsRequired();
+
+        builder.Property(p => p.QuantityPicked)
+               .IsRequired();
 
         builder.Property(p => p.Status)
-               .HasMaxLength(50)
                .IsRequired();
 
         //relationships

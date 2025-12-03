@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
 using WMS.DAL.UnitOfWork;
@@ -33,13 +34,20 @@ namespace WMS.BLL.Services
         public async Task<Zone?> GetZoneByIdAsync(int id)
         {
             var zoneRepository = _unitOfWork.GetRepository<Zone, int>();
-            return await zoneRepository.GetByIdAsync(id);
+            return await zoneRepository.GetByIdAsync(
+                id,
+                include: query => query.Include(z => z.Warehouse)
+            );
         }
 
         public async Task<IReadOnlyList<Zone>> GetAllZonesAsync()
         {
             var zoneRepository = _unitOfWork.GetRepository<Zone, int>();
-            return await zoneRepository.GetAllAsync(false);
+            var zones = await zoneRepository.GetAllWithIncludeAsync(
+                withTracking: false,
+                include: query => query.Include(z => z.Warehouse)
+            );
+            return zones.ToList();
         }
 
         public async Task<IReadOnlyList<Zone>> GetZonesByWarehouseIdAsync(int warehouseId)

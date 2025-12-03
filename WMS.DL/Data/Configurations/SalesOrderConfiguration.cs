@@ -12,12 +12,21 @@ internal class SalesOrderConfiguration : BaseAuditableEntityConfiguration<SalesO
         builder.Property(so => so.OrderDate)
        .IsRequired();
 
-        builder.Property(so => so.CustomerRef)
+        builder.Property(so => so.SO_Number)
                .HasMaxLength(50)
                .IsRequired();
 
         builder.Property(so => so.Status)
-               .HasMaxLength(20)
                .IsRequired();
+
+        builder.HasOne(so => so.Customer)
+               .WithMany()
+               .HasForeignKey(so => so.CustomerId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(so => so.Warehouse)
+               .WithMany()
+               .HasForeignKey(so => so.WarehouseId)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

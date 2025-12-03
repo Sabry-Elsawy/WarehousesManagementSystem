@@ -21,8 +21,8 @@ internal class SO_ItemConfiguration : BaseAuditableEntityConfiguration<SO_Item, 
         builder.Property(si => si.QtyPicked)
                .IsRequired();
 
-        builder.Property(si => si.Status)
-               .HasMaxLength(20)
+        builder.Property(si => si.UnitPrice)
+               .HasColumnType("decimal(18,2)")
                .IsRequired();
 
 
