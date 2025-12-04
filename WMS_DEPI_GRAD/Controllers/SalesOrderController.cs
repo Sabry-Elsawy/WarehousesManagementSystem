@@ -1,253 +1,319 @@
-﻿namespace WMS_DEPI_GRAD.Controllers;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using WMS.BLL.Interfaces;
+using WMS.DAL;
+using WMS.DAL.Entities._Identity;
+using WMS.DAL.UnitOfWork;
+using WMS_DEPI_GRAD.ViewModels;
 
+namespace WMS_DEPI_GRAD.Controllers;
+
+//[Authorize]
 public class SalesOrderController : Controller
 {
-    public IActionResult Index()
-    {
-        var salesOrders = new List<SalesOrderModel>
-    {
-        new SalesOrderModel
-        {
-            Id = 1001,
-            CustomerName = "Tech Solutions Inc.",
-            OrderDate = new DateTime(2024, 1, 15),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "LAP-001", SalesOrderId = 1001, ProductName = "Business Laptop", Qty = 5 },
-                new SalesOrderItemModel { SKU = "MON-001", SalesOrderId = 1001, ProductName = "24-inch Monitor", Qty = 10 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1002,
-            CustomerName = "Office Supplies Co.",
-            OrderDate = new DateTime(2024, 1, 16),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "DESK-001", SalesOrderId = 1002, ProductName = "Executive Desk", Qty = 3 },
-                new SalesOrderItemModel { SKU = "CHAIR-001", SalesOrderId = 1002, ProductName = "Ergonomic Chair", Qty = 6 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1003,
-            CustomerName = "Retail Store Chain",
-            OrderDate = new DateTime(2024, 1, 17),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "PHONE-001", SalesOrderId = 1003, ProductName = "Smartphone", Qty = 25 },
-                new SalesOrderItemModel { SKU = "TAB-001", SalesOrderId = 1003, ProductName = "Tablet", Qty = 15 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1004,
-            CustomerName = "Hospital Equipment Ltd.",
-            OrderDate = new DateTime(2024, 1, 18),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "SCAN-001", SalesOrderId = 1004, ProductName = "Medical Scanner", Qty = 2 },
-                new SalesOrderItemModel { SKU = "MON-002", SalesOrderId = 1004, ProductName = "Medical Monitor", Qty = 4 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1005,
-            CustomerName = "Construction Pro",
-            OrderDate = new DateTime(2024, 1, 19),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "TOOL-001", SalesOrderId = 1005, ProductName = "Power Drill", Qty = 8 },
-                new SalesOrderItemModel { SKU = "SAFE-001", SalesOrderId = 1005, ProductName = "Safety Helmet", Qty = 20 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1006,
-            CustomerName = "Fashion Retail Inc.",
-            OrderDate = new DateTime(2024, 1, 20),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "SHIRT-001", SalesOrderId = 1006, ProductName = "Cotton Shirt", Qty = 50 },
-                new SalesOrderItemModel { SKU = "PANTS-001", SalesOrderId = 1006, ProductName = "Denim Jeans", Qty = 40 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1007,
-            CustomerName = "Auto Parts Distributor",
-            OrderDate = new DateTime(2024, 1, 21),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "OIL-001", SalesOrderId = 1007, ProductName = "Engine Oil", Qty = 100 },
-                new SalesOrderItemModel { SKU = "FILTER-001", SalesOrderId = 1007, ProductName = "Air Filter", Qty = 75 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1008,
-            CustomerName = "Home Appliances Corp.",
-            OrderDate = new DateTime(2024, 1, 22),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "FRIDGE-001", SalesOrderId = 1008, ProductName = "Refrigerator", Qty = 12 },
-                new SalesOrderItemModel { SKU = "WASH-001", SalesOrderId = 1008, ProductName = "Washing Machine", Qty = 10 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1009,
-            CustomerName = "Sports Equipment Ltd.",
-            OrderDate = new DateTime(2024, 1, 23),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "BIKE-001", SalesOrderId = 1009, ProductName = "Mountain Bike", Qty = 6 },
-                new SalesOrderItemModel { SKU = "TREAD-001", SalesOrderId = 1009, ProductName = "Treadmill", Qty = 4 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1010,
-            CustomerName = "Bookstore Chain",
-            OrderDate = new DateTime(2024, 1, 24),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "BOOK-001", SalesOrderId = 1010, ProductName = "Bestseller Novel", Qty = 200 },
-                new SalesOrderItemModel { SKU = "BOOK-002", SalesOrderId = 1010, ProductName = "Educational Textbook", Qty = 150 }
-            }
-        }
-    };
-        // Assume this method fetches the data
-        return View(salesOrders);
-    }
-    
+    private readonly ISalesOrderService _soService;
+    private readonly IPickingService _pickingService;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IProductService _productService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public IActionResult GetSalesOrder(int id)
+    public SalesOrderController(
+        ISalesOrderService soService,
+        IPickingService pickingService,
+        IUnitOfWork unitOfWork,
+        IProductService productService,
+        UserManager<ApplicationUser> userManager)
     {
-        // In a real application, fetch the sales order from the database
-          var salesOrders = new List<SalesOrderModel>
-    {
-        new SalesOrderModel
-        {
-            Id = 1001,
-            CustomerName = "Tech Solutions Inc.",
-            OrderDate = new DateTime(2024, 1, 15),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "LAP-001", SalesOrderId = 1001, ProductName = "Business Laptop", Qty = 5 },
-                new SalesOrderItemModel { SKU = "MON-001", SalesOrderId = 1001, ProductName = "24-inch Monitor", Qty = 10 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1002,
-            CustomerName = "Office Supplies Co.",
-            OrderDate = new DateTime(2024, 1, 16),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "DESK-001", SalesOrderId = 1002, ProductName = "Executive Desk", Qty = 3 },
-                new SalesOrderItemModel { SKU = "CHAIR-001", SalesOrderId = 1002, ProductName = "Ergonomic Chair", Qty = 6 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1003,
-            CustomerName = "Retail Store Chain",
-            OrderDate = new DateTime(2024, 1, 17),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "PHONE-001", SalesOrderId = 1003, ProductName = "Smartphone", Qty = 25 },
-                new SalesOrderItemModel { SKU = "TAB-001", SalesOrderId = 1003, ProductName = "Tablet", Qty = 15 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1004,
-            CustomerName = "Hospital Equipment Ltd.",
-            OrderDate = new DateTime(2024, 1, 18),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "SCAN-001", SalesOrderId = 1004, ProductName = "Medical Scanner", Qty = 2 },
-                new SalesOrderItemModel { SKU = "MON-002", SalesOrderId = 1004, ProductName = "Medical Monitor", Qty = 4 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1005,
-            CustomerName = "Construction Pro",
-            OrderDate = new DateTime(2024, 1, 19),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "TOOL-001", SalesOrderId = 1005, ProductName = "Power Drill", Qty = 8 },
-                new SalesOrderItemModel { SKU = "SAFE-001", SalesOrderId = 1005, ProductName = "Safety Helmet", Qty = 20 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1006,
-            CustomerName = "Fashion Retail Inc.",
-            OrderDate = new DateTime(2024, 1, 20),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "SHIRT-001", SalesOrderId = 1006, ProductName = "Cotton Shirt", Qty = 50 },
-                new SalesOrderItemModel { SKU = "PANTS-001", SalesOrderId = 1006, ProductName = "Denim Jeans", Qty = 40 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1007,
-            CustomerName = "Auto Parts Distributor",
-            OrderDate = new DateTime(2024, 1, 21),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "OIL-001", SalesOrderId = 1007, ProductName = "Engine Oil", Qty = 100 },
-                new SalesOrderItemModel { SKU = "FILTER-001", SalesOrderId = 1007, ProductName = "Air Filter", Qty = 75 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1008,
-            CustomerName = "Home Appliances Corp.",
-            OrderDate = new DateTime(2024, 1, 22),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "FRIDGE-001", SalesOrderId = 1008, ProductName = "Refrigerator", Qty = 12 },
-                new SalesOrderItemModel { SKU = "WASH-001", SalesOrderId = 1008, ProductName = "Washing Machine", Qty = 10 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1009,
-            CustomerName = "Sports Equipment Ltd.",
-            OrderDate = new DateTime(2024, 1, 23),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "BIKE-001", SalesOrderId = 1009, ProductName = "Mountain Bike", Qty = 6 },
-                new SalesOrderItemModel { SKU = "TREAD-001", SalesOrderId = 1009, ProductName = "Treadmill", Qty = 4 }
-            }
-        },
-        new SalesOrderModel
-        {
-            Id = 1010,
-            CustomerName = "Bookstore Chain",
-            OrderDate = new DateTime(2024, 1, 24),
-            Items = new List<SalesOrderItemModel>
-            {
-                new SalesOrderItemModel { SKU = "BOOK-001", SalesOrderId = 1010, ProductName = "Bestseller Novel", Qty = 200 },
-                new SalesOrderItemModel { SKU = "BOOK-002", SalesOrderId = 1010, ProductName = "Educational Textbook", Qty = 150 }
-            }
-        }
-    };
-
-        foreach (var order in salesOrders)
-        {
-            if (order.Id == id)
-            {
-               return View(order);
-                
-            }
-        }
-        return NotFound();
+        _soService = soService;
+        _pickingService = pickingService;
+        _unitOfWork = unitOfWork;
+        _productService = productService;
+        _userManager = userManager;
     }
 
+    public async Task<IActionResult> Index()
+    {
+        var salesOrders = await _soService.GetAllAsync();
+
+        // Get all unique user IDs
+        var userIds = salesOrders.Select(s => s.CreatedBy)
+            .Union(salesOrders.Select(s => s.LastModifiedBy))
+            .Where(id => !string.IsNullOrEmpty(id))
+            .Distinct()
+            .ToList();
+
+        // Fetch users dictionary for fast lookup
+        var users = new Dictionary<string, string>();
+        foreach (var userId in userIds)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                users[userId] = $"{user.FirstName} {user.LastName}";
+            }
+        }
+
+        var viewModels = salesOrders.Select(so => new SalesOrderViewModel
+        {
+            Id = so.Id,
+            SO_Number = so.SO_Number,
+            CustomerId = so.CustomerId,
+            CustomerName = so.Customer?.Name ?? "N/A",
+            WarehouseId = so.WarehouseId,
+            WarehouseName = so.Warehouse?.Name ?? "N/A",
+            OrderDate = so.OrderDate,
+            Status = so.Status,
+            CreatedOn = so.CreatedOn,
+            CreatedBy = !string.IsNullOrEmpty(so.CreatedBy) && users.ContainsKey(so.CreatedBy) ? users[so.CreatedBy] : so.CreatedBy,
+            LastModifiedOn = so.LastModifiedOn,
+            LastModifiedBy = !string.IsNullOrEmpty(so.LastModifiedBy) && users.ContainsKey(so.LastModifiedBy) ? users[so.LastModifiedBy] : so.LastModifiedBy
+        }).ToList();
+
+        return View(viewModels);
+    }
+
+    public async Task<IActionResult> Details(int id)
+    {
+        var so = await _soService.GetByIdAsync(id);
+        if (so == null)
+            return NotFound();
+
+        await LoadLookups();
+
+        var products = await _productService.GetAllAsync();
+
+        var model = new SalesOrderViewModel
+        {
+            Id = so.Id,
+            SO_Number = so.SO_Number,
+            CustomerId = so.CustomerId,
+            CustomerName = so.Customer?.Name ?? "",
+            WarehouseId = so.WarehouseId,
+            WarehouseName = so.Warehouse?.Name ?? "",
+            OrderDate = so.OrderDate,
+            Status = so.Status,
+            CreatedOn = so.CreatedOn,
+            CreatedBy = so.CreatedBy,
+            LastModifiedOn = so.LastModifiedOn,
+            LastModifiedBy = so.LastModifiedBy,
+            Items = so.SO_Items?.Select(i => new SalesOrderItemViewModel
+            {
+                ProductName = products.FirstOrDefault(p => p.Id == i.ProductId)?.Name ?? "",
+                SKU = products.FirstOrDefault(p => p.Id == i.ProductId)?.Code ?? "",
+                QtyOrdered = i.QtyOrdered,
+                QtyPicked = i.QtyPicked,
+                UnitPrice = i.UnitPrice
+            }).ToList() ?? new List<SalesOrderItemViewModel>()
+        };
+
+        return View(model);
+    }
+
+    public async Task<IActionResult> Create()
+    {
+        await LoadLookups();
+        return View(new CreateSalesOrderViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(CreateSalesOrderViewModel viewModel)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                var salesOrder = new SalesOrder
+                {
+                    SO_Number = viewModel.SO_Number,
+                    CustomerId = viewModel.CustomerId,
+                    WarehouseId = viewModel.WarehouseId,
+                    OrderDate = viewModel.OrderDate,
+                    Status = SalesOrderStatus.Draft
+                };
+
+                await _soService.CreateAsync(salesOrder);
+                TempData["Success"] = "Sales Order created successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+            }
+        }
+
+        await LoadLookups();
+        return View(viewModel);
+    }
+
+    public async Task<IActionResult> Edit(int id)
+    {
+        var so = await _soService.GetByIdAsync(id);
+        if (so == null)
+            return NotFound();
+
+        var viewModel = new SalesOrderViewModel
+        {
+            Id = so.Id,
+            SO_Number = so.SO_Number,
+            CustomerId = so.CustomerId,
+            CustomerName = so.Customer?.Name ?? "",
+            WarehouseId = so.WarehouseId,
+            WarehouseName = so.Warehouse?.Name ?? "",
+            OrderDate = so.OrderDate,
+            Status = so.Status,
+            CreatedOn = so.CreatedOn,
+            CreatedBy = so.CreatedBy,
+            LastModifiedOn = so.LastModifiedOn,
+            LastModifiedBy = so.LastModifiedBy
+        };
+
+        await LoadLookups();
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, SalesOrderViewModel viewModel)
+    {
+        if (id != viewModel.Id)
+            return BadRequest();
+
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                var salesOrder = await _soService.GetByIdAsync(id);
+                if (salesOrder == null)
+                {
+                    TempData["Error"] = "Sales Order not found.";
+                    return NotFound();
+                }
+
+                salesOrder.SO_Number = viewModel.SO_Number;
+                salesOrder.CustomerId = viewModel.CustomerId;
+                salesOrder.WarehouseId = viewModel.WarehouseId;
+                salesOrder.OrderDate = viewModel.OrderDate;
+
+                await _soService.UpdateAsync(salesOrder);
+                TempData["Success"] = "Sales Order updated successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while updating the Sales Order.");
+            }
+        }
+
+        await LoadLookups();
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Submit(int id)
+    {
+        try
+        {
+            await _soService.SubmitAsync(id);
+
+            // Auto-allocate picking tasks
+            await _pickingService.AllocatePickingTasksAsync(id);
+
+            TempData["Success"] = "Sales Order submitted successfully! Picking tasks have been allocated.";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddItem([FromBody] AddSalesOrderItemRequest request)
+    {
+        if (request == null || request.Item == null)
+        {
+            return Json(new { success = false, message = "Invalid request data." });
+        }
+
+        try
+        {
+            var product = await _productService.GetByIdAsync(request.Item.ProductId);
+            if (product == null)
+            {
+                return Json(new { success = false, message = "Product not found." });
+            }
+
+            var item = new SO_Item
+            {
+                ProductId = request.Item.ProductId,
+                QtyOrdered = request.Item.QtyOrdered,
+                UnitPrice = request.Item.UnitPrice
+            };
+
+            await _soService.AddItemAsync(request.SoId, item);
+            return Json(new { success = true, message = "Item added successfully" });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> RemoveItem(int itemId)
+    {
+        try
+        {
+            await _soService.RemoveItemAsync(itemId);
+            TempData["Success"] = "Item removed successfully!";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            await _soService.DeleteAsync(id);
+            TempData["Success"] = "Sales Order deleted successfully!";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(Details), new { id });
+        }
+    }
+
+    private async Task LoadLookups()
+    {
+        var customerRepo = _unitOfWork.GetRepository<Customer, int>();
+        var warehouseRepo = _unitOfWork.GetRepository<Warehouse, int>();
+
+        ViewBag.Customers = new SelectList(await customerRepo.GetAllAsync(), "Id", "Name");
+        ViewBag.Warehouses = new SelectList(await warehouseRepo.GetAllAsync(), "Id", "Name");
+
+        var products = await _productService.GetAllAsync();
+        ViewBag.Products = products
+            .Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = $"{p.Code} - {p.Name}"
+            })
+            .ToList();
+    }
 }

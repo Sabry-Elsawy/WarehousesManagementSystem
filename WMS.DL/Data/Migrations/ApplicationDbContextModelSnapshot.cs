@@ -281,7 +281,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("ZoneId");
 
-                    b.ToTable("Aisles", (string)null);
+                    b.ToTable("Aisles");
                 });
 
             modelBuilder.Entity("WMS.DAL.Customer", b =>
@@ -325,7 +325,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("WMS.DAL.Entities.Bin", b =>
@@ -368,7 +368,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("RackId");
 
-                    b.ToTable("Bins", (string)null);
+                    b.ToTable("Bins");
                 });
 
             modelBuilder.Entity("WMS.DAL.Entities.BinType", b =>
@@ -401,7 +401,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BinTypes", (string)null);
+                    b.ToTable("BinTypes");
                 });
 
             modelBuilder.Entity("WMS.DAL.Entities._Identity.Address", b =>
@@ -417,10 +417,22 @@ namespace WMS.DAL.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar");
 
+                    b.Property<string>("Company")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Country")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Street")
                         .IsRequired()
@@ -494,6 +506,9 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ProfilePicturePath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -573,7 +588,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Inventories", (string)null);
+                    b.ToTable("Inventories");
                 });
 
             modelBuilder.Entity("WMS.DAL.Picking", b =>
@@ -602,16 +617,17 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Qty")
+                    b.Property<int>("QuantityPicked")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantityToPick")
                         .HasColumnType("int");
 
                     b.Property<int>("SO_ItemId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -621,7 +637,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("SO_ItemId");
 
-                    b.ToTable("Pickings", (string)null);
+                    b.ToTable("Pickings");
                 });
 
             modelBuilder.Entity("WMS.DAL.Product", b =>
@@ -679,7 +695,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("WMS.DAL.PurchaseOrder", b =>
@@ -728,7 +744,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("POs", (string)null);
+                    b.ToTable("POs");
                 });
 
             modelBuilder.Entity("WMS.DAL.PurchaseOrderItem", b =>
@@ -781,7 +797,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PO_Items", (string)null);
+                    b.ToTable("PO_Items");
                 });
 
             modelBuilder.Entity("WMS.DAL.Putaway", b =>
@@ -855,7 +871,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("PutawayId");
 
-                    b.ToTable("Putaway_Bins", (string)null);
+                    b.ToTable("Putaway_Bins");
                 });
 
             modelBuilder.Entity("WMS.DAL.Rack", b =>
@@ -890,7 +906,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("AisleId");
 
-                    b.ToTable("Racks", (string)null);
+                    b.ToTable("Racks");
                 });
 
             modelBuilder.Entity("WMS.DAL.Receipt", b =>
@@ -1030,10 +1046,8 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("SalesOrderId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -1041,7 +1055,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("SalesOrderId");
 
-                    b.ToTable("SO_Items", (string)null);
+                    b.ToTable("SO_Items");
                 });
 
             modelBuilder.Entity("WMS.DAL.SalesOrder", b =>
@@ -1058,10 +1072,8 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CustomerRef")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1072,19 +1084,24 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
+                    b.Property<string>("SO_Number")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CustomerId");
+
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("SalesOrders", (string)null);
+                    b.ToTable("SalesOrders");
                 });
 
             modelBuilder.Entity("WMS.DAL.TransferOrder", b =>
@@ -1122,7 +1139,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("SourceWarehouseId");
 
-                    b.ToTable("TransferOrders", (string)null);
+                    b.ToTable("TransferOrders");
                 });
 
             modelBuilder.Entity("WMS.DAL.TransferOrderItem", b =>
@@ -1206,7 +1223,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vendors", (string)null);
+                    b.ToTable("Vendors");
                 });
 
             modelBuilder.Entity("WMS.DAL.Warehouse", b =>
@@ -1259,7 +1276,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Warehouses", (string)null);
+                    b.ToTable("Warehouses");
                 });
 
             modelBuilder.Entity("WMS.DAL.Zone", b =>
@@ -1294,7 +1311,7 @@ namespace WMS.DAL.Data.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("Zones", (string)null);
+                    b.ToTable("Zones");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1616,11 +1633,19 @@ namespace WMS.DAL.Data.Migrations
 
             modelBuilder.Entity("WMS.DAL.SalesOrder", b =>
                 {
+                    b.HasOne("WMS.DAL.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("WMS.DAL.Warehouse", "Warehouse")
                         .WithMany("SalesOrders")
                         .HasForeignKey("WarehouseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Customer");
 
                     b.Navigation("Warehouse");
                 });

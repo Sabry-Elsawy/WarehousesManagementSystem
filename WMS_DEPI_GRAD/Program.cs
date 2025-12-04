@@ -48,7 +48,7 @@ namespace WMS_DEPI_GRAD
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-                string[] roles = { "Admin", "User" };
+                string[] roles = { "Admin", "User", "Test01", "Test02" };
 
                 foreach (var role in roles)
                 {

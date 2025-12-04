@@ -1,0 +1,82 @@
+@model IEnumerable<WMS_DEPI_GRAD.ViewModels.ShippingViewModel>
+
+@{
+    ViewData["Title"] = "Ready for Shipping";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-truck"></i> Orders Ready for Shipping</h2>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["Success"]
+            @if (TempData["DeliveryNoteNumber"] != null)
+            {
+                <br /><strong>Delivery Note Number: @TempData["DeliveryNoteNumber"]</strong>
+            }
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>SO Number</th>
+                                <th>Customer</th>
+                                <th>Warehouse</th>
+                                <th>Order Date</th>
+                                <th>Items Count</th>
+                                <th>Total Quantity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td><strong>@item.SO_Number</strong></td>
+                                    <td>@item.CustomerName</td>
+                                    <td>@item.WarehouseName</td>
+                                    <td>@item.OrderDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@item.ItemCount</td>
+                                    <td>@item.TotalQuantity</td>
+                                    <td>
+                                        <a asp-action="Confirm" asp-route-id="@item.SalesOrderId" class="btn btn-sm btn-success" title="Ship Order">
+                                            <i class="bi bi-truck"></i> Ship
+                                        </a>
+                                        <a asp-controller="SalesOrder" asp-action="Details" asp-route-id="@item.SalesOrderId" 
+                                           class="btn btn-sm btn-info" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No orders ready for shipping at this time.
+                </div>
+            }
+        </div>
+    </div>
+</div>

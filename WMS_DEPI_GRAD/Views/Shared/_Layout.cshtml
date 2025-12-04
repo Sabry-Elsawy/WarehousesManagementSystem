@@ -27,12 +27,12 @@
 		<div class="sidebar-content">
 			<ul class="nav flex-column" id="sidebarNav">
 				<!-- Dashboard -->
-				<li class="nav-item">
-					<a class="nav-link" href="/Home/Index">
-						<i class="fas fa-home nav-icon"></i>
-						<span class="nav-text">Dashboard</span>
-					</a>
-				</li>
+				@* <li class="nav-item"> *@
+				@* 	<a class="nav-link" href="/Home/Index"> *@
+				@* 		<i class="fas fa-home nav-icon"></i> *@
+				@* 		<span class="nav-text">Dashboard</span> *@
+				@* 	</a> *@
+				@* </li> *@
 
 				<!-- Master Data -->
 				<li class="nav-item">
@@ -43,7 +43,7 @@
 					</a>
 					<div class="collapse" id="masterDataCollapse" data-bs-parent="#sidebarNav">
 						<ul class="nav flex-column ms-3">
-							<li class="nav-item"><a class="nav-link" href="/Location/Index"><span class="nav-text">Locations</span></a></li>
+							@* <li class="nav-item"><a class="nav-link" href="/Location/Index"><span class="nav-text">Locations</span></a></li> *@
 							<li class="nav-item"><a class="nav-link" href="/Warehouse/Index"><span class="nav-text">Warehouses</span></a></li>
 							<li class="nav-item"><a class="nav-link" href="/Zone/Index"><span class="nav-text">Zones</span></a></li>
 							<li class="nav-item"><a class="nav-link" href="/Aisle/Index"><span class="nav-text">Aisles</span></a></li>
@@ -84,7 +84,7 @@
 						<ul class="nav flex-column ms-3">
 							<li class="nav-item"><a class="nav-link" href="/Inventory/Index"><span class="nav-text">Inventory List</span></a></li>
 							<li class="nav-item"><a class="nav-link" href="/Putaway/Index"><span class="nav-text">Putaway</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Picking</span></a></li>
+							@* <li class="nav-item"><a class="nav-link" href="/Picking/Index"><span class="nav-text">Picking</span></a></li> *@
 						</ul>
 					</div>
 				</li>
@@ -99,7 +99,7 @@
 					<div class="collapse" id="salesCollapse" data-bs-parent="#sidebarNav">
 						<ul class="nav flex-column ms-3">
 							<li class="nav-item"><a class="nav-link" href="/SalesOrder/Index"><span class="nav-text">Sales Orders</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Picking</span></a></li>
+							<li class="nav-item"><a class="nav-link" href="/Picking/Index"><span class="nav-text">Picking</span></a></li>
 						</ul>
 					</div>
 				</li>
@@ -119,21 +119,21 @@
 				</li>
 
 				<!-- Reports / Analytics -->
-				<li class="nav-item">
-					<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#reportsCollapse">
-						<i class="fas fa-chart-bar nav-icon"></i>
-						<span class="nav-text">Reports</span>
-						<i class="fas fa-chevron-right ms-auto collapse-icon"></i>
-					</a>
-					<div class="collapse" id="reportsCollapse" data-bs-parent="#sidebarNav">
-						<ul class="nav flex-column ms-3">
-							<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Stock Reports</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">PO / ASN Reports</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Inventory Movement</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Discrepancy Reports</span></a></li>
-						</ul>
-					</div>
-				</li>
+				@* <li class="nav-item"> *@
+				@* 	<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#reportsCollapse"> *@
+				@* 		<i class="fas fa-chart-bar nav-icon"></i> *@
+				@* 		<span class="nav-text">Reports</span> *@
+				@* 		<i class="fas fa-chevron-right ms-auto collapse-icon"></i> *@
+				@* 	</a> *@
+				@* 	<div class="collapse" id="reportsCollapse" data-bs-parent="#sidebarNav"> *@
+				@* 		<ul class="nav flex-column ms-3"> *@
+				@* 			<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Stock Reports</span></a></li> *@
+				@* 			<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">PO / ASN Reports</span></a></li> *@
+				@* 			<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Inventory Movement</span></a></li> *@
+				@* 			<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Discrepancy Reports</span></a></li> *@
+				@* 		</ul> *@
+				@* 	</div> *@
+				@* </li> *@
 
 				<!-- Settings / Users -->
 				<li class="nav-item">
@@ -145,10 +145,10 @@
 					<div class="collapse" id="settingsCollapse" data-bs-parent="#sidebarNav">
 						<ul class="nav flex-column ms-3">
 							<li class="nav-item"><a class="nav-link" href="/User/Index"><span class="nav-text">User Management</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="/Role/Index"><span class="nav-text">Roles & Permissions</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="/Settings/Index"><span class="nav-text">System Settings</span></a></li>
+							@* <li class="nav-item"><a class="nav-link" href="/Role/Index"><span class="nav-text">Roles & Permissions</span></a></li> *@
+							@* <li class="nav-item"><a class="nav-link" href="/Settings/Index"><span class="nav-text">System Settings</span></a></li> *@
 							<li class="nav-item"><a class="nav-link" href="/Profile/Index"><span class="nav-text">Profile</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="/Home/Privacy"><span class="nav-text">Privacy</span></a></li>
+							 @*<li class="nav-item"><a class="nav-link" href="/Home/Privacy"><span class="nav-text">Privacy</span></a></li>*@
 						</ul>
 					</div>
 				</li>

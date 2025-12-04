@@ -1,38 +1,102 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WMS.BLL.Interfaces;
+using WMS.DAL;
 using WMS_DEPI_GRAD.Models;
 
 namespace WMS_DEPI_GRAD.Controllers;
+
 public class TransferOrdersController : Controller
 {
-    private static List<TransferOrderModel> _transferOrders = new()
-    {
-        new TransferOrderModel { Id = 1, TransferId = "TO-2024-001", SKU = "SKU-1001", Quantity = 50, FromLocation = "A-01-02-03", ToLocation = "B-02-03-01", Status = "completed", CreatedDate = new DateTime(2024, 1, 14) },
-        new TransferOrderModel { Id = 2, TransferId = "TO-2024-002", SKU = "SKU-1003", Quantity = 25, FromLocation = "C-01-01-04", ToLocation = "A-03-02-01", Status = "in-progress", CreatedDate = new DateTime(2024, 1, 15) },
-        new TransferOrderModel { Id = 3, TransferId = "TO-2024-003", SKU = "SKU-1002", Quantity = 100, FromLocation = "B-02-01-02", ToLocation = "C-01-04-03", Status = "pending", CreatedDate = new DateTime(2024, 1, 16) }
-    };
+    private readonly ITransferOrderService _transferOrderService;
+    private readonly IWarehouseService _warehouseService;
+    private readonly IProductService _productService;
 
-    public IActionResult Index()
+    public TransferOrdersController(
+        ITransferOrderService transferOrderService,
+        IWarehouseService warehouseService,
+        IProductService productService)
     {
-        return View(_transferOrders.OrderByDescending(t => t.CreatedDate).ToList());
+        _transferOrderService = transferOrderService;
+        _warehouseService = warehouseService;
+        _productService = productService;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        var warehouses = await _warehouseService.GetAllWarehousesAsync();
+        var products = await _productService.GetAllAsync();
+        ViewBag.Warehouses = warehouses;
+        ViewBag.Products = products;
+
+        var orders = await _transferOrderService.GetAllAsync();
+        var model = orders.Select(o => new TransferOrderModel
+        {
+            Id = o.Id,
+            TransferId = $"TO-{o.CreatedOn.Year}-{o.Id:D3}",
+            SKU = o.TransferOrderItems.FirstOrDefault()?.Product.Code ?? "N/A",
+            Quantity = o.TransferOrderItems.FirstOrDefault()?.Qty ?? 0,
+            FromLocation = o.SourceWarehouse?.Name ?? "Unknown",
+            ToLocation = o.DestinationWarehouse?.Name ?? "Unknown",
+            Status = o.Status.ToString().ToLower(),
+            CreatedDate = o.CreatedOn
+        }).OrderByDescending(t => t.CreatedDate).ToList();
+
+        return View(model);
+    }
+
+    public async Task<IActionResult> Details(int id)
+    {
+        var order = await _transferOrderService.GetByIdAsync(id);
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        var model = new TransferOrderModel
+        {
+            Id = order.Id,
+            TransferId = $"TO-{order.CreatedOn.Year}-{order.Id:D3}",
+            SKU = order.TransferOrderItems.FirstOrDefault()?.Product.Code ?? "N/A",
+            Quantity = order.TransferOrderItems.FirstOrDefault()?.Qty ?? 0,
+            FromLocation = order.SourceWarehouse?.Name ?? "Unknown",
+            ToLocation = order.DestinationWarehouse?.Name ?? "Unknown",
+            Status = order.Status.ToString().ToLower(),
+            CreatedDate = order.CreatedOn
+        };
+
+        ViewBag.ProductName = order.TransferOrderItems.FirstOrDefault()?.Product.Name;
+
+        return View(model);
     }
 
     [HttpPost]
-    public IActionResult Create(string sku, int quantity, string fromLocation, string toLocation)
+    public async Task<IActionResult> Create(int productId, int quantity, int fromWarehouseId, int toWarehouseId)
     {
-        var newOrder = new TransferOrderModel
+        var newOrder = new TransferOrder
         {
-            Id = _transferOrders.Max(t => t.Id) + 1,
-            TransferId = $"TO-{DateTime.UtcNow.Year}-{_transferOrders.Max(t => t.Id) + 1:D3}",
-            SKU = sku,
-            Quantity = quantity,
-            FromLocation = fromLocation,
-            ToLocation = toLocation,
-            Status = "pending",
-            CreatedDate = DateTime.UtcNow
+            SourceWarehouseId = fromWarehouseId,
+            DestinationWarehouseId = toWarehouseId,
+            Status = TransferOrderStatus.Pending,
+            TransferOrderItems = new List<TransferOrderItem>
+            {
+                new TransferOrderItem
+                {
+                    ProductId = productId,
+                    Qty = quantity
+                }
+            }
         };
 
-        _transferOrders.Add(newOrder);
-        TempData["Success"] = $"Transfer Order {newOrder.TransferId} created successfully!";
+        await _transferOrderService.CreateAsync(newOrder);
+        TempData["Success"] = "Transfer Order created successfully!";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Approve(int id)
+    {
+        await _transferOrderService.ApproveAsync(id);
+        TempData["Success"] = "Transfer Order approved successfully.";
         return RedirectToAction(nameof(Index));
     }
 }

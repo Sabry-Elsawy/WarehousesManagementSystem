@@ -29,6 +29,10 @@
                         <h6 class="text-muted small text-uppercase fw-bold">Aisle</h6>
                         <p class="fs-5">@(Model.Aisle?.Name ?? "N/A")</p>
                     </div>
+                    <div class="mb-4">
+                        <h6 class="text-muted small text-uppercase fw-bold">Warehouse</h6>
+                        <p class="fs-5">@(Model.Aisle?.Zone?.Warehouse?.Name ?? "N/A")</p>
+                    </div>
 
                     <hr class="text-muted opacity-25 my-4">
 

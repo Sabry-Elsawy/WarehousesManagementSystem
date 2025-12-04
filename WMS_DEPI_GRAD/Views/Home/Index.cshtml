@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+	Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
 <!-- Hero Cover Section -->
@@ -23,14 +24,14 @@
                 Track inventory, manage orders, and optimize your workflow efficiently.
             </p>
             <div class="hero-actions">
-                <a asp-controller="Account" asp-action="Index" class="btn-hero-primary">
+                <a asp-controller="Account" asp-action="Login" class="btn-hero-primary">
                     <i class="fas fa-sign-in-alt me-2"></i>
                     Get Started
                 </a>
-                <a href="/Account/Index" class="btn-hero-secondary">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Learn More
-                </a>
+                @* <a href="/Account/Index" class="btn-hero-secondary"> *@
+                @*     <i class="fas fa-info-circle me-2"></i> *@
+                @*     Learn More *@
+                @* </a> *@
             </div>
         </div>
     </div>
@@ -38,7 +39,7 @@
 
 <!-- Content Section -->
 <section class="services content-section py-4">
-    <div class="container-fluid mt-5">
+    <div class="container mt-5">
         <h2 class="text-center text-muted mb-4">Our Services</h2>
         <div class="row">
             <div class="col-xl-4">
@@ -99,13 +100,58 @@
     </div>
 </section>
 
-<div class="container-fluid">
+<div class="container">
     <h2 class=" text-primary-orange mb-4">About WMS</h2>
     <p>Welcome to our warehouse management system. Here you can manage your inventory, orders, and team efficiently.</p>
     <p>Our platform offers real-time tracking, automated workflows, and powerful analytics to help you optimize your operations.</p>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
 
 </div>
+
+
+
+
+
+  
+
+<div class="container">
+    <h1 class="text-primary-orange">Privacy Policy</h1>
+
+    <h3 class="text-dark my-4">Introduction</h3>
+    <p class="lead">Use this page to detail your site's privacy policy.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-primary-orange">Data Collection</h5>
+                    <p class="card-text">We collect personal information from you when you use our services, including your name, email address, and payment information.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-primary-orange">Data Usage</h5>
+                    <p class="card-text">We use your personal information to provide and improve our services, process transactions, and communicate with you.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                    <a href="#" class="btn btn-hero-primary">Learn more</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
 
 
 

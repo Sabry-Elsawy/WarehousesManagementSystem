@@ -22,6 +22,20 @@
             <form asp-action="Register" asp-controller="Account" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+                <!-- First Name -->
+                <div class="mb-3">
+                    <label asp-for="FirstName" class="form-label"></label>
+                    <input asp-for="FirstName" class="form-control" placeholder="Enter First Name" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <!-- Last Name -->
+                <div class="mb-3">
+                    <label asp-for="LastName" class="form-label"></label>
+                    <input asp-for="LastName" class="form-control" placeholder="Enter Last Name" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
                 <!-- Username -->
                 <div class="mb-3">
                     <label asp-for="UserName" class="form-label"></label>

@@ -1,0 +1,69 @@
+@model WMS_DEPI_GRAD.ViewModels.ConfirmPickingViewModel
+
+@{
+    ViewData["Title"] = "Confirm Picking";
+}
+
+<div class="container-fluid">
+    <h2><i class="bi bi-check-circle"></i> Confirm Picking</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Picking Task Details</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-5">Product:</dt>
+                        <dd class="col-sm-7">@Model.ProductName</dd>
+
+                        <dt class="col-sm-5">SKU:</dt>
+                        <dd class="col-sm-7">@Model.SKU</dd>
+
+                        <dt class="col-sm-5">Bin Location:</dt>
+                        <dd class="col-sm-7"><strong class="text-primary">@Model.BinLocation</strong></dd>
+
+                        <dt class="col-sm-5">Quantity to Pick:</dt>
+                        <dd class="col-sm-7"><strong>@Model.QuantityToPick</strong></dd>
+                    </dl>
+
+                    <form asp-action="Confirm" method="post">
+                        <input type="hidden" asp-for="PickingTaskId" />
+                        <input type="hidden" asp-for="QuantityToPick" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="QuantityPicked" class="form-label"></label>
+                            <input asp-for="QuantityPicked" class="form-control form-control-lg" 
+                                   type="number" min="0" max="@Model.QuantityToPick" autofocus />
+                            <span asp-validation-for="QuantityPicked" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                Maximum allowed: @Model.QuantityToPick
+                            </small>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle"></i> Confirm Picking
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="alert alert-warning mt-3">
+                <i class="bi bi-exclamation-triangle"></i> 
+                <strong>Important:</strong> Confirming this picking task will reduce the inventory quantity from the specified bin.
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

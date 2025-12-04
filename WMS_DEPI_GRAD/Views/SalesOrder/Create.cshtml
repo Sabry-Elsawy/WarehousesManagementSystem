@@ -1,0 +1,67 @@
+@model WMS_DEPI_GRAD.ViewModels.CreateSalesOrderViewModel
+
+@{
+    ViewData["Title"] = "Create Sales Order";
+}
+
+<div class="container-fluid">
+    <h2><i class="bi bi-plus-circle"></i> Create Sales Order</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="SO_Number" class="form-label"></label>
+                            <input asp-for="SO_Number" class="form-control" readonly />
+                            <span asp-validation-for="SO_Number" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CustomerId" class="form-label"></label>
+                            <select asp-for="CustomerId" class="form-select" asp-items="ViewBag.Customers">
+                                <option value="">-- Select Customer --</option>
+                            </select>
+                            <span asp-validation-for="CustomerId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="WarehouseId" class="form-label"></label>
+                            <select asp-for="WarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
+                                <option value="">-- Select Warehouse --</option>
+                            </select>
+                            <span asp-validation-for="WarehouseId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="OrderDate" class="form-label"></label>
+                            <input asp-for="OrderDate" class="form-control" type="date" />
+                            <span asp-validation-for="OrderDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Create Sales Order
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-3">
+                <i class="bi bi-info-circle"></i> <strong>Note:</strong> After creating the sales order, you can add items from the Details page.
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

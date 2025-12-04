@@ -45,7 +45,7 @@ public class AccountController(UserManager<ApplicationUser> userManager,
         if (result.Succeeded)
         {
             await _signInManager.SignInAsync(user, isPersistent: true);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Warehouse");
         }
 
         ModelState.AddModelError(string.Empty, "Invalid email or password");
@@ -64,6 +64,8 @@ public class AccountController(UserManager<ApplicationUser> userManager,
         if (!ModelState.IsValid) return View(viewModel);
         var user = new ApplicationUser()
         {
+            FirstName = viewModel.FirstName,
+            LastName = viewModel.LastName,
             PhoneNumber = viewModel.PhoneNumber,
             UserName = viewModel.UserName,
             Email = viewModel.Email,
