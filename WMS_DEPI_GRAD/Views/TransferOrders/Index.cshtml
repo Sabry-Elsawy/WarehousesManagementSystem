@@ -124,13 +124,13 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label class="form-label">From Warehouse</label>
-                    <select name="fromLocation" class="form-select" required>
+                    <select name="fromWarehouseId" class="form-select" required>
                         <option value="">Select Warehouse...</option>
                         @if (ViewBag.Warehouses != null)
                         {
                             foreach (var w in ViewBag.Warehouses)
                             {
-                                <option value="@w.Name">@w.Name</option>
+                                <option value="@w.Id">@w.Name</option>
                             }
                         }
                     </select>
@@ -138,13 +138,13 @@
 
                 <div class="mb-3">
                     <label class="form-label">To Warehouse</label>
-                    <select name="toLocation" class="form-select" required>
+                    <select name="toWarehouseId" class="form-select" required>
                         <option value="">Select Warehouse...</option>
                         @if (ViewBag.Warehouses != null)
                         {
                             foreach (var w in ViewBag.Warehouses)
                             {
-                                <option value="@w.Name">@w.Name</option>
+                                <option value="@w.Id">@w.Name</option>
                             }
                         }
                     </select>
@@ -152,13 +152,13 @@
 
                 <div class="mb-3">
                     <label class="form-label">Product</label>
-                    <select name="sku" class="form-select" required>
+                    <select name="productId" class="form-select" required>
                         <option value="">Select Product...</option>
                         @if (ViewBag.Products != null)
                         {
                             foreach (var p in ViewBag.Products)
                             {
-                                <option value="@p.Code">@p.Name (@p.Code)</option>
+                                <option value="@p.Id">@p.Name (@p.Code)</option>
                             }
                         }
                     </select>
