@@ -6,14 +6,42 @@ public class TransferOrdersController : Controller
 {
     private static List<TransferOrderModel> _transferOrders = new()
     {
-        new TransferOrderModel { Id = 1, TransferId = "TO-2024-001", SKU = "SKU-1001", Quantity = 50, FromLocation = "A-01-02-03", ToLocation = "B-02-03-01", Status = "completed", CreatedDate = new DateTime(2024, 1, 14) },
-        new TransferOrderModel { Id = 2, TransferId = "TO-2024-002", SKU = "SKU-1003", Quantity = 25, FromLocation = "C-01-01-04", ToLocation = "A-03-02-01", Status = "in-progress", CreatedDate = new DateTime(2024, 1, 15) },
-        new TransferOrderModel { Id = 3, TransferId = "TO-2024-003", SKU = "SKU-1002", Quantity = 100, FromLocation = "B-02-01-02", ToLocation = "C-01-04-03", Status = "pending", CreatedDate = new DateTime(2024, 1, 16) }
+        new TransferOrderModel { Id = 1, TransferId = "TO-2024-001", SKU = "SKU-1001", Quantity = 50, FromLocation = "Main Warehouse", ToLocation = "North Branch", Status = "completed", CreatedDate = new DateTime(2024, 1, 14) },
+        new TransferOrderModel { Id = 2, TransferId = "TO-2024-002", SKU = "SKU-1003", Quantity = 25, FromLocation = "South Branch", ToLocation = "Main Warehouse", Status = "in-progress", CreatedDate = new DateTime(2024, 1, 15) },
+        new TransferOrderModel { Id = 3, TransferId = "TO-2024-003", SKU = "SKU-1002", Quantity = 100, FromLocation = "East Distribution", ToLocation = "West Hub", Status = "pending", CreatedDate = new DateTime(2024, 1, 16) }
     };
 
-    public IActionResult Index()
+    private readonly WMS.BLL.Interfaces.IWarehouseService _warehouseService;
+    private readonly WMS.BLL.Interfaces.IProductService _productService;
+
+    public TransferOrdersController(WMS.BLL.Interfaces.IWarehouseService warehouseService, WMS.BLL.Interfaces.IProductService productService)
     {
+        _warehouseService = warehouseService;
+        _productService = productService;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        var warehouses = await _warehouseService.GetAllWarehousesAsync();
+        var products = await _productService.GetAllAsync();
+        ViewBag.Warehouses = warehouses;
+        ViewBag.Products = products;
         return View(_transferOrders.OrderByDescending(t => t.CreatedDate).ToList());
+    }
+
+    public async Task<IActionResult> Details(int id)
+    {
+        var order = _transferOrders.FirstOrDefault(t => t.Id == id);
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        var products = await _productService.GetAllAsync();
+        var product = products.FirstOrDefault(p => p.Code == order.SKU);
+        ViewBag.ProductName = product?.Name;
+
+        return View(order);
     }
 
     [HttpPost]
@@ -33,6 +61,24 @@ public class TransferOrdersController : Controller
 
         _transferOrders.Add(newOrder);
         TempData["Success"] = $"Transfer Order {newOrder.TransferId} created successfully!";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public IActionResult Approve(int id)
+    {
+        var order = _transferOrders.FirstOrDefault(t => t.Id == id);
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        if (order.Status == "pending")
+        {
+            order.Status = "approved"; // Or "agreed" based on user terminology, sticking to "approved" for now as per plan
+            TempData["Success"] = $"Transfer Order {order.TransferId} has been approved.";
+        }
+
         return RedirectToAction(nameof(Index));
     }
 }
