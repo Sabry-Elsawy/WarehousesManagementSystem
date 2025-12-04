@@ -26,7 +26,8 @@ public static class DependencyInjection
             .AddScoped<IPurchaseOrderService, PurchaseOrderService>()
             .AddScoped<IASNService, ASNService>()
             .AddScoped<IReceiptService, ReceiptService>()
-            .AddScoped<IPutawayService, PutawayService>();
+            .AddScoped<IPutawayService, PutawayService>()
+            .AddScoped<IInventoryService, InventoryService>();
 
         // Master Data Services
         services.AddScoped<IProductService, ProductService>();
