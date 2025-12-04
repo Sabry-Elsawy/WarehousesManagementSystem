@@ -45,7 +45,7 @@ public class AccountController(UserManager<ApplicationUser> userManager,
         if (result.Succeeded)
         {
             await _signInManager.SignInAsync(user, isPersistent: true);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Warehouse");
         }
 
         ModelState.AddModelError(string.Empty, "Invalid email or password");
