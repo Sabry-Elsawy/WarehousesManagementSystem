@@ -52,10 +52,11 @@
                         <th>Transfer ID</th>
                         <th>SKU</th>
                         <th>Quantity</th>
-                        <th>From</th>
-                        <th>To</th>
+                        <th>From Warehouse</th>
+                        <th>To Warehouse</th>
                         <th>Status</th>
                         <th>Created Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,12 +81,29 @@
                                 {
                                     <span class="badge bg-warning bg-opacity-25 text-warning border border-warning">Pending</span>
                                 }
+                                else if (t.Status == "approved")
+                                {
+                                    <span class="badge bg-primary bg-opacity-25 text-primary border border-primary">Approved</span>
+                                }
                                 else
                                 {
                                     <span class="badge bg-secondary text-dark">Unknown</span>
                                 }
                             </td>
                             <td>@t.CreatedDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@t.Id" class="btn btn-sm btn-outline-primary me-1" title="View Details">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                @if (t.Status == "pending")
+                                {
+                                    <form asp-action="Approve" asp-route-id="@t.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Approve Transfer">
+                                            <i class="fa-solid fa-check"></i> Approve
+                                        </button>
+                                    </form>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -105,18 +123,45 @@
 
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label">From Location</label>
-                    <input name="fromLocation" class="form-control" required />
+                    <label class="form-label">From Warehouse</label>
+                    <select name="fromWarehouseId" class="form-select" required>
+                        <option value="">Select Warehouse...</option>
+                        @if (ViewBag.Warehouses != null)
+                        {
+                            foreach (var w in ViewBag.Warehouses)
+                            {
+                                <option value="@w.Id">@w.Name</option>
+                            }
+                        }
+                    </select>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">To Location</label>
-                    <input name="toLocation" class="form-control" required />
+                    <label class="form-label">To Warehouse</label>
+                    <select name="toWarehouseId" class="form-select" required>
+                        <option value="">Select Warehouse...</option>
+                        @if (ViewBag.Warehouses != null)
+                        {
+                            foreach (var w in ViewBag.Warehouses)
+                            {
+                                <option value="@w.Id">@w.Name</option>
+                            }
+                        }
+                    </select>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">SKU</label>
-                    <input name="sku" class="form-control" required />
+                    <label class="form-label">Product</label>
+                    <select name="productId" class="form-select" required>
+                        <option value="">Select Product...</option>
+                        @if (ViewBag.Products != null)
+                        {
+                            foreach (var p in ViewBag.Products)
+                            {
+                                <option value="@p.Id">@p.Name (@p.Code)</option>
+                            }
+                        }
+                    </select>
                 </div>
 
                 <div class="mb-3">
@@ -124,10 +169,7 @@
                     <input name="quantity" type="number" class="form-control" min="1" required />
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Reason (optional)</label>
-                    <textarea name="reason" class="form-control" rows="2"></textarea>
-                </div>
+
             </div>
 
             <div class="modal-footer">

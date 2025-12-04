@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+	Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
 <!-- Hero Cover Section -->
@@ -23,14 +24,14 @@
                 Track inventory, manage orders, and optimize your workflow efficiently.
             </p>
             <div class="hero-actions">
-                <a asp-controller="Account" asp-action="Index" class="btn-hero-primary">
+                <a asp-controller="Account" asp-action="Login" class="btn-hero-primary">
                     <i class="fas fa-sign-in-alt me-2"></i>
                     Get Started
                 </a>
-                <a href="/Account/Index" class="btn-hero-secondary">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Learn More
-                </a>
+                @* <a href="/Account/Index" class="btn-hero-secondary"> *@
+                @*     <i class="fas fa-info-circle me-2"></i> *@
+                @*     Learn More *@
+                @* </a> *@
             </div>
         </div>
     </div>
