@@ -87,9 +87,34 @@
                             @if (Model.Address != null)
                             {
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item"><strong>Country:</strong> @Model.Address.Country</li>
-                                    <li class="list-group-item"><strong>City:</strong> @Model.Address.City</li>
-                                    <li class="list-group-item"><strong>Street:</strong> @Model.Address.Street</li>
+                                    @if (!string.IsNullOrWhiteSpace(Model.Address.Street))
+                                    {
+                                        <li class="list-group-item"><strong>Street:</strong> @Model.Address.Street</li>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Model.Address.City))
+                                    {
+                                        <li class="list-group-item"><strong>City:</strong> @Model.Address.City</li>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Model.Address.State))
+                                    {
+                                        <li class="list-group-item"><strong>State:</strong> @Model.Address.State</li>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Model.Address.PostalCode))
+                                    {
+                                        <li class="list-group-item"><strong>Postal Code:</strong> @Model.Address.PostalCode</li>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Model.Address.Country))
+                                    {
+                                        <li class="list-group-item"><strong>Country:</strong> @Model.Address.Country</li>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Model.Address.Phone))
+                                    {
+                                        <li class="list-group-item"><strong>Phone:</strong> @Model.Address.Phone</li>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Model.Address.Company))
+                                    {
+                                        <li class="list-group-item"><strong>Company:</strong> @Model.Address.Company</li>
+                                    }
                                 </ul>
                             }
                             else
@@ -97,7 +122,6 @@
                                 <div class="text-center py-4">
                                     <i class="bi bi-house-slash fs-1 text-muted"></i>
                                     <p class="text-muted mt-3 mb-2">No address on file.</p>
-                                    <a href="#" class="btn btn-outline-warning">Add Address</a>
                                 </div>
                             }
                         </div>
@@ -107,11 +131,8 @@
 
             <!-- Action Buttons -->
             <div class="text-center mt-4">
-                <a href="#" class="btn btn-primary me-2">
+                <a asp-controller="Profile" asp-action="Edit" class="btn btn-primary">
                     <i class="bi bi-pencil me-1"></i>Edit Profile
-                </a>
-                <a href="#" class="btn btn-secondary">
-                    <i class="bi bi-gear me-1"></i>Settings
                 </a>
             </div>
         }

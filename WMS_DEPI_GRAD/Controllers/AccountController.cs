@@ -64,6 +64,8 @@ public class AccountController(UserManager<ApplicationUser> userManager,
         if (!ModelState.IsValid) return View(viewModel);
         var user = new ApplicationUser()
         {
+            FirstName = viewModel.FirstName,
+            LastName = viewModel.LastName,
             PhoneNumber = viewModel.PhoneNumber,
             UserName = viewModel.UserName,
             Email = viewModel.Email,
