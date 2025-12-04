@@ -19,8 +19,31 @@
                 </div>
             }
 
-            <form asp-action="Edit" method="post">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <h5 class="text-primary mb-3">
+                    <i class="bi bi-image me-2"></i>Profile Picture
+                </h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-12">
+                        @if (!string.IsNullOrEmpty(Model.ProfilePicturePath))
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Current Picture</label>
+                                <div>
+                                    <img src="@Model.ProfilePicturePath" alt="Current Profile Picture" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #dee2e6;" />
+                                </div>
+                            </div>
+                        }
+                        <div>
+                            <label asp-for="ProfilePicture" class="form-label"></label>
+                            <input asp-for="ProfilePicture" type="file" class="form-control" accept="image/*" />
+                            <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                            <small class="text-muted">Max file size: 5MB. Allowed formats: JPG, PNG, GIF</small>
+                        </div>
+                    </div>
+                </div>
 
                 <h5 class="text-primary mb-3">
                     <i class="bi bi-person me-2"></i>Personal Information

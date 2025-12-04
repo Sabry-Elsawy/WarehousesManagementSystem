@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace WMS_DEPI_GRAD.ViewModels
 {
@@ -24,6 +25,12 @@ namespace WMS_DEPI_GRAD.ViewModels
 
         [Display(Name = "Username")]
         public string UserName { get; set; }
+
+        // Profile Picture
+        [Display(Name = "Profile Picture")]
+        public IFormFile? ProfilePicture { get; set; }
+
+        public string? ProfilePicturePath { get; set; }
 
         // Address Fields
         [StringLength(200)]

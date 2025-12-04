@@ -6,9 +6,10 @@ using WMS_DEPI_GRAD.ViewModels;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-public class ProfileController(UserManager<ApplicationUser> userManager) : Controller
+public class ProfileController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment) : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
 
     public async Task<IActionResult> Index()
     {
@@ -39,6 +40,7 @@ public class ProfileController(UserManager<ApplicationUser> userManager) : Contr
             Email = user.Email ?? string.Empty,
             PhoneNumber = user.PhoneNumber,
             UserName = user.UserName ?? string.Empty,
+            ProfilePicturePath = user.ProfilePicturePath,
             AddressStreet = user.Address?.Street,
             AddressCity = user.Address?.City,
             AddressState = user.Address?.State,
@@ -64,6 +66,54 @@ public class ProfileController(UserManager<ApplicationUser> userManager) : Contr
 
         if (user == null)
             return RedirectToAction("Login", "Account");
+
+        // Handle profile picture upload
+        if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
+        {
+            // Validate file type
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var fileExtension = Path.GetExtension(model.ProfilePicture.FileName).ToLowerInvariant();
+            
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                ModelState.AddModelError("ProfilePicture", "Only image files (.jpg, .jpeg, .png, .gif) are allowed.");
+                return View(model);
+            }
+
+            // Validate file size (max 5MB)
+            if (model.ProfilePicture.Length > 5 * 1024 * 1024)
+            {
+                ModelState.AddModelError("ProfilePicture", "File size must not exceed 5MB.");
+                return View(model);
+            }
+
+            // Delete old profile picture if exists
+            if (!string.IsNullOrEmpty(user.ProfilePicturePath))
+            {
+                var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, user.ProfilePicturePath.TrimStart('/'));
+                if (System.IO.File.Exists(oldFilePath))
+                {
+                    System.IO.File.Delete(oldFilePath);
+                }
+            }
+
+            // Create uploads directory if it doesn't exist
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "profiles");
+            Directory.CreateDirectory(uploadsFolder);
+
+            // Generate unique filename
+            var uniqueFileName = $"{user.Id}_{Guid.NewGuid()}{fileExtension}";
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            // Save file
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await model.ProfilePicture.CopyToAsync(fileStream);
+            }
+
+            // Update user's profile picture path (store relative path)
+            user.ProfilePicturePath = $"/uploads/profiles/{uniqueFileName}";
+        }
 
         // Update user basic info
         user.FirstName = model.FirstName;
