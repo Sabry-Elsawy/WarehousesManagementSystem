@@ -107,6 +107,21 @@ public class ASNService : IASNService
         if (asn.Status != AdvancedShippingNoticeStatus.Received)
             throw new InvalidOperationException("Only Received ASNs can be closed");
 
+        // Validate that a Receipt exists for this ASN
+        var receiptRepo = _unitOfWork.GetRepository<Receipt, int>();
+        var receipts = await receiptRepo.GetAllWithIncludeAsync(withTracking: false,
+            query => query.Where(r => r.AdvancedShippingNoticeId == asnId));
+
+        if (!receipts.Any())
+            throw new InvalidOperationException("Cannot close ASN: A Receipt must be created from this ASN before it can be closed. Please create and process a Receipt first.");
+
+        var receipt = receipts.First();
+
+        // Validate that the Receipt is closed
+        if (receipt.Status != ReceiptStatus.Closed)
+            throw new InvalidOperationException($"Cannot close ASN: The associated Receipt (ID: {receipt.Id}, Number: {receipt.ReceiptNumber}) must be closed first. Current Receipt status: {receipt.Status}");
+
+        // All validations passed, close the ASN
         asn.Status = AdvancedShippingNoticeStatus.Closed;
         repo.Update(asn);
         await _unitOfWork.CompleteAsync();
