@@ -98,7 +98,7 @@ namespace WMS_DEPI_GRAD.Controllers
             if (inventory == null)
                 return NotFound();
 
-            var bins = await _binService.GetAllAsync();
+            var bins = await _binService.GetAllBinsAsync();
             ViewBag.Bins = bins;
 
             return View(inventory);
