@@ -1,0 +1,99 @@
+@model IEnumerable<WMS.BLL.DTOs.CycleCountDto>
+
+@{
+    ViewBag.Title = "Cycle Counts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Cycle Counts</h1>
+            <p class="text-muted small mb-0">Manage inventory counting sessions</p>
+        </div>
+        <a href="@Url.Action("Create")" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> New Session
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Items</th>
+                            <th>Discrepancies</th>
+                            <th>Created On</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>#@item.Id</td>
+                                    <td>@item.Description</td>
+                                    <td>
+                                        @if (item.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success">Completed</span>
+                                        }
+                                        else if (item.Status == "Pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-primary">@item.Status</span>
+                                        }
+                                    </td>
+                                    <td>@item.TotalItems</td>
+                                    <td>
+                                        @if (item.TotalDiscrepancies > 0)
+                                        {
+                                            <span class="badge bg-danger">@item.TotalDiscrepancies</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>@item.CreatedOn.ToString("g")</td>
+                                    <td>
+                                        @if (item.Status != "Completed")
+                                        {
+                                            <a href="@Url.Action("Execute", new { id = item.Id })" class="btn btn-sm btn-outline-primary">
+                                                <i class="fa-solid fa-play"></i> Count
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa-solid fa-eye"></i> View
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="fa-solid fa-clipboard-list fa-3x mb-3 d-block"></i>
+                                    No cycle count sessions found
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -89,6 +89,21 @@ public class InventoryService:IInventoryService
         await inventoryRepo.AddAsync(inv);
         await _unitOfWork.CompleteAsync();
 
+        // Log Transaction
+        var transactionRepo = _unitOfWork.GetRepository<InventoryTransaction, int>();
+        var transaction = new InventoryTransaction
+        {
+            TransactionType = "Receipt",
+            QuantityChange = dto.Quantity,
+            ProductId = product.Id,
+            DestinationBinId = bin.Id,
+            TransactionDate = DateTime.UtcNow,
+            CreatedBy = "System", // TODO: Get current user
+            Reason = "Initial Inventory Add"
+        };
+        await transactionRepo.AddAsync(transaction);
+        await _unitOfWork.CompleteAsync();
+
         return true;
     }
     public async Task<bool> AdjustInventoryAsync(AdjustInventoryDto dto)
@@ -122,6 +137,22 @@ public class InventoryService:IInventoryService
         invRepo.Update(inv);
         await _unitOfWork.CompleteAsync();
 
+        // Log Transaction
+        var transactionRepo = _unitOfWork.GetRepository<InventoryTransaction, int>();
+        var transaction = new InventoryTransaction
+        {
+            TransactionType = "Adjustment",
+            QuantityChange = dto.Change,
+            ProductId = product.Id,
+            SourceBinId = inv.BinId, // Assuming adjustment happens in place
+            DestinationBinId = inv.BinId,
+            TransactionDate = DateTime.UtcNow,
+            CreatedBy = dto.PerformedBy,
+            Reason = dto.Reason
+        };
+        await transactionRepo.AddAsync(transaction);
+        await _unitOfWork.CompleteAsync();
+
         return true;
     }
 
@@ -152,7 +183,9 @@ public class InventoryService:IInventoryService
             CreatedBy = inventory.CreatedBy,
             LastModifiedOn = inventory.LastModifiedOn,
             LastModifiedBy = inventory.LastModifiedBy,
-            RecentTransactions = new List<InventoryTransactionDto>() // TODO: Implement when transaction entity exists
+            RecentTransactions = (await GetTransactionsAsync(inventory.ProductId, inventory.BinId))
+                .Take(10)
+                .ToList()
         };
     }
 
@@ -313,7 +346,22 @@ public class InventoryService:IInventoryService
 
         await _unitOfWork.CompleteAsync();
 
-        // TODO: Log transaction when InventoryTransaction entity is implemented
+        // Log Transaction
+        var transactionRepo = _unitOfWork.GetRepository<InventoryTransaction, int>();
+        var transaction = new InventoryTransaction
+        {
+            TransactionType = "Transfer",
+            QuantityChange = dto.Quantity,
+            ProductId = sourceInventory.ProductId,
+            SourceBinId = sourceInventory.BinId,
+            DestinationBinId = dto.DestinationBinId,
+            TransactionDate = DateTime.UtcNow,
+            CreatedBy = dto.PerformedBy,
+            Reason = dto.Reason
+        };
+        await transactionRepo.AddAsync(transaction);
+        await _unitOfWork.CompleteAsync();
+
         return true;
     }
 
@@ -330,5 +378,35 @@ public class InventoryService:IInventoryService
             );
 
         return summary;
+    }
+
+    public async Task<IEnumerable<InventoryTransactionDto>> GetTransactionsAsync(int? productId = null, int? binId = null)
+    {
+        var repo = _unitOfWork.GetRepository<InventoryTransaction, int>();
+        var query = await repo.GetAllWithIncludeAsync(
+            withTracking: false,
+            include: q => q
+                .Include(t => t.Product)
+                .Include(t => t.SourceBin)
+                .Include(t => t.DestinationBin)
+        );
+
+        if (productId.HasValue)
+            query = query.Where(t => t.ProductId == productId.Value);
+
+        if (binId.HasValue)
+            query = query.Where(t => t.SourceBinId == binId.Value || t.DestinationBinId == binId.Value);
+
+        return query.OrderByDescending(t => t.TransactionDate).Select(t => new InventoryTransactionDto
+        {
+            Id = t.Id,
+            TransactionType = t.TransactionType,
+            QuantityChange = t.QuantityChange,
+            SourceBin = t.SourceBin?.Code,
+            DestinationBin = t.DestinationBin?.Code,
+            Reason = t.Reason,
+            TransactionDate = t.TransactionDate,
+            PerformedBy = t.CreatedBy
+        }).ToList();
     }
 }

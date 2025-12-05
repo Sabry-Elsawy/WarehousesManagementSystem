@@ -1,0 +1,83 @@
+@model IEnumerable<WMS.BLL.DTOs.InventoryTransactionDto>
+
+@{
+    ViewBag.Title = "Inventory Transactions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Inventory Transactions</h1>
+            <p class="text-muted small mb-0">Log of all inventory movements</p>
+        </div>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left"></i> Back to Inventory
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Quantity Change</th>
+                            <th>Source</th>
+                            <th>Destination</th>
+                            <th>Reason</th>
+                            <th>Performed By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.TransactionDate.ToString("g")</td>
+                                    <td>
+                                        @if (item.TransactionType == "Receipt")
+                                        {
+                                            <span class="badge bg-success">Receipt</span>
+                                        }
+                                        else if (item.TransactionType == "Transfer")
+                                        {
+                                            <span class="badge bg-info text-dark">Transfer</span>
+                                        }
+                                        else if (item.TransactionType == "Adjustment")
+                                        {
+                                            <span class="badge bg-warning text-dark">Adjustment</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@item.TransactionType</span>
+                                        }
+                                    </td>
+                                    <td class="@(item.QuantityChange > 0 ? "text-success" : "text-danger") fw-bold">
+                                        @(item.QuantityChange > 0 ? "+" : "")@item.QuantityChange
+                                    </td>
+                                    <td>@(item.SourceBin ?? "-")</td>
+                                    <td>@(item.DestinationBin ?? "-")</td>
+                                    <td>@item.Reason</td>
+                                    <td>@item.PerformedBy</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="fa-solid fa-clock-rotate-left fa-3x mb-3 d-block"></i>
+                                    No transactions found
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

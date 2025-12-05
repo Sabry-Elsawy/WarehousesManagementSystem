@@ -4,9 +4,10 @@ using WMS.BLL.Interfaces;
 
 namespace WMS_DEPI_GRAD.Controllers
 {
-    public class InventoryController(IInventoryService inventoryService) : Controller
+    public class InventoryController(IInventoryService inventoryService, IBinService binService) : Controller
     {
         private readonly IInventoryService _inventoryService = inventoryService;
+        private readonly IBinService _binService = binService;
 
         public async Task<IActionResult> Index(string? search, int? productId, int? binId, string? status, int page = 1, int pageSize = 20)
         {
@@ -94,6 +95,9 @@ namespace WMS_DEPI_GRAD.Controllers
             if (inventory == null)
                 return NotFound();
 
+            var bins = await _binService.GetAllAsync();
+            ViewBag.Bins = bins;
+
             return View(inventory);
         }
 
@@ -113,7 +117,7 @@ namespace WMS_DEPI_GRAD.Controllers
                 
                 await _inventoryService.TransferInventoryAsync(model);
                 TempData["Success"] = "Inventory transferred successfully!";
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { id = model.InventoryId });
             }
             catch (Exception ex)
             {
@@ -121,6 +125,13 @@ namespace WMS_DEPI_GRAD.Controllers
                 var inventory = await _inventoryService.GetByIdAsync(model.InventoryId);
                 return View(inventory);
             }
+        }
+        public async Task<IActionResult> Transactions(int? productId, int? binId)
+        {
+            var transactions = await _inventoryService.GetTransactionsAsync(productId, binId);
+            ViewBag.ProductId = productId;
+            ViewBag.BinId = binId;
+            return View(transactions);
         }
     }
 }

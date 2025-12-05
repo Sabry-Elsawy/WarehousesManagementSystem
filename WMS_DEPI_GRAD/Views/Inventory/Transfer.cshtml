@@ -50,10 +50,13 @@
                             <label class="form-label">Destination Bin <span class="text-danger">*</span></label>
                             <select name="DestinationBinId" class="form-select" required>
                                 <option value="">-- Select Destination Bin --</option>
-                                @* TODO: Populate bins from ViewBag or separate action *@
-                                <option value="1">BIN-A-001</option>
-                                <option value="2">BIN-A-002</option>
-                                <option value="3">BIN-B-001</option>
+                                @if (ViewBag.Bins != null)
+                                {
+                                    foreach (var bin in ViewBag.Bins)
+                                    {
+                                        <option value="@bin.Id">@bin.Code</option>
+                                    }
+                                }
                             </select>
                             <div class="form-text">Select the bin where you want to transfer the inventory</div>
                         </div>

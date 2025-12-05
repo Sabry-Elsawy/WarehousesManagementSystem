@@ -16,4 +16,5 @@ public interface IInventoryService
     Task<bool> AdjustInventoryAsync(AdjustInventoryDto dto);
     Task<bool> TransferInventoryAsync(TransferInventoryDto dto);
     Task<Dictionary<string, int>> GetStockSummaryAsync();
+    Task<IEnumerable<InventoryTransactionDto>> GetTransactionsAsync(int? productId = null, int? binId = null);
 }
