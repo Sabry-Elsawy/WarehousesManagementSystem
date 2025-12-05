@@ -8,10 +8,45 @@ namespace WMS_DEPI_GRAD.Controllers
     {
         private readonly IInventoryService _inventoryService = inventoryService;
 
-        public async Task<IActionResult> Index(string? search)
+        public async Task<IActionResult> Index(string? search, int? productId, int? binId, string? status, int page = 1, int pageSize = 20)
         {
-            var items = await _inventoryService.GetAllAsync(search);
+            var (items, totalCount) = await _inventoryService.GetPagedAsync(page, pageSize, search, productId, binId, status);
+            
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = totalCount;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+            ViewBag.Search = search;
+            ViewBag.ProductId = productId;
+            ViewBag.BinId = binId;
+            ViewBag.Status = status;
+
+            // Get stock summary for dashboard cards
+            var summary = await _inventoryService.GetStockSummaryAsync();
+            ViewBag.StockSummary = summary;
+
             return View(items);
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var inventory = await _inventoryService.GetByIdAsync(id);
+            if (inventory == null)
+                return NotFound();
+
+            return View(inventory);
+        }
+
+        public async Task<IActionResult> StockByProduct(int productId)
+        {
+            var items = await _inventoryService.GetByProductIdAsync(productId);
+            return View("Index", items);
+        }
+
+        public async Task<IActionResult> StockByBin(int binId)
+        {
+            var items = await _inventoryService.GetByBinIdAsync(binId);
+            return View("Index", items);
         }
 
         [HttpPost]
@@ -52,6 +87,40 @@ namespace WMS_DEPI_GRAD.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Transfer(int id)
+        {
+            var inventory = await _inventoryService.GetByIdAsync(id);
+            if (inventory == null)
+                return NotFound();
 
+            return View(inventory);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Transfer(TransferInventoryDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var inventory = await _inventoryService.GetByIdAsync(model.InventoryId);
+                return View(inventory);
+            }
+
+            try
+            {
+                // Set performed by from current user (you might get this from authentication)
+                model.PerformedBy = User.Identity?.Name ?? "System";
+                
+                await _inventoryService.TransferInventoryAsync(model);
+                TempData["Success"] = "Inventory transferred successfully!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                var inventory = await _inventoryService.GetByIdAsync(model.InventoryId);
+                return View(inventory);
+            }
+        }
     }
 }

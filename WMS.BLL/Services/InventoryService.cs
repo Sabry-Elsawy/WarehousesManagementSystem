@@ -29,6 +29,7 @@ public class InventoryService:IInventoryService
         
         var list = data.Select(i => new InventoryListDto
         {
+            Id = i.Id,
             SKU = i.Product.Code,
             ProductName = i.Product.Name,
             Quantity = i.Quantity,
@@ -124,4 +125,210 @@ public class InventoryService:IInventoryService
         return true;
     }
 
+    public async Task<InventoryDetailsDto?> GetByIdAsync(int id)
+    {
+        var repo = _unitOfWork.GetRepository<Inventory, int>();
+        var inventory = await repo.GetByIdAsync(id, 
+            query => query
+                .Include(i => i.Product)
+                .Include(i => i.Bin));
+
+        if (inventory == null)
+            return null;
+
+        return new InventoryDetailsDto
+        {
+            Id = inventory.Id,
+            ProductId = inventory.ProductId,
+            SKU = inventory.Product.Code,
+            ProductName = inventory.Product.Name,
+            BinId = inventory.BinId,
+            BinCode = inventory.Bin.Code,
+            Quantity = inventory.Quantity,
+            Status = inventory.Status,
+            BatchNumber = inventory.BatchNumber,
+            ExpiryDate = inventory.ExpiryDate,
+            CreatedOn = inventory.CreatedOn,
+            CreatedBy = inventory.CreatedBy,
+            LastModifiedOn = inventory.LastModifiedOn,
+            LastModifiedBy = inventory.LastModifiedBy,
+            RecentTransactions = new List<InventoryTransactionDto>() // TODO: Implement when transaction entity exists
+        };
+    }
+
+    public async Task<IEnumerable<InventoryListDto>> GetByProductIdAsync(int productId)
+    {
+        var repo = _unitOfWork.GetRepository<Inventory, int>();
+        var inventories = await repo.GetAllWithIncludeAsync(
+            withTracking: false,
+            include: q => q
+                .Include(i => i.Product)
+                .Include(i => i.Bin)
+                .Where(i => i.ProductId == productId));
+
+        return inventories.Select(i => new InventoryListDto
+        {
+            Id = i.Id,
+            SKU = i.Product.Code,
+            ProductName = i.Product.Name,
+            Quantity = i.Quantity,
+            Location = i.Bin.Code,
+            Status = i.Status,
+            LastUpdated = i.LastModifiedOn ?? i.CreatedOn
+        }).ToList();
+    }
+
+    public async Task<IEnumerable<InventoryListDto>> GetByBinIdAsync(int binId)
+    {
+        var repo = _unitOfWork.GetRepository<Inventory, int>();
+        var inventories = await repo.GetAllWithIncludeAsync(
+            withTracking: false,
+            include: q => q
+                .Include(i => i.Product)
+                .Include(i => i.Bin)
+                .Where(i => i.BinId == binId));
+
+        return inventories.Select(i => new InventoryListDto
+        {
+            Id = i.Id,
+            SKU = i.Product.Code,
+            ProductName = i.Product.Name,
+            Quantity = i.Quantity,
+            Location = i.Bin.Code,
+            Status = i.Status,
+            LastUpdated = i.LastModifiedOn ?? i.CreatedOn
+        }).ToList();
+    }
+
+    public async Task<(IEnumerable<InventoryListDto> Items, int TotalCount)> GetPagedAsync(
+        int pageNumber, int pageSize,
+        string? search, int? productId, int? binId, string? status)
+    {
+        var repo = _unitOfWork.GetRepository<Inventory, int>();
+        var query = await repo.GetAllWithIncludeAsync(
+            withTracking: false,
+            include: q => q
+                .Include(i => i.Product)
+                .Include(i => i.Bin));
+
+        // Apply filters
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim().ToLower();
+            query = query.Where(i =>
+                i.Product.Code.ToLower().Contains(s) ||
+                i.Product.Name.ToLower().Contains(s) ||
+                i.Bin.Code.ToLower().Contains(s));
+        }
+
+        if (productId.HasValue)
+            query = query.Where(i => i.ProductId == productId.Value);
+
+        if (binId.HasValue)
+            query = query.Where(i => i.BinId == binId.Value);
+
+        if (!string.IsNullOrWhiteSpace(status))
+            query = query.Where(i => i.Status.ToLower() == status.ToLower());
+
+        var totalCount = query.Count();
+
+        // Apply pagination
+        var items = query
+            .OrderByDescending(i => i.LastModifiedOn ?? i.CreatedOn)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(i => new InventoryListDto
+            {
+                Id = i.Id,
+                SKU = i.Product.Code,
+                ProductName = i.Product.Name,
+                Quantity = i.Quantity,
+                Location = i.Bin.Code,
+                Status = i.Status,
+                LastUpdated = i.LastModifiedOn ?? i.CreatedOn
+            })
+            .ToList();
+
+        return (items, totalCount);
+    }
+
+    public async Task<bool> TransferInventoryAsync(TransferInventoryDto dto)
+    {
+        if (dto.Quantity <= 0)
+            throw new ArgumentException("Transfer quantity must be greater than 0");
+
+        var inventoryRepo = _unitOfWork.GetRepository<Inventory, int>();
+        
+        // Get source inventory with tracking
+        var sourceInventory = await inventoryRepo.GetByIdAsync(dto.InventoryId);
+        if (sourceInventory == null)
+            throw new InvalidOperationException("Source inventory not found");
+
+        if (sourceInventory.Quantity < dto.Quantity)
+            throw new InvalidOperationException($"Insufficient quantity. Available: {sourceInventory.Quantity}, Requested: {dto.Quantity}");
+
+        // Validate destination bin exists
+        var binRepo = _unitOfWork.GetRepository<Bin, int>();
+        var destinationBin = await binRepo.GetByIdAsync(dto.DestinationBinId);
+        if (destinationBin == null)
+            throw new InvalidOperationException("Destination bin not found");
+
+        // Check if inventory already exists in destination bin
+        var allInventories = await inventoryRepo.GetAllAsync(WithTracking: true);
+        var destinationInventory = allInventories.FirstOrDefault(i =>
+            i.ProductId == sourceInventory.ProductId &&
+            i.BinId == dto.DestinationBinId);
+
+        // Deduct from source
+        sourceInventory.Quantity -= dto.Quantity;
+        sourceInventory.LastModifiedOn = DateTime.UtcNow;
+        sourceInventory.LastModifiedBy = dto.PerformedBy;
+        inventoryRepo.Update(sourceInventory);
+
+        // Add to destination
+        if (destinationInventory != null)
+        {
+            // Update existing inventory in destination
+            destinationInventory.Quantity += dto.Quantity;
+            destinationInventory.LastModifiedOn = DateTime.UtcNow;
+            destinationInventory.LastModifiedBy = dto.PerformedBy;
+            inventoryRepo.Update(destinationInventory);
+        }
+        else
+        {
+            // Create new inventory record in destination
+            var newInventory = new Inventory
+            {
+                ProductId = sourceInventory.ProductId,
+                BinId = dto.DestinationBinId,
+                Quantity = dto.Quantity,
+                Status = sourceInventory.Status,
+                BatchNumber = sourceInventory.BatchNumber,
+                ExpiryDate = sourceInventory.ExpiryDate,
+                CreatedOn = DateTime.UtcNow,
+                CreatedBy = dto.PerformedBy
+            };
+            await inventoryRepo.AddAsync(newInventory);
+        }
+
+        await _unitOfWork.CompleteAsync();
+
+        // TODO: Log transaction when InventoryTransaction entity is implemented
+        return true;
+    }
+
+    public async Task<Dictionary<string, int>> GetStockSummaryAsync()
+    {
+        var repo = _unitOfWork.GetRepository<Inventory, int>();
+        var allInventories = await repo.GetAllAsync(WithTracking: false);
+
+        var summary = allInventories
+            .GroupBy(i => i.Status)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Sum(i => i.Quantity)
+            );
+
+        return summary;
+    }
 }
