@@ -33,7 +33,7 @@ public class CycleCountController : Controller
     public async Task<IActionResult> Create()
     {
         // Populate dropdowns if needed
-        ViewBag.Zones = await _zoneService.GetAllAsync();
+        ViewBag.Zones = await _zoneService.GetAllZonesAsync();
         return View();
     }
 
