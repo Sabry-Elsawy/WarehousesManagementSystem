@@ -187,6 +187,9 @@ public class ReceiptService : IReceiptService
         receiptRepo.Update(receipt);
         await _unitOfWork.CompleteAsync();
 
+        // Trigger auto-close for ASN if all receipts are closed
+        await TryAutoCloseASNAsync(receiptId);
+
         return true;
     }
 
@@ -212,5 +215,100 @@ public class ReceiptService : IReceiptService
     {
         var repo = _unitOfWork.GetRepository<ReceiptItem, int>();
         return await repo.GetByIdAsync(receiptItemId);
+    }
+
+    /// <summary>
+    /// Attempts to automatically close an ASN if all its receipts are closed.
+    /// </summary>
+    private async Task TryAutoCloseASNAsync(int receiptId)
+    {
+        try
+        {
+            // Get the receipt to find its ASN
+            var receiptRepo = _unitOfWork.GetRepository<Receipt, int>();
+            var receipt = await receiptRepo.GetByIdAsync(receiptId);
+            
+            if (receipt == null || receipt.AdvancedShippingNoticeId == 0)
+                return; // Receipt not linked to ASN
+
+            int asnId = receipt.AdvancedShippingNoticeId;
+
+            // Get the ASN with tracking enabled for update
+            var asnRepo = _unitOfWork.GetRepository<AdvancedShippingNotice, int>();
+            var asn = await asnRepo.GetByIdAsync(asnId);
+
+            if (asn == null || asn.Status == AdvancedShippingNoticeStatus.Closed)
+                return; // ASN already closed or not found
+
+            // Check if there are any other open receipts for this ASN
+            var allReceiptsList = await receiptRepo.GetAllWithIncludeAsync(withTracking: false,
+                query => query.Where(r => r.AdvancedShippingNoticeId == asnId));
+
+            if (allReceiptsList.Any(r => r.Status != ReceiptStatus.Closed))
+                return; // Some receipts still open
+
+            // All receipts are closed - auto-close the ASN
+            asn.Status = AdvancedShippingNoticeStatus.Closed;
+            asnRepo.Update(asn);
+            await _unitOfWork.CompleteAsync();
+
+            // Log auto-closure (in production, use proper logging framework)
+            Console.WriteLine($"[AUTO-CLOSE] ASN {asn.Id} ({asn.ASN_Number}) automatically closed - all receipts completed");
+
+            // Cascade: Trigger PO auto-close check by calling ASNService's TryAutoClosePOAsync indirectly
+            // We need to trigger the ASN's close logic which will check PO
+            // Since we just changed ASN status, we should trigger PO check
+            await TryAutoClosePOAsync(asnId);
+        }
+        catch (Exception ex)
+        {
+            // Don't fail the receipt closure if ASN auto-close fails
+            Console.WriteLine($"[WARNING] Failed to auto-close ASN for Receipt {receiptId}: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Helper to trigger PO auto-close when ASN is auto-closed.
+    /// This replicates the logic that would be in ASNService but keeps ReceiptService independent.
+    /// </summary>
+    private async Task TryAutoClosePOAsync(int asnId)
+    {
+        try
+        {
+            var asnRepo = _unitOfWork.GetRepository<AdvancedShippingNotice, int>();
+            var asn = await asnRepo.GetByIdAsync(asnId);
+            
+            if (asn == null || asn.PurchaseOrderId == 0)
+                return;
+
+            int poId = asn.PurchaseOrderId;
+
+            var poRepo = _unitOfWork.GetRepository<PurchaseOrder, int>();
+            var po = await poRepo.GetByIdAsync(poId, 
+                query => query.Include(p => p.POItems),
+                withTracking: true);
+
+            if (po == null || po.Status == PurchaseOrderStatus.Closed)
+                return;
+
+            if (po.POItems.Any(item => item.QtyReceived < item.QtyOrdered))
+                return;
+
+            var allAsnsList = await asnRepo.GetAllWithIncludeAsync(withTracking: false,
+                query => query.Where(a => a.PurchaseOrderId == poId));
+
+            if (allAsnsList.Any(a => a.Status != AdvancedShippingNoticeStatus.Closed))
+                return;
+
+            po.Status = PurchaseOrderStatus.Closed;
+            poRepo.Update(po);
+            await _unitOfWork.CompleteAsync();
+
+            Console.WriteLine($"[AUTO-CLOSE] PO {po.Id} ({po.PO_Number}) automatically closed - all items received and all ASNs closed");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[WARNING] Failed to auto-close PO for ASN {asnId}: {ex.Message}");
+        }
     }
 }
