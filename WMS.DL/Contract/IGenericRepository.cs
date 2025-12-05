@@ -16,7 +16,7 @@ namespace WMS.DAL.Contract
             string includeProperties = "");
 		Task<TEntity?> GetByIdAsync(TKey id);
 
-        Task<TEntity?> GetByIdAsync(TKey id, Func<IQueryable<TEntity>, IQueryable<TEntity>> include);
+        Task<TEntity?> GetByIdAsync(TKey id, Func<IQueryable<TEntity>, IQueryable<TEntity>> include, bool withTracking = false);
          
         Task AddAsync(TEntity entity);
         Task AddRangeAsync(IEnumerable<TEntity> entity);

@@ -92,7 +92,8 @@ namespace WMS.BLL.Services
                 var putawayRepo = _unitOfWork.GetRepository<Putaway, int>();
                 var putaway = await putawayRepo.GetByIdAsync(putawayId,
                     include: q => q.Include(p => p.ReceiptItem)
-                                   .ThenInclude(ri => ri.Product));
+                                   .ThenInclude(ri => ri.Product),
+                    withTracking: true);
 
                 if (putaway == null)
                     throw new ArgumentException($"Putaway {putawayId} not found");
@@ -287,7 +288,8 @@ namespace WMS.BLL.Services
                 var putaway = await putawayRepo.GetByIdAsync(putawayId,
                     include: q => q.Include(p => p.ReceiptItem)
                                    .ThenInclude(ri => ri.ASNItem)
-                                   .Include(p => p.PutawayBins));
+                                   .Include(p => p.PutawayBins),
+                    withTracking: true);
 
                 if (putaway == null)
                     throw new ArgumentException($"Putaway {putawayId} not found");
@@ -426,14 +428,21 @@ namespace WMS.BLL.Services
                 // Build filter expression
                 System.Linq.Expressions.Expression<Func<Putaway, bool>>? filter = null;
 
-                if (!string.IsNullOrWhiteSpace(searchTerm) || !string.IsNullOrWhiteSpace(statusFilter))
+                // Parse status filter to enum if provided
+                PutawayStatus? parsedStatus = null;
+                if (!string.IsNullOrWhiteSpace(statusFilter) && Enum.TryParse<PutawayStatus>(statusFilter, out var status))
+                {
+                    parsedStatus = status;
+                }
+
+                if (!string.IsNullOrWhiteSpace(searchTerm) || parsedStatus.HasValue)
                 {
                     filter = p =>
                         (string.IsNullOrWhiteSpace(searchTerm) ||
                          p.ReceiptItem.SKU.Contains(searchTerm) ||
                          p.ReceiptItem.Product.Name.Contains(searchTerm)) &&
-                        (string.IsNullOrWhiteSpace(statusFilter) ||
-                         p.Status.ToString() == statusFilter);
+                        (!parsedStatus.HasValue ||
+                         p.Status == parsedStatus.Value);
                 }
 
                 var (items, totalCount) = await putawayRepo.GetPagedListAsync(
