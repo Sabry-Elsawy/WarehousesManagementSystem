@@ -1,0 +1,80 @@
+@model WMS_DEPI_GRAD.ViewModels.PutawayCircle.CreatePutawayViewModel
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Create New Putaway Task</h4>
+                </div>
+
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label for="SelectedReceiptItemId" class="form-label fw-bold">
+                                Select Receipt Item <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="SelectedReceiptItemId" class="form-select" required>
+                                <option value="">-- Select Receipt Item --</option>
+                                @foreach (var item in Model.AvailableReceiptItems)
+                                {
+                                    <option value="@item.ReceiptItemId">@item.DisplayText</option>
+                                }
+                            </select>
+                            <div class="form-text">Choose the receipt item for which to create a putaway task.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Qty" class="form-label fw-bold">
+                                Quantity <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Qty" type="number" class="form-control" min="1" required />
+                            <div class="form-text">Enter the quantity to putaway (must not exceed available quantity).</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Create Putaway
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        // Client-side validation: ensure quantity doesn't exceed available
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var select = document.getElementById('SelectedReceiptItemId');
+            var selectedOption = select.options[select.selectedIndex];
+            var availableQty = 0;
+            
+            if (selectedOption.text) {
+                var match = selectedOption.text.match(/Available:\s*(\d+)/);
+                if (match && match[1]) {
+                    availableQty = parseInt(match[1]);
+                }
+            }
+            
+            var requestedQty = parseInt(document.getElementById('Qty').value);
+            
+            if (requestedQty > availableQty) {
+                e.preventDefault();
+                alert('Requested quantity (' + requestedQty + ') exceeds available quantity (' + availableQty + ')');
+                return false;
+            }
+        });
+    </script>
+}

@@ -1,0 +1,278 @@
+@model WMS_DEPI_GRAD.ViewModels.PutawayCircle.AssignManualViewModel
+
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Manual Bin Assignment</h2>
+        <a asp-action="Details" asp-route-id="@Model.PutawayId" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Details
+        </a>
+    </div>
+
+    <!-- Product Info Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-box-seam"></i> Product Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4"><strong>SKU:</strong> @Model.SKU</div>
+                <div class="col-md-4"><strong>Product:</strong> @Model.ProductName</div>
+                <div class="col-md-4">
+                    <strong>Required Qty:</strong> <span class="badge bg-primary">@Model.TotalQty units</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment Form -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-hand-index"></i> Bin Assignments</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="AssignManual" asp-route-id="@Model.PutawayId" method="post" id="assignmentForm">
+                @Html.AntiForgeryToken()
+
+                <!-- Summary -->
+                <div class="alert alert-info mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Total Required:</strong> <span id="totalRequired">@Model.TotalQty</span> units
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Total Assigned:</strong> <span id="totalAssigned">0</span> units
+                            <span id="remainingBadge" class="badge bg-warning ms-2">Remaining: <span id="remaining">@Model.TotalQty</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignment Table -->
+                <div class="table-responsive mb-3">
+                    <table class="table table-bordered" id="assignmentsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 40%;">Bin</th>
+                                <th style="width: 30%;">Quantity</th>
+                                <th style="width: 20%;">Available</th>
+                                <th style="width: 10%;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assignmentRows">
+                            @for (int i = 0; i < Model.CurrentAssignments.Count; i++)
+                            {
+                                <tr class="assignment-row">
+                                    <td>
+                                        <select name="assignments[@i].BinId" class="form-select bin-select" required>
+                                            <option value="">-- Select Bin --</option>
+                                            @foreach (var bin in Model.AvailableBins)
+                                            {
+                                                <option value="@bin.BinId" 
+                                                        data-capacity="@bin.AvailableCapacity"
+                                                        selected="@(bin.BinId == Model.CurrentAssignments[i].BinId)">
+                                                    @bin.Code (Available: @bin.AvailableCapacity)
+                                                </option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="assignments[@i].Qty" 
+                                               class="form-control qty-input" 
+                                               value="@Model.CurrentAssignments[i].Qty" 
+                                               min="1" required />
+                                    </td>
+                                    <td class="available-capacity">-</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add New Row Button -->
+                <div class="mb-3">
+                    <button type="button" class="btn btn-secondary" id="addRowBtn">
+                        <i class="bi bi-plus-circle"></i> Add Bin Assignment
+                    </button>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a asp-action="Details" asp-route-id="@Model.PutawayId" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-success" id="submitBtn">
+                        <i class="bi bi-check-circle"></i> Save Assignments
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        const totalRequired = @Model.TotalQty;
+        const availableBins = @Html.Raw(Json.Serialize(Model.AvailableBins.Select(b => new { b.BinId, b.Code, b.AvailableCapacity })));
+        let rowIndex = @Model.CurrentAssignments.Count;
+
+        function updateSummary() {
+            let totalAssigned = 0;
+            document.querySelectorAll('.qty-input').forEach(input => {
+                const qty = parseInt(input.value) || 0;
+                totalAssigned += qty;
+            });
+
+            document.getElementById('totalAssigned').textContent = totalAssigned;
+            const remaining = totalRequired - totalAssigned;
+            document.getElementById('remaining').textContent = remaining;
+
+            const badge = document.getElementById('remainingBadge');
+            if (remaining === 0) {
+                badge.className = 'badge bg-success ms-2';
+            } else if (remaining < 0) {
+                badge.className = 'badge bg-danger ms-2';
+            } else {
+                badge.className = 'badge bg-warning ms-2';
+            }
+
+            // Enable/disable submit button
+            document.getElementById('submitBtn').disabled = (remaining !== 0);
+        }
+
+        function updateAvailableCapacity(row) {
+            const select = row.querySelector('.bin-select');
+            const qtyInput = row.querySelector('.qty-input');
+            const capacityCell = row.querySelector('.available-capacity');
+
+            if (select.value) {
+                const selectedOption = select.options[select.selectedIndex];
+                const capacity = parseInt(selectedOption.dataset.capacity) || 0;
+                const qty = parseInt(qtyInput.value) || 0;
+                const remaining = capacity - qty;
+
+                capacityCell.textContent = capacity;
+                
+                if (qty > capacity) {
+                    qtyInput.classList.add('is-invalid');
+                    capacityCell.classList.add('text-danger');
+                } else {
+                    qtyInput.classList.remove('is-invalid');
+                    capacityCell.classList.remove('text-danger');
+                }
+            } else {
+                capacityCell.textContent = '-';
+            }
+        }
+
+        function createNewRow() {
+            const newRow = document.createElement('tr');
+            newRow.className = 'assignment-row';
+            newRow.innerHTML = `
+                <td>
+                    <select name="assignments[${rowIndex}].BinId" class="form-select bin-select" required>
+                        <option value="">-- Select Bin --</option>
+                        ${availableBins.map(b => `
+                            <option value="${b.binId}" data-capacity="${b.availableCapacity}">
+                                ${b.code} (Available: ${b.availableCapacity})
+                            </option>
+                        `).join('')}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="assignments[${rowIndex}].Qty" 
+                           class="form-control qty-input" 
+                           value="1" min="1" required />
+                </td>
+                <td class="available-capacity">-</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger remove-row">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            rowIndex++;
+            return newRow;
+        }
+
+        // Event Listeners
+        document.getElementById('addRowBtn').addEventListener('click', function() {
+            const newRow = createNewRow();
+            document.getElementById('assignmentRows').appendChild(newRow);
+            updateSummary();
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-row')) {
+                const row = e.target.closest('tr');
+                if (document.querySelectorAll('.assignment-row').length > 1) {
+                    row.remove();
+                    updateSummary();
+                } else {
+                    alert('At least one bin assignment is required');
+                }
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('qty-input')) {
+                const row = e.target.closest('tr');
+                updateAvailableCapacity(row);
+                updateSummary();
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('bin-select')) {
+                const row = e.target.closest('tr');
+                updateAvailableCapacity(row);
+            }
+        });
+
+        // Form validation
+        document.getElementById('assignmentForm').addEventListener('submit', function(e) {
+            const totalAssigned = parseInt(document.getElementById('totalAssigned').textContent);
+            
+            if (totalAssigned !== totalRequired) {
+                e.preventDefault();
+                alert(`Total assigned quantity (${totalAssigned}) must equal required quantity (${totalRequired})`);
+                return false;
+            }
+
+            // Check capacity constraints
+            let hasError = false;
+            document.querySelectorAll('.assignment-row').forEach(row => {
+                const select = row.querySelector('.bin-select');
+                const qtyInput = row.querySelector('.qty-input');
+                
+                if (select.value) {
+                    const capacity = parseInt(select.options[select.selectedIndex].dataset.capacity) || 0;
+                    const qty = parseInt(qtyInput.value) || 0;
+                    
+                    if (qty > capacity) {
+                        hasError = true;
+                        qtyInput.classList.add('is-invalid');
+                    }
+                }
+            });
+
+            if (hasError) {
+                e.preventDefault();
+                alert('Some bin assignments exceed available capacity. Please adjust.');
+                return false;
+            }
+        });
+
+        // Initialize
+        document.querySelectorAll('.assignment-row').forEach(row => {
+            updateAvailableCapacity(row);
+        });
+        updateSummary();
+    </script>
+}

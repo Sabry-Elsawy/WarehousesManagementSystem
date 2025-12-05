@@ -70,9 +70,10 @@ namespace WMS.DAL.Repository
 
         public async Task<TEntity?> GetByIdAsync(
             TKey id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> include)
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> include,
+            bool withTracking = false)
         {
-            IQueryable<TEntity> query = _dbSet.AsNoTracking();
+            IQueryable<TEntity> query = withTracking ? _dbSet : _dbSet.AsNoTracking();
 
             if (include != null)
                 query = include(query);
