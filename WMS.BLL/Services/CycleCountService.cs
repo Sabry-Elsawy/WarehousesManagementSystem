@@ -35,7 +35,11 @@ public class CycleCountService : ICycleCountService
         var inventoryRepo = _unitOfWork.GetRepository<Inventory, int>();
         var query = await inventoryRepo.GetAllWithIncludeAsync(
             withTracking: false,
-            include: q => q.Include(i => i.Product).Include(i => i.Bin)
+            include: q => q
+                .Include(i => i.Product)
+                .Include(i => i.Bin)
+                    .ThenInclude(b => b.Rack)
+                        .ThenInclude(r => r.Aisle)
         );
 
         if (dto.ProductIds != null && dto.ProductIds.Any())
@@ -45,7 +49,7 @@ public class CycleCountService : ICycleCountService
             query = query.Where(i => dto.BinIds.Contains(i.BinId));
 
         if (dto.ZoneId.HasValue)
-            query = query.Where(i => i.Bin.ZoneId == dto.ZoneId.Value);
+            query = query.Where(i => i.Bin.Rack.Aisle.ZoneId == dto.ZoneId.Value);
 
         // 3. Create Cycle Count Items
         var itemRepo = _unitOfWork.GetRepository<CycleCountItem, int>();
