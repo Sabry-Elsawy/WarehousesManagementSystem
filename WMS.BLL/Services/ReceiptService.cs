@@ -34,6 +34,18 @@ public class ReceiptService : IReceiptService
 
     public async Task<Receipt> CreateFromASNAsync(int asnId, int warehouseId)
     {
+        // Check if a Receipt already exists for this ASN - if so, return it instead of creating a new one
+        var receiptRepo = _unitOfWork.GetRepository<Receipt, int>();
+        var existingReceipts = await receiptRepo.GetAllWithIncludeAsync(withTracking: false, 
+            query => query.Where(r => r.AdvancedShippingNoticeId == asnId));
+        
+        if (existingReceipts.Any())
+        {
+            // Return the existing receipt instead of throwing an error
+            var existingReceipt = existingReceipts.First();
+            return existingReceipt;
+        }
+
         // Validate ASN exists
         var asnRepo = _unitOfWork.GetRepository<AdvancedShippingNotice, int>();
         var asn = await asnRepo.GetByIdAsync(asnId, query => query.Include(a => a.ASNItems));
@@ -54,7 +66,6 @@ public class ReceiptService : IReceiptService
             Status = ReceiptStatus.Open
         };
 
-        var receiptRepo = _unitOfWork.GetRepository<Receipt, int>();
         await receiptRepo.AddAsync(receipt);
         await _unitOfWork.CompleteAsync();
 
