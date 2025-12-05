@@ -125,11 +125,12 @@ namespace WMS_DEPI_GRAD.Controllers
         {
             try
             {
-                // Get all receipt items with available quantity
+                // Get only OPEN receipts with available quantity
                 var receipts = await _receiptService.GetAllAsync();
+                var openReceipts = receipts.Where(r => r.Status == ReceiptStatus.Open).ToList();
                 var availableItems = new List<ReceiptItemOption>();
 
-                foreach (var receipt in receipts)
+                foreach (var receipt in openReceipts)
                 {
                     var receiptDetails = await _receiptService.GetByIdAsync(receipt.Id);
                     if (receiptDetails?.ReceiptItems != null)
