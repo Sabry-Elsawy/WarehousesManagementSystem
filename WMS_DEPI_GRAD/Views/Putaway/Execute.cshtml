@@ -1,0 +1,142 @@
+@model WMS_DEPI_GRAD.ViewModels.PutawayCircle.ExecutePutawayViewModel
+
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Execute Putaway - Confirmation</h2>
+        <a asp-action="Details" asp-route-id="@Model.PutawayId" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Details
+        </a>
+    </div>
+
+    <!-- Product Info Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-box-seam"></i> Product Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4"><strong>SKU:</strong> @Model.SKU</div>
+                <div class="col-md-4"><strong>Product:</strong> @Model.ProductName</div>
+                <div class="col-md-4"><strong>Total Quantity:</strong> <span class="badge bg-primary">@Model.TotalQty units</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warnings (if any) -->
+    @if (Model.Warnings != null && Model.Warnings.Any())
+    {
+        <div class="alert alert-warning" role="alert">
+            <h5><i class="bi bi-exclamation-triangle-fill"></i> Warnings</h5>
+            <ul class="mb-0">
+                @foreach (var warning in Model.Warnings)
+                {
+                    <li>@warning</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <!-- Bin Assignments Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-basket"></i> Bin Assignments to Execute</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Bin Code</th>
+                        <th>Zone</th>
+                        <th>Quantity to Add</th>
+                        <th>Current Inventory</th>
+                        <th>After Execution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var assignment in Model.Assignments)
+                    {
+                        var after = Model.AfterInventory.FirstOrDefault(a => a.BinId == assignment.BinId);
+                        var current = after?.CurrentQty ?? 0;
+                        var projected = after?.ProjectedQty ?? assignment.Qty;
+                        
+                        <tr>
+                            <td><strong>@assignment.BinCode</strong></td>
+                            <td>@assignment.Zone</td>
+                            <td><span class="badge bg-success">+@assignment.Qty</span></td>
+                            <td>@current units</td>
+                            <td>
+                                <strong>@projected units</strong>
+                                @if (current == 0)
+                                {
+                                    <span class="badge bg-info ms-2">New</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning ms-2">Update</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td colspan="2" class="text-end"><strong>Total:</strong></td>
+                        <td><span class="badge bg-success">+@Model.Assignments.Sum(a => a.Qty) units</span></td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Confirmation Card -->
+    <div class="card shadow-sm border-warning">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0"><i class="bi bi-check-circle"></i> Confirm Execution</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info mb-4">
+                <h6 class="alert-heading"><i class="bi bi-info-circle-fill"></i> What will happen:</h6>
+                <ul class="mb-0">
+                    <li>Inventory records will be created or updated for each assigned bin</li>
+                    <li>The putaway status will change to <strong>Completed</strong></li>
+                    <li>This action <strong>cannot be undone</strong></li>
+                </ul>
+            </div>
+
+            <p class="mb-0">
+                <strong>Are you sure you want to execute this putaway?</strong>
+            </p>
+            <p class="text-muted small">
+                Please review all assignments above before confirming. After execution, you will need to close the putaway task separately.
+            </p>
+
+            <form asp-action="ExecuteConfirm" asp-route-id="@Model.PutawayId" method="post" class="mt-4">
+                @Html.AntiForgeryToken()
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a asp-action="Details" asp-route-id="@Model.PutawayId" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-success btn-lg" id="confirmBtn">
+                        <i class="bi bi-check-circle-fill"></i> Confirm & Execute
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        // Add confirmation dialog on submit
+        document.getElementById('confirmBtn').addEventListener('click', function(e) {
+            if (!confirm('Are you absolutely sure you want to execute this putaway? This will update inventory and cannot be undone.')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+}

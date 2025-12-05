@@ -111,8 +111,23 @@ public class ReceiptController : Controller
         {
             try
             {
+                // Check if a receipt already exists for this ASN before calling the service
+                var allReceipts = await _receiptService.GetAllAsync();
+                var existingReceipt = allReceipts.FirstOrDefault(r => r.AdvancedShippingNoticeId == viewModel.ASNId);
+                
                 var receipt = await _receiptService.CreateFromASNAsync(viewModel.ASNId, viewModel.WarehouseId);
-                TempData["Success"] = "Receipt created successfully!";
+                
+                if (existingReceipt != null && existingReceipt.Id == receipt.Id)
+                {
+                    // Receipt already existed
+                    TempData["Info"] = $"A Receipt already exists for this ASN. Redirected to existing Receipt: {receipt.ReceiptNumber}";
+                }
+                else
+                {
+                    // New receipt was created
+                    TempData["Success"] = "Receipt created successfully!";
+                }
+                
                 return RedirectToAction(nameof(Details), new { id = receipt.Id });
             }
             catch (Exception ex)

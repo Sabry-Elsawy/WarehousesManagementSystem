@@ -3,6 +3,8 @@
 public enum PutawayStatus
 {
     Pending,
+    Assigned,
     InProgress,
-    Completed
+    Completed,
+    Closed
 }
