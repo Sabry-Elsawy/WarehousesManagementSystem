@@ -1,0 +1,132 @@
+@model WMS_DEPI_GRAD.ViewModels.PutawayCircle.AutoAssignViewModel
+
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Auto-Assign Bins</h2>
+        <a asp-action="Details" asp-route-id="@Model.PutawayId" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Details
+        </a>
+    </div>
+
+    <!-- Product Info Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-box-seam"></i> Product Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4"><strong>SKU:</strong> @Model.SKU</div>
+                <div class="col-md-4"><strong>Product:</strong> @Model.ProductName</div>
+                <div class="col-md-4"><strong>Quantity:</strong> @Model.TotalQty units</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment Result Card -->
+    @if (!Model.FullyAssigned)
+    {
+        <div class="alert alert-warning" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> <strong>Warning:</strong> @Model.WarningMessage
+            <br />
+            <small>Only @Model.AssignedQty out of @Model.TotalQty units could be auto-assigned. Please use manual assignment for the remaining quantity.</small>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle-fill"></i> <strong>Success!</strong> All @Model.TotalQty units have been successfully assigned to bins.
+        </div>
+    }
+
+    <!-- Suggested Bins Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-cpu"></i> Suggested Bin Assignments</h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.SuggestedBins == null || !Model.SuggestedBins.Any())
+            {
+                <div class="p-4 text-center text-muted">
+                    No bins available for assignment.
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Bin Code</th>
+                            <th>Zone</th>
+                            <th>Bin Type</th>
+                            <th>Suggested Qty</th>
+                            <th>Available Capacity</th>
+                            <th>Utilization</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var bin in Model.SuggestedBins)
+                        {
+                            var utilizationPercent = bin.AvailableCapacity > 0 ? (bin.Qty * 100.0 / bin.AvailableCapacity) : 0;
+                            <tr>
+                                <td><strong>@bin.BinCode</strong></td>
+                                <td>@bin.Zone</td>
+                                <td>@bin.BinType</td>
+                                <td><span class="badge bg-primary">@bin.Qty units</span></td>
+                                <td>@bin.AvailableCapacity units</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar @(utilizationPercent > 80 ? "bg-warning" : "bg-success")" 
+                                             role="progressbar" 
+                                             style="width: @(utilizationPercent)%;" 
+                                             aria-valuenow="@utilizationPercent" aria-valuemin="0" aria-valuemax="100">
+                                            @utilizationPercent.ToString("F0")%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Total Assigned:</strong></td>
+                            <td><span class="badge bg-success">@Model.SuggestedBins.Sum(b => b.Qty) units</span></td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            }
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            @if (Model.SuggestedBins != null && Model.SuggestedBins.Any())
+            {
+                <form asp-action="AcceptAutoAssign" asp-route-id="@Model.PutawayId" method="post">
+                    @Html.AntiForgeryToken()
+                    
+                    @for (int i = 0; i < Model.SuggestedBins.Count; i++)
+                    {
+                        <input type="hidden" name="suggestedBins[@i].BinId" value="@Model.SuggestedBins[i].BinId" />
+                        <input type="hidden" name="suggestedBins[@i].Qty" value="@Model.SuggestedBins[i].Qty" />
+                    }
+
+                    <button type="submit" class="btn btn-success btn-lg me-2">
+                        <i class="bi bi-check-circle"></i> Accept Assignment
+                    </button>
+                </form>
+            }
+            
+            <a asp-action="AssignManual" asp-route-id="@Model.PutawayId" class="btn btn-warning btn-lg me-2">
+                <i class="bi bi-hand-index"></i> Manual Assignment Instead
+            </a>
+            
+            <a asp-action="Details" asp-route-id="@Model.PutawayId" class="btn btn-secondary btn-lg">
+                <i class="bi bi-x-circle"></i> Cancel
+            </a>
+        </div>
+    </div>
+
+</div>
