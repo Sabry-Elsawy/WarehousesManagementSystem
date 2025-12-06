@@ -99,6 +99,7 @@ public class InventoryService:IInventoryService
             DestinationBinId = bin.Id,
             TransactionDate = DateTime.UtcNow,
             CreatedBy = "System", // TODO: Get current user
+            ReferenceNumber = $"INV-ADD-{DateTime.UtcNow:yyyyMMddHHmmss}",
             Reason = "Initial Inventory Add"
         };
         await transactionRepo.AddAsync(transaction);
@@ -148,6 +149,7 @@ public class InventoryService:IInventoryService
             DestinationBinId = inv.BinId,
             TransactionDate = DateTime.UtcNow,
             CreatedBy = dto.PerformedBy,
+            ReferenceNumber = $"ADJ-{product.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}",
             Reason = dto.Reason
         };
         await transactionRepo.AddAsync(transaction);
@@ -357,6 +359,7 @@ public class InventoryService:IInventoryService
             DestinationBinId = dto.DestinationBinId,
             TransactionDate = DateTime.UtcNow,
             CreatedBy = dto.PerformedBy,
+            ReferenceNumber = $"TRF-{dto.InventoryId}-{DateTime.UtcNow:yyyyMMddHHmmss}",
             Reason = dto.Reason
         };
         await transactionRepo.AddAsync(transaction);
