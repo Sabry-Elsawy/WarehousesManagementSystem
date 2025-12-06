@@ -263,7 +263,8 @@ public class ASNController : Controller
     {
         try
         {
-            await _asnService.CloseAsync(id);
+            var closedBy = User.Identity?.Name ?? "System";
+            await _asnService.CloseAsync(id, closedBy);
             TempData["Success"] = "ASN closed successfully!";
         }
         catch (Exception ex)

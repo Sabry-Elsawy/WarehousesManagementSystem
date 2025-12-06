@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WMS.DAL;
 
@@ -11,9 +12,11 @@ using WMS.DAL;
 namespace WMS.DAL.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251205124404_AddCycleCount")]
+    partial class AddCycleCount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,15 +171,6 @@ namespace WMS.DAL.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -185,9 +179,6 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<DateTime>("ExpectedArrivalDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -224,23 +215,11 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("AdvancedShippingNoticeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -281,23 +260,11 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -332,15 +299,6 @@ namespace WMS.DAL.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -352,9 +310,6 @@ namespace WMS.DAL.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsAutoClosed")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
@@ -390,15 +345,6 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -409,9 +355,6 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -439,15 +382,6 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -457,9 +391,6 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -484,15 +415,6 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("datetime2");
 
@@ -505,9 +427,6 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -538,15 +457,6 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("BinId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("CountedQuantity")
                         .HasColumnType("int");
 
@@ -561,9 +471,6 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<int>("ExpectedQuantity")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -600,15 +507,6 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -617,9 +515,6 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<int?>("DestinationBinId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -812,15 +707,6 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("BinId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -831,9 +717,6 @@ namespace WMS.DAL.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -872,23 +755,11 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("BinId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -934,15 +805,6 @@ namespace WMS.DAL.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -960,9 +822,6 @@ namespace WMS.DAL.Data.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsAutoClosed")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
@@ -1000,15 +859,6 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1017,9 +867,6 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<DateTime>("ExpectedArrivalDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1061,23 +908,11 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1129,9 +964,6 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<DateTime?>("AssignedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ClosedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1146,9 +978,6 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1187,23 +1016,11 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("BinId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1237,23 +1054,11 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("AisleId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1284,23 +1089,11 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("AdvancedShippingNoticeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1345,15 +1138,6 @@ namespace WMS.DAL.Data.Migrations
                     b.Property<int>("ASNItemId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1362,9 +1146,6 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<int>("DiscrepancyType")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1410,23 +1191,11 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1466,15 +1235,6 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1483,9 +1243,6 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1524,15 +1281,6 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1541,9 +1289,6 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<int>("DestinationWarehouseId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1574,23 +1319,11 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1628,15 +1361,6 @@ namespace WMS.DAL.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("ContactEmail")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1653,9 +1377,6 @@ namespace WMS.DAL.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsAutoClosed")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
@@ -1690,15 +1411,6 @@ namespace WMS.DAL.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -1714,9 +1426,6 @@ namespace WMS.DAL.Data.Migrations
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1747,23 +1456,11 @@ namespace WMS.DAL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CloseReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClosedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAutoClosed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");

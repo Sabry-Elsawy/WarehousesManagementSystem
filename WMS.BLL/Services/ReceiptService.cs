@@ -164,7 +164,7 @@ public class ReceiptService : IReceiptService
         return true;
     }
 
-    public async Task<bool> CloseAsync(int receiptId)
+    public async Task<bool> CloseAsync(int receiptId, string closedBy, string? reason = null)
     {
         var receiptRepo = _unitOfWork.GetRepository<Receipt, int>();
         var receipt = await receiptRepo.GetByIdAsync(receiptId);
@@ -184,10 +184,45 @@ public class ReceiptService : IReceiptService
             throw new InvalidOperationException("Cannot close receipt with unprocessed items");
 
         receipt.Status = ReceiptStatus.Closed;
+        receipt.ClosedOn = DateTime.UtcNow;
+        receipt.ClosedBy = closedBy;
+        receipt.IsAutoClosed = false; // Manual close
+        receipt.CloseReason = reason ?? "Manually closed - all items received";
+        
         receiptRepo.Update(receipt);
         await _unitOfWork.CompleteAsync();
 
         // Trigger auto-close for ASN if all receipts are closed
+        await TryAutoCloseASNAsync(receiptId);
+
+        return true;
+    }
+
+    public async Task<bool> ForceCloseAsync(int receiptId, string closedBy, string reason)
+    {
+        if (string.IsNullOrWhiteSpace(reason) || reason.Length < 10)
+            throw new ArgumentException("CloseReason must be at least 10 characters");
+
+        var receiptRepo = _unitOfWork.GetRepository<Receipt, int>();
+        var receipt = await receiptRepo.GetByIdAsync(receiptId);
+
+        if (receipt == null)
+            throw new InvalidOperationException("Receipt not found");
+
+        if (receipt.Status == ReceiptStatus.Closed)
+            throw new InvalidOperationException("Receipt is already closed");
+
+        // Allow force-close even with unprocessed items
+        receipt.Status = ReceiptStatus.Closed;
+        receipt.ClosedOn = DateTime.UtcNow;
+        receipt.ClosedBy = closedBy;
+        receipt.IsAutoClosed = false;
+        receipt.CloseReason = reason;
+
+        receiptRepo.Update(receipt);
+        await _unitOfWork.CompleteAsync();
+
+        // Still trigger upstream auto-closure checks
         await TryAutoCloseASNAsync(receiptId);
 
         return true;
@@ -249,6 +284,11 @@ public class ReceiptService : IReceiptService
 
             // All receipts are closed - auto-close the ASN
             asn.Status = AdvancedShippingNoticeStatus.Closed;
+            asn.ClosedOn = DateTime.UtcNow;
+            asn.ClosedBy = "SYSTEM";
+            asn.IsAutoClosed = true;
+            asn.CloseReason = "Automatically closed - all receipts completed";
+            
             asnRepo.Update(asn);
             await _unitOfWork.CompleteAsync();
 
@@ -301,6 +341,11 @@ public class ReceiptService : IReceiptService
                 return;
 
             po.Status = PurchaseOrderStatus.Closed;
+            po.ClosedOn = DateTime.UtcNow;
+            po.ClosedBy = "SYSTEM";
+            po.IsAutoClosed = true;
+            po.CloseReason = "Automatically closed - all items received and all ASNs closed";
+            
             poRepo.Update(po);
             await _unitOfWork.CompleteAsync();
 

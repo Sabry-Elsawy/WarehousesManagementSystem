@@ -3,9 +3,44 @@
 @{
     ViewBag.Title = "Inventory — Warehouse Manager";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var stockSummary = ViewBag.StockSummary as Dictionary<string, int> ?? new Dictionary<string, int>();
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    var totalCount = ViewBag.TotalCount ?? 0;
 }
 
 <div class="container py-4" id="app-root">
+
+    <!-- Toast Notifications -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+            <div class="toast align-items-center text-bg-success border-0 show" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fa-solid fa-check-circle me-2"></i>
+                        @TempData["Success"]
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+            <div class="toast align-items-center text-bg-danger border-0 show" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fa-solid fa-exclamation-circle me-2"></i>
+                        @TempData["Error"]
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        </div>
+    }
 
     <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 mb-3">
         <div>
@@ -14,8 +49,13 @@
         </div>
 
         <div class="d-flex gap-2">
+            <a href="@Url.Action("Transactions")" class="btn btn-outline-info d-flex align-items-center gap-2">
+                <i class="fa-solid fa-list-ul"></i>
+                Transactions
+            </a>
+            
             <button class="btn btn-outline-secondary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#adjustModal">
-                <i class="fa-solid fa-filter"></i>
+                <i class="fa-solid fa-sliders"></i>
                 Adjust
             </button>
 
@@ -26,17 +66,82 @@
         </div>
     </div>
 
-    <!-- Search -->
-    <form method="get" class="mb-3" style="max-width:640px;">
-        <div class="input-group">
-            <span class="input-group-text bg-white">
-                <i class="fa-solid fa-magnifying-glass text-muted"></i>
-            </span>
-            <input type="search"
-                   name="search"
-                   class="form-control"
-                   placeholder="Search by SKU or product name..."
-                   value="@Context.Request.Query["search"]" />
+    <!-- Stock Summary Cards -->
+    @if (stockSummary.Any())
+    {
+        <div class="row g-3 mb-4">
+            @foreach (var status in stockSummary)
+            {
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">@status.Key</h6>
+                                    <h3 class="mb-0">@status.Value</h3>
+                                </div>
+                                <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                    <i class="fa-solid fa-box fa-2x text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        }
+
+    <!-- Search & Filter -->
+    <form method="get" class="mb-3">
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white">
+                        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                    </span>
+                    <input type="search"
+                           name="search"
+                           class="form-control"
+                           placeholder="Search by SKU, product name, or bin..."
+                           value="@ViewBag.Search" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    @if (ViewBag.Status == "Completed")
+                    {
+                        <option value="Completed" selected>Completed</option>
+                    }
+                    else
+                    {
+                        <option value="Completed">Completed</option>
+                    }
+                    
+                    @if (ViewBag.Status == "In-Progress")
+                    {
+                        <option value="In-Progress" selected>In Progress</option>
+                    }
+                    else
+                    {
+                        <option value="In-Progress">In Progress</option>
+                    }
+                    
+                    @if (ViewBag.Status == "Pending")
+                    {
+                        <option value="Pending" selected>Pending</option>
+                    }
+                    else
+                    {
+                        <option value="Pending">Pending</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fa-solid fa-filter"></i> Apply Filter
+                </button>
+            </div>
         </div>
     </form>
 
@@ -52,18 +157,54 @@
                             <th>Location</th>
                             <th>Status</th>
                             <th>Last Updated</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model)
+                        @if (Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="font-monospace">@item.SKU</td>
+                                    <td>@item.ProductName</td>
+                                    <td><strong>@item.Quantity</strong></td>
+                                    <td><span class="badge bg-info">@item.Location</span></td>
+                                    <td>
+                                        @if (item.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success">@item.Status</span>
+                                        }
+                                        else if (item.Status == "In-Progress")
+                                        {
+                                            <span class="badge bg-warning text-dark">@item.Status</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@item.Status</span>
+                                        }
+                                    </td>
+                                    <td>@item.LastUpdated.ToString("g")</td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-outline-primary" title="View Details">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+                                            <a href="@Url.Action("Transfer", new { id = item.Id })" class="btn btn-outline-success" title="Transfer">
+                                                <i class="fa-solid fa-arrows-turn-right"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
-                                <td class="font-monospace">@item.SKU</td>
-                                <td>@item.ProductName</td>
-                                <td>@item.Quantity</td>
-                                <td>@item.Location</td>
-                                <td>@item.Status</td>
-                                <td>@item.LastUpdated.ToString("g")</td>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="fa-solid fa-inbox fa-3x mb-3 d-block"></i>
+                                    No inventory items found
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -72,10 +213,37 @@
         </div>
     </div>
 
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage - 1)&search=@ViewBag.Search&status=@ViewBag.Status">Previous</a>
+                </li>
+                
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="?page=@i&search=@ViewBag.Search&status=@ViewBag.Status">@i</a>
+                    </li>
+                }
+                
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage + 1)&search=@ViewBag.Search&status=@ViewBag.Status">Next</a>
+                </li>
+            </ul>
+            <p class="text-center text-muted small">
+                Showing @((currentPage - 1) * ViewBag.PageSize + 1) to @Math.Min(currentPage * ViewBag.PageSize, totalCount) of @totalCount items
+            </p>
+        </nav>
+    }
+
     <div class="modal fade" id="createSkuModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered">
             <div class="modal-content">
-                <form method="post" action="/Inventory/AddInventory">
+                <form id="addSkuForm" method="post" action="@Url.Action("AddInventory")">
+                    @Html.AntiForgeryToken()
                     <div class="modal-header">
                         <h5 class="modal-title">Add New SKU</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -84,27 +252,38 @@
                     <div class="modal-body">
 
                         <div class="mb-3">
-                            <label class="form-label">Product Name</label>
-                            <input type="text" name="ProductName" class="form-control" required />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Quantity</label>
-                            <input type="number" name="Quantity" class="form-control" min="0" required />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Location (Bin Code)</label>
-                            <input type="text" name="Location" class="form-control" required />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Status</label>
-                            <select name="Status" class="form-select">
-                                <option value="Completed">Completed</option>
-                                <option value="In-Progress">In Progress</option>
-                                <option value="Pending">Pending</option>
+                            <label class="form-label">Product <span class="text-danger">*</span></label>
+                            <select name="ProductId" class="form-select" required>
+                                <option value="">-- Select Product --</option>
+                                @if (ViewBag.Products != null)
+                                {
+                                    @foreach (var item in ViewBag.Products)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                }
                             </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                            <input type="number" name="Quantity" class="form-control" min="1" required />
+                            <div class="form-text">Enter a positive number</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Location (Bin Code) <span class="text-danger">*</span></label>
+                            <select name="Location" class="form-select" required>
+                                <option value="">-- Select Bin --</option>
+                                @if (ViewBag.Bins != null)
+                                {
+                                    @foreach (var item in ViewBag.Bins)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                }
+                            </select>
+                            <div class="form-text">Select the storage bin location</div>
                         </div>
 
                     </div>
@@ -122,7 +301,8 @@
     <div class="modal fade" id="adjustModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered">
             <div class="modal-content">
-                <form method="post" action="/Inventory/AdjustInventory">
+                <form id="adjustForm" method="post" action="@Url.Action("AdjustInventory")">
+                    @Html.AntiForgeryToken()
 
                     <div class="modal-header">
                         <h5 class="modal-title">Inventory Adjustment</h5>
@@ -137,8 +317,9 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Quantity Change</label>
-                            <input type="number" name="Change" class="form-control" placeholder="e.g. -5 or 10" required />
+                            <label class="form-label">Quantity Change <span class="text-danger">*</span></label>
+                            <input type="number" id="adjustChange" name="Change" class="form-control" placeholder="e.g. -5 or 10" required />
+                            <div class="form-text">Use negative numbers to decrease quantity</div>
                         </div>
 
                         <div class="mb-3">
@@ -158,3 +339,52 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Auto-hide toast notifications after 5 seconds
+        document.addEventListener('DOMContentLoaded', function () {
+            const toasts = document.querySelectorAll('.toast');
+            toasts.forEach(function (toast) {
+                setTimeout(function () {
+                    toast.classList.remove('show');
+                }, 5000);
+            });
+
+            // Form validation for Add SKU
+            const addSkuForm = document.getElementById('addSkuForm');
+            if (addSkuForm) {
+                addSkuForm.addEventListener('submit', function (e) {
+                    const quantity = parseInt(document.querySelector('input[name="Quantity"]').value);
+                    if (quantity < 1) {
+                        e.preventDefault();
+                        alert('Quantity must be a positive number');
+                        return false;
+                    }
+                });
+            }
+
+            // Form validation for Adjust
+            const adjustForm = document.getElementById('adjustForm');
+            if (adjustForm) {
+                adjustForm.addEventListener('submit', function (e) {
+                    const change = parseInt(document.getElementById('adjustChange').value);
+                    if (isNaN(change) || change === 0) {
+                        e.preventDefault();
+                        alert('Quantity change cannot be zero');
+                        return false;
+                    }
+                });
+            }
+
+            // Reset forms when modals are closed
+            document.getElementById('createSkuModal')?.addEventListener('hidden.bs.modal', function () {
+                document.getElementById('addSkuForm')?.reset();
+            });
+
+            document.getElementById('adjustModal')?.addEventListener('hidden.bs.modal', function () {
+                document.getElementById('adjustForm')?.reset();
+            });
+        });
+    </script>
+}

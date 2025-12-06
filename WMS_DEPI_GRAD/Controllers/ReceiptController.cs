@@ -212,7 +212,8 @@ public class ReceiptController : Controller
     {
         try
         {
-            await _receiptService.CloseAsync(id);
+            var closedBy = User.Identity?.Name ?? "System";
+            await _receiptService.CloseAsync(id, closedBy);
             TempData["Success"] = "Receipt closed successfully!";
         }
         catch (Exception ex)

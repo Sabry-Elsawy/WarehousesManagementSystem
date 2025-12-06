@@ -1,0 +1,45 @@
+@model WMS.BLL.DTOs.CreateCycleCountDto
+
+@{
+    ViewBag.Title = "New Cycle Count";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Create Cycle Count Session</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <input asp-for="Description" class="form-control" placeholder="e.g. Weekly Spot Check - Zone A" required />
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <hr class="my-4" />
+                        <h6 class="mb-3">Filters (Optional)</h6>
+                        <p class="text-muted small">Leave empty to include all inventory, or select specific criteria.</p>
+
+                        <div class="mb-3">
+                            <label class="form-label">Zone</label>
+                            <select asp-for="ZoneId" class="form-select" asp-items="@(new SelectList(ViewBag.Zones, "Id", "Name"))">
+                                <option value="">-- All Zones --</option>
+                            </select>
+                        </div>
+
+                        <!-- TODO: Add multi-select for Products or Bins if needed -->
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Session</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

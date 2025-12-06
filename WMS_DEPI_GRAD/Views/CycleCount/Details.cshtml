@@ -1,0 +1,82 @@
+@model IEnumerable<WMS.BLL.DTOs.CycleCountItemDto>
+
+@{
+    ViewBag.Title = "Cycle Count Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var session = ViewBag.Session as WMS.BLL.DTOs.CycleCountDto;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Session Details #@session?.Id</h1>
+            <p class="text-muted small mb-0">Completed on @session?.CompletedAt?.ToString("g")</p>
+        </div>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Items</h6>
+                    <h3>@session?.TotalItems</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card @(session?.TotalDiscrepancies > 0 ? "bg-danger text-white" : "bg-success text-white")">
+                <div class="card-body">
+                    <h6 class="opacity-75">Discrepancies</h6>
+                    <h3>@session?.TotalDiscrepancies</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0">Count Results</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Location</th>
+                            <th>Product</th>
+                            <th>Expected</th>
+                            <th>Counted</th>
+                            <th>Difference</th>
+                            <th>Notes</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="@(item.Difference != 0 ? "table-warning" : "")">
+                                <td><span class="badge bg-light text-dark border">@item.BinCode</span></td>
+                                <td>
+                                    <div class="fw-bold">@item.SKU</div>
+                                    <div class="small text-muted">@item.ProductName</div>
+                                </td>
+                                <td>@item.ExpectedQuantity</td>
+                                <td>@item.CountedQuantity</td>
+                                <td class="fw-bold @(item.Difference == 0 ? "text-success" : "text-danger")">
+                                    @(item.Difference > 0 ? "+" : "")@item.Difference
+                                </td>
+                                <td>@item.Notes</td>
+                                <td>
+                                    <span class="badge bg-success">@item.Status</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

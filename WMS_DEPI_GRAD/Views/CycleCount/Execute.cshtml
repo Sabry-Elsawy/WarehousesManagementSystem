@@ -1,0 +1,132 @@
+@model IEnumerable<WMS.BLL.DTOs.CycleCountItemDto>
+
+@{
+    ViewBag.Title = "Execute Cycle Count";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var session = ViewBag.Session as WMS.BLL.DTOs.CycleCountDto;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Counting Session #@session?.Id</h1>
+            <p class="text-muted small mb-0">@session?.Description</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">Save & Exit</a>
+            <form asp-action="Finalize" asp-route-id="@session?.Id" method="post" onsubmit="return confirm('Are you sure you want to finalize this session? This will update inventory levels.');">
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-solid fa-check"></i> Finalize Count
+                </button>
+            </form>
+        </div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Location</th>
+                            <th>Product</th>
+                            <th>Expected Qty</th>
+                            <th style="width: 150px;">Counted Qty</th>
+                            <th>Difference</th>
+                            <th>Notes</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr data-item-id="@item.Id">
+                                <td><span class="badge bg-light text-dark border">@item.BinCode</span></td>
+                                <td>
+                                    <div class="fw-bold">@item.SKU</div>
+                                    <div class="small text-muted">@item.ProductName</div>
+                                </td>
+                                <td>@item.ExpectedQuantity</td>
+                                <td>
+                                    <input type="number" 
+                                           class="form-control form-control-sm count-input" 
+                                           value="@item.CountedQuantity" 
+                                           min="0" 
+                                           onchange="updateCount(@item.Id, this.value)" />
+                                </td>
+                                <td class="diff-cell fw-bold @(item.Difference == 0 ? "text-success" : "text-danger")">
+                                    @item.Difference
+                                </td>
+                                <td>
+                                    <input type="text" 
+                                           class="form-control form-control-sm" 
+                                           value="@item.Notes" 
+                                           placeholder="Add note..."
+                                           onchange="updateNote(@item.Id, this.value)" />
+                                </td>
+                                <td>
+                                    <span class="badge @(item.Status == "Counted" ? "bg-primary" : "bg-secondary") status-badge">
+                                        @item.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateCount(itemId, qty) {
+            const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+            const expected = parseInt(row.querySelector('td:nth-child(3)').innerText);
+            const diffCell = row.querySelector('.diff-cell');
+            const diff = qty - expected;
+            
+            diffCell.innerText = diff;
+            diffCell.className = `diff-cell fw-bold ${diff === 0 ? 'text-success' : 'text-danger'}`;
+
+            saveUpdate(itemId, qty, null);
+        }
+
+        function updateNote(itemId, note) {
+            saveUpdate(itemId, null, note);
+        }
+
+        function saveUpdate(itemId, qty, note) {
+            const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+            const currentQty = row.querySelector('.count-input').value;
+            const currentNote = row.querySelector('input[type="text"]').value;
+
+            const data = {
+                itemId: itemId,
+                countedQuantity: parseInt(currentQty),
+                notes: currentNote
+            };
+
+            fetch('/CycleCount/UpdateCount', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    row.querySelector('.status-badge').innerText = 'Counted';
+                    row.querySelector('.status-badge').className = 'badge bg-primary status-badge';
+                } else {
+                    alert('Failed to save update');
+                }
+            });
+        }
+    </script>
+}
