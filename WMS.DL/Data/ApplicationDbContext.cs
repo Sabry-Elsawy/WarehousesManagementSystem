@@ -47,6 +47,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Vendor> Vendors { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<PutawayBin> Putaway_Bins { get; set; }
+    public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
+    public DbSet<CycleCount> CycleCounts { get; set; }
+    public DbSet<CycleCountItem> CycleCountItems { get; set; }
 
     public DbSet<Address> Addresses { get; set; }
 

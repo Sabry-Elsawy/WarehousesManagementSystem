@@ -1,0 +1,208 @@
+@model WMS.BLL.DTOs.InventoryDetailsDto
+
+@{
+    ViewBag.Title = "Inventory Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Inventory Details</h1>
+            <p class="text-muted small mb-0">View detailed information about this inventory item</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Transfer", new { id = Model.Id })" class="btn btn-primary">
+                <i class="fa-solid fa-arrows-turn-right"></i> Transfer
+            </a>
+            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" id="inventoryTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
+                <i class="fa-solid fa-circle-info me-2"></i>Details
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions" aria-selected="false">
+                <i class="fa-solid fa-list-ul me-2"></i>Transactions
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="inventoryTabsContent">
+        
+        <!-- Details Tab -->
+        <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+            <div class="row g-4">
+                <!-- Product Information -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fa-solid fa-box"></i> Product Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless mb-0">
+                                <tr>
+                                    <th class="text-muted" style="width: 40%;">SKU:</th>
+                                    <td><span class="badge bg-secondary font-monospace">@Model.SKU</span></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Product Name:</th>
+                                    <td><strong>@Model.ProductName</strong></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Batch Number:</th>
+                                    <td>@(Model.BatchNumber ?? "N/A")</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Expiry Date:</th>
+                                    <td>@(Model.ExpiryDate ?? "N/A")</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location & Stock -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fa-solid fa-location-dot"></i> Location & Stock</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless mb-0">
+                                <tr>
+                                    <th class="text-muted" style="width: 40%;">Bin Location:</th>
+                                    <td><span class="badge bg-info">@Model.BinCode</span></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Current Quantity:</th>
+                                    <td><h4 class="mb-0 text-success">@Model.Quantity</h4></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Status:</th>
+                                    <td>
+                                        @if (Model.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success">@Model.Status</span>
+                                        }
+                                        else if (Model.Status == "In-Progress")
+                                        {
+                                            <span class="badge bg-warning">@Model.Status</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@Model.Status</span>
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Information -->
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fa-solid fa-clock-rotate-left"></i> Audit Trail</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Created On:</strong> @Model.CreatedOn.ToString("g")</p>
+                                    <p class="mb-0 text-muted small">By: @(Model.CreatedBy ?? "System")</p>
+                                </div>
+                                @if (Model.LastModifiedOn.HasValue)
+                                {
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Last Modified:</strong> @Model.LastModifiedOn.Value.ToString("g")</p>
+                                        <p class="mb-0 text-muted small">By: @(Model.LastModifiedBy ?? "System")</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Tab -->
+        <div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Quantity Change</th>
+                                    <th>Reason</th>
+                                    <th>Performed By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.RecentTransactions != null && Model.RecentTransactions.Any())
+                                {
+                                    @foreach (var txn in Model.RecentTransactions)
+                                    {
+                                        <tr>
+                                            <td>@txn.TransactionDate.ToString("g")</td>
+                                            <td>
+                                                @if (txn.TransactionType == "Receipt")
+                                                {
+                                                    <span class="badge bg-success">Receipt</span>
+                                                }
+                                                else if (txn.TransactionType == "Transfer")
+                                                {
+                                                    <span class="badge bg-info text-dark">Transfer</span>
+                                                }
+                                                else if (txn.TransactionType == "Adjustment")
+                                                {
+                                                    <span class="badge bg-warning text-dark">Adjustment</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@txn.TransactionType</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (txn.QuantityChange > 0)
+                                                {
+                                                    <span class="text-success fw-bold">+@txn.QuantityChange</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-danger fw-bold">@txn.QuantityChange</span>
+                                                }
+                                            </td>
+                                            <td>@(txn.Reason ?? "-")</td>
+                                            <td>@txn.PerformedBy</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <i class="fa-solid fa-clock-rotate-left fa-2x mb-2 d-block"></i>
+                                            No transactions found for this item
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

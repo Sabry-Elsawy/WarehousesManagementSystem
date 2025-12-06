@@ -9,7 +9,8 @@ public interface IPurchaseOrderService
     Task<PurchaseOrder> CreateAsync(PurchaseOrder purchaseOrder);
     Task<PurchaseOrder> UpdateAsync(PurchaseOrder purchaseOrder);
     Task<bool> ApproveAsync(int id);
-    Task<bool> CloseAsync(int id);
+    Task<bool> CloseAsync(int id, string closedBy, string? reason = null);
+    Task<bool> ForceCloseAsync(int id, string closedBy, string reason);
     Task<bool> AddItemAsync(int poId, PurchaseOrderItem item);
     Task<bool> DeleteAsync(int id);
 }

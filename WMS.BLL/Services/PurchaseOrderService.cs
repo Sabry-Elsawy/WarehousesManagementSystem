@@ -110,7 +110,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         return true;
     }
 
-    public async Task<bool> CloseAsync(int id)
+    public async Task<bool> CloseAsync(int id, string closedBy, string? reason = null)
     {
         var repo = _unitOfWork.GetRepository<PurchaseOrder, int>();
         var po = await repo.GetByIdAsync(id);
@@ -122,6 +122,50 @@ public class PurchaseOrderService : IPurchaseOrderService
             throw new InvalidOperationException("Only Approved Purchase Orders can be closed");
 
         po.Status = PurchaseOrderStatus.Closed;
+        po.ClosedOn = DateTime.UtcNow;
+        po.ClosedBy = closedBy;
+        po.IsAutoClosed = false; // Manual close
+        po.CloseReason = reason ?? "Manually closed";
+        
+        repo.Update(po);
+        await _unitOfWork.CompleteAsync();
+
+        return true;
+    }
+
+    public async Task<bool> ForceCloseAsync(int id, string closedBy, string reason)
+    {
+        if (string.IsNullOrWhiteSpace(reason) || reason.Length < 10)
+            throw new ArgumentException("CloseReason must be at least 10 characters");
+
+        var repo = _unitOfWork.GetRepository<PurchaseOrder, int>();
+        var po = await repo.GetByIdAsync(id, 
+            query => query.Include(p => p.POItems), 
+            withTracking: true);
+
+        if (po == null)
+            throw new InvalidOperationException("Purchase Order not found");
+
+        if (po.Status == PurchaseOrderStatus.Closed)
+            throw new InvalidOperationException("Purchase Order is already closed");
+
+        // Check for open ASNs (validation)
+        var asnRepo = _unitOfWork.GetRepository<AdvancedShippingNotice, int>();
+        var asns = await asnRepo.GetAllWithIncludeAsync(withTracking: false,
+            query => query.Where(a => a.PurchaseOrderId == id));
+
+        if (asns.Any(a => a.Status != AdvancedShippingNoticeStatus.Closed))
+        {
+            // Warning but allow with acknowledgment
+            Console.WriteLine($"[WARNING] Force-closing PO {id} with open ASNs");
+        }
+
+        po.Status = PurchaseOrderStatus.Closed;
+        po.ClosedOn = DateTime.UtcNow;
+        po.ClosedBy = closedBy;
+        po.IsAutoClosed = false;
+        po.CloseReason = reason;
+
         repo.Update(po);
         await _unitOfWork.CompleteAsync();
 
