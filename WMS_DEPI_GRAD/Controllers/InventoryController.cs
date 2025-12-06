@@ -81,6 +81,9 @@ namespace WMS_DEPI_GRAD.Controllers
 
             try
             {
+                // Set performed by from current user
+                model.PerformedBy = User.Identity?.Name ?? "System";
+                
                 await _inventoryService.AddInventoryAsync(model);
                 TempData["Success"] = "SKU added successfully!";
             }

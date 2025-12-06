@@ -11,5 +11,6 @@ public class AddInventoryDto
     public int Quantity { get; set; }
     public string Location { get; set; }
     public string Status { get; set; }
+    public string PerformedBy { get; set; } = string.Empty;
 }
 

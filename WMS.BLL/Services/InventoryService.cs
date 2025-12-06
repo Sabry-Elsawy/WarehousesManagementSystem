@@ -97,7 +97,7 @@ public class InventoryService:IInventoryService
             ProductId = product.Id,
             DestinationBinId = bin.Id,
             TransactionDate = DateTime.UtcNow,
-            CreatedBy = "System", // TODO: Get current user
+            CreatedBy = dto.PerformedBy,
             ReferenceNumber = $"INV-ADD-{DateTime.UtcNow:yyyyMMddHHmmss}",
             Reason = "Initial Inventory Add"
         };
