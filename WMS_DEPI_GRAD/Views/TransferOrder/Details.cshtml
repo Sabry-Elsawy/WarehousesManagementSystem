@@ -1,0 +1,168 @@
+@model WMS_DEPI_GRAD.ViewModels.TransferOrderViewModel
+
+@{
+    ViewData["Title"] = "Transfer Order Details";
+    var isPending = Model.Status == WMS.DAL.TransferOrderStatus.Pending;
+    var isApproved = Model.Status == WMS.DAL.TransferOrderStatus.Approved;
+    var isIssued = Model.Status == WMS.DAL.TransferOrderStatus.Issued;
+    var canAddItems = isPending;
+    var canIssue = isApproved || isPending; 
+    // Simplified: Allow Issue from Pending or Approved. 
+    // Strict flow would be Pending -> Approved -> Issue. But for MVP Pending -> Issue is okay.
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Transfer Order #@Model.Id</h1>
+        <div>
+            @if (canIssue)
+            {
+                <form asp-action="Issue" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to Issue this order? This will reduce inventory from Source Warehouse.')">
+                        Issue Order
+                    </button>
+                </form>
+            }
+            @if (isIssued)
+            {
+                <form asp-action="Receive" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to Receive this order? This will add inventory to Destination Warehouse.')">
+                        Receive Order
+                    </button>
+                </form>
+            }
+            @if (!isIssued && Model.Status != WMS.DAL.TransferOrderStatus.Received && Model.Status != WMS.DAL.TransferOrderStatus.Cancelled)
+            {
+                 <form asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to Cancel this order?')">
+                        Cancel Order
+                    </button>
+                </form>
+            }
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Order Info</h6>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge @GetStatusBadge(Model.Status)">@Model.Status</span>
+                        </dd>
+                        <dt class="col-sm-4">From</dt>
+                        <dd class="col-sm-8">@Model.SourceWarehouseName</dd>
+                        <dt class="col-sm-4">To</dt>
+                        <dd class="col-sm-8">@Model.DestinationWarehouseName</dd>
+                        <dt class="col-sm-4">Date</dt>
+                        <dd class="col-sm-8">@Model.CreatedOn.ToString("g")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Items</h6>
+                    @if (canAddItems)
+                    {
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                            <i class="fas fa-plus"></i> Add Item
+                        </button>
+                    }
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Items.Any())
+                                {
+                                    foreach (var item in Model.Items)
+                                    {
+                                        <tr>
+                                            <td>@item.ProductName <small class="text-muted">(@item.ProductCode)</small></td>
+                                            <td>@item.Qty</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted">No items in this order</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form asp-action="AddItem" method="post">
+                <input type="hidden" name="TransferOrderId" value="@Model.Id" />
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addItemModalLabel">Add Product to Transfer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label class="control-label">Product</label>
+                        <select name="ProductId" class="form-control" asp-items="ViewBag.Products" required>
+                            <option value="">-- Select Product --</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="control-label">Quantity</label>
+                        <input type="number" name="Quantity" class="form-control" min="1" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetStatusBadge(WMS.DAL.TransferOrderStatus status)
+    {
+        return status switch
+        {
+            WMS.DAL.TransferOrderStatus.Pending => "bg-warning",
+            WMS.DAL.TransferOrderStatus.Approved => "bg-info",
+            WMS.DAL.TransferOrderStatus.Issued => "bg-primary",
+            WMS.DAL.TransferOrderStatus.Received => "bg-success",
+            WMS.DAL.TransferOrderStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

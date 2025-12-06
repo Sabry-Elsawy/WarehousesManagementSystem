@@ -1,5 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using WMS.BLL.DTOs;
 using WMS.BLL.Interfaces;
+using WMS.DAL;
+using WMS.DAL.Entities._Identity;
 using WMS_DEPI_GRAD.ViewModels;
 
 namespace WMS_DEPI_GRAD.Controllers;
@@ -7,23 +12,28 @@ namespace WMS_DEPI_GRAD.Controllers;
 //[Authorize]
 public class ShippingController : Controller
 {
-    private readonly IShippingService _shippingService;
     private readonly ISalesOrderService _soService;
     private readonly IProductService _productService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     public ShippingController(
-        IShippingService shippingService,
         ISalesOrderService soService,
-        IProductService productService)
+        IProductService productService,
+        UserManager<ApplicationUser> userManager)
     {
-        _shippingService = shippingService;
         _soService = soService;
         _productService = productService;
+        _userManager = userManager;
     }
 
     public async Task<IActionResult> Index()
     {
-        var ordersReadyForShipping = await _shippingService.GetOrdersReadyForShippingAsync();
+        var allOrders = await _soService.GetAllAsync();
+        var ordersReadyForShipping = allOrders
+            .Where(so => so.Status == WMS.DAL.SalesOrderStatus.Picked || 
+                         so.Status == WMS.DAL.SalesOrderStatus.PartiallyPicked)
+            .OrderBy(so => so.OrderDate)
+            .ToList();
 
         var viewModels = ordersReadyForShipping.Select(so => new ShippingViewModel
         {
@@ -47,8 +57,7 @@ public class ShippingController : Controller
 
         var products = await _productService.GetAllAsync();
 
-        // Generate delivery note number (preview)
-        var deliveryNoteNumber = $"DN-{so.SO_Number}-{DateTime.UtcNow:yyyyMMddHHmmss}";
+        var deliveryNoteNumber = $"DN-{so.SO_Number}-{DateTime.UtcNow:yyyyMMdd}";
 
         var viewModel = new ShippingConfirmationViewModel
         {
@@ -72,13 +81,24 @@ public class ShippingController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Confirm(int id, ShippingConfirmationViewModel viewModel)
+    public async Task<IActionResult> Confirm(int id, string carrier, string trackingNumber, string notes)
     {
         try
         {
-            var deliveryNoteNumber = await _shippingService.ShipOrderAsync(id);
-            TempData["Success"] = $"Order shipped successfully! Delivery Note: {deliveryNoteNumber}";
-            TempData["DeliveryNoteNumber"] = deliveryNoteNumber;
+            var currentUser = await _userManager.GetUserAsync(User);
+            var performedBy = currentUser != null ? $"{currentUser.FirstName} {currentUser.LastName}" : User.Identity?.Name ?? "System";
+
+            var shipmentDto = new ShipmentDto
+            {
+                Carrier = carrier,
+                TrackingNumber = trackingNumber,
+                Notes = notes ?? string.Empty,
+                PerformedBy = performedBy
+            };
+
+            await _soService.ShipOrderAsync(id, shipmentDto);
+            
+            TempData["Success"] = $"Order {id} shipped successfully! Tracking: {trackingNumber}";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)

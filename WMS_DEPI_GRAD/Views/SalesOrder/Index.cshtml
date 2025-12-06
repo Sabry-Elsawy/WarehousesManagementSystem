@@ -2,19 +2,24 @@
 
 @{
     ViewData["Title"] = "Sales Orders";
+    var draftCount = Model.Count(so => so.Status == WMS.DAL.SalesOrderStatus.Draft);
+    var submittedCount = Model.Count(so => so.Status == WMS.DAL.SalesOrderStatus.Submitted);
+    var processingCount = Model.Count(so => so.Status == WMS.DAL.SalesOrderStatus.Processing);
+    var pickedCount = Model.Count(so => so.Status == WMS.DAL.SalesOrderStatus.Picked || so.Status == WMS.DAL.SalesOrderStatus.PartiallyPicked);
+    var shippedCount = Model.Count(so => so.Status == WMS.DAL.SalesOrderStatus.Shipped);
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="bi bi-cart-check"></i> Sales Orders</h2>
-        <a asp-action="Create" class="btn btn-primary">
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-circle"></i> Create New Sales Order
         </a>
     </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="bi bi-check-circle"></i> @TempData["Success"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -22,64 +27,139 @@
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
             <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
+    <!-- Metrics Cards -->
+    <div class="row mb-4">
+        <div class="col-md">
+            <div class="card text-center shadow-sm border-secondary text-secondary">
+                <div class="card-body py-2">
+                    <h4 class="mb-0">@draftCount</h4>
+                    <small>Draft</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card text-center shadow-sm border-info text-info">
+                <div class="card-body py-2">
+                    <h4 class="mb-0">@submittedCount</h4>
+                    <small>Submitted</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card text-center shadow-sm border-primary text-primary">
+                <div class="card-body py-2">
+                    <h4 class="mb-0">@processingCount</h4>
+                    <small>Processing</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card text-center shadow-sm border-success text-success">
+                <div class="card-body py-2">
+                    <h4 class="mb-0">@pickedCount</h4>
+                    <small>Picked</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card text-center shadow-sm border-success text-success">
+                <div class="card-body py-2 bg-success text-white">
+                    <h4 class="mb-0 text-white">@shippedCount</h4>
+                    <small>Shipped</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card shadow-sm">
-        <div class="card-body">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0 text-primary">All Orders</h5>
+                </div>
+                <div class="col-auto">
+                    <!-- Future: Filter form can go here -->
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>SO Number</th>
+                            <th class="ps-3">SO Number</th>
                             <th>Customer</th>
                             <th>Warehouse</th>
                             <th>Order Date</th>
                             <th>Status</th>
                             <th>Created On</th>
-                            <th>Actions</th>
+                            <th class="text-end pe-3">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model)
+                        @foreach (var item in Model.OrderByDescending(x => x.CreatedOn))
                         {
                             <tr>
-                                <td><strong>@item.SO_Number</strong></td>
+                                <td class="ps-3">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-decoration-none">
+                                        @item.SO_Number
+                                    </a>
+                                </td>
                                 <td>@item.CustomerName</td>
                                 <td>@item.WarehouseName</td>
                                 <td>@item.OrderDate.ToString("yyyy-MM-dd")</td>
                                 <td>
-                                    @if (item.Status == WMS.DAL.SalesOrderStatus.Draft)
+                                    @switch (item.Status)
                                     {
-                                        <span class="badge bg-secondary">Draft</span>
-                                    }
-                                    else if (item.Status == WMS.DAL.SalesOrderStatus.Submitted)
-                                    {
-                                        <span class="badge bg-info">Submitted</span>
-                                    }
-                                    else if (item.Status == WMS.DAL.SalesOrderStatus.Picked)
-                                    {
-                                        <span class="badge bg-warning">Picked</span>
-                                    }
-                                    else if (item.Status == WMS.DAL.SalesOrderStatus.Shipped)
-                                    {
-                                        <span class="badge bg-success">Shipped</span>
+                                        case WMS.DAL.SalesOrderStatus.Draft:
+                                            <span class="badge bg-secondary">Draft</span>
+                                            break;
+                                        case WMS.DAL.SalesOrderStatus.Submitted:
+                                            <span class="badge bg-info text-dark">Submitted</span>
+                                            break;
+                                        case WMS.DAL.SalesOrderStatus.Processing:
+                                            <span class="badge bg-primary">Processing</span>
+                                            break;
+                                        case WMS.DAL.SalesOrderStatus.Picked:
+                                            <span class="badge bg-success">Picked</span>
+                                            break;
+                                        case WMS.DAL.SalesOrderStatus.PartiallyPicked:
+                                            <span class="badge bg-warning text-dark">Partially Picked</span>
+                                            break;
+                                        case WMS.DAL.SalesOrderStatus.Shipped:
+                                            <span class="badge bg-success"><i class="bi bi-truck"></i> Shipped</span>
+                                            break;
+                                        case WMS.DAL.SalesOrderStatus.Cancelled:
+                                            <span class="badge bg-danger">Cancelled</span>
+                                            break;
                                     }
                                 </td>
-                                <td>@item.CreatedOn.ToString("yyyy-MM-dd")</td>
-                                <td>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="Details">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    @if (item.Status == WMS.DAL.SalesOrderStatus.Draft)
-                                    {
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning" title="Edit">
-                                            <i class="bi bi-pencil"></i>
+                                <td><small class="text-muted">@item.CreatedOn.ToString("MM/dd/yy HH:mm")</small></td>
+                                <td class="text-end pe-3">
+                                    <div class="btn-group">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
                                         </a>
-                                    }
+                                        @if (item.Status == WMS.DAL.SalesOrderStatus.Draft)
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline"
+                                                onsubmit="return confirm('Are you sure you want to delete this Sales Order?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }

@@ -1,0 +1,72 @@
+@model IEnumerable<WMS_DEPI_GRAD.ViewModels.TransferOrderViewModel>
+
+@{
+    ViewData["Title"] = "Transfer Orders";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0 text-gray-800">Transfer Orders</h1>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Transfer Order
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Transfer Order List</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Source Warehouse</th>
+                            <th>Destination Warehouse</th>
+                            <th>Status</th>
+                            <th>Created On</th>
+                            <th>Items</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>TO-@item.Id</td>
+                                <td>@item.SourceWarehouseName</td>
+                                <td>@item.DestinationWarehouseName</td>
+                                <td>
+                                    <span class="badge @GetStatusBadge(item.Status)">@item.Status</span>
+                                </td>
+                                <td>@item.CreatedOn.ToShortDateString()</td>
+                                <td>@item.Items.Count</td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                        <i class="fas fa-info-circle"></i> Details
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetStatusBadge(WMS.DAL.TransferOrderStatus status)
+    {
+        return status switch
+        {
+            WMS.DAL.TransferOrderStatus.Pending => "bg-warning",
+            WMS.DAL.TransferOrderStatus.Approved => "bg-info",
+            WMS.DAL.TransferOrderStatus.Issued => "bg-primary",
+            WMS.DAL.TransferOrderStatus.Received => "bg-success",
+            WMS.DAL.TransferOrderStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

@@ -1,47 +1,49 @@
-@using WMS.DAL.Entities
-@model Bin
+@model WMS.DAL.Entities.Bin
+
 @{
     ViewData["Title"] = "Bin Details";
 }
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="text-primary-orange fw-bold mb-0">
-                <i class="fas fa-info-circle me-2"></i>Bin Details
-            </h2>
-            <p class="text-muted mb-0">View bin information</p>
-        </div>
-        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
-            <i class="fas fa-arrow-left me-2"></i>Back to List
-        </a>
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Bin Details</h1>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <dl class="row">
-                        <dt class="col-sm-4 text-muted">Bin Code</dt>
-                        <dd class="col-sm-8 fw-bold">@Model.Code</dd>
-
-                        <dt class="col-sm-4 text-muted">Bin Type</dt>
-                        <dd class="col-sm-8">@Model.BinType?.Name</dd>
-
-                        <dt class="col-sm-4 text-muted">Rack</dt>
-                        <dd class="col-sm-8">@Model.Rack?.Name</dd>
-
-                        <dt class="col-sm-4 text-muted">Capacity</dt>
-                        <dd class="col-sm-8">@Model.Capacity</dd>
-                    </dl>
-
-                    <div class="d-flex justify-content-end mt-4">
-                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary px-4 me-2">
-                            <i class="fas fa-edit me-2"></i>Edit
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Bin Information</h6>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Code)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Code)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Capacity)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Capacity)
+                </dd>
+                <dt class="col-sm-2">
+                    Rack
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Rack.Name)
+                </dd>
+                <dt class="col-sm-2">
+                    Type
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.BinType.Name)
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
         </div>
     </div>
 </div>

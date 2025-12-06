@@ -1,58 +1,55 @@
-﻿@using WMS.DAL.Entities
-@model Bin
+@model WMS.DAL.Entities.Bin
+
 @{
     ViewData["Title"] = "Create Bin";
 }
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="text-primary-orange fw-bold mb-0">
-                <i class="fas fa-plus-circle me-2"></i>Create Bin
-            </h2>
-            <p class="text-muted mb-0">Add a new bin to a rack</p>
-        </div>
-        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
-            <i class="fas fa-arrow-left me-2"></i>Back to List
-        </a>
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Create Bin</h1>
     </div>
 
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label asp-for="RackId"  class="form-label fw-bold">Rack <span class="text-danger">*</span></label>
-                                <select asp-for="RackId" class="form-select" asp-items="ViewBag.RackId" required>
-                                    <option value="">Select Rack...</option>
-                                </select>
-                                <span asp-validation-for="RackId" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="BinTypeId" class="form-label fw-bold">Bin Type <span class="text-danger">*</span></label>
-                                <select asp-for="BinTypeId" class="form-select" asp-items="ViewBag.BinTypeId" required>
-                                    <option value="">Select Type...</option>
-                                </select>
-                                <span asp-validation-for="BinTypeId" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="Code" class="form-label fw-bold">Bin Code <span class="text-danger">*</span></label>
-                                <input asp-for="Code" type="text" class="form-control" placeholder="e.g. B-01-A-1" required>
-                                <span asp-validation-for="Code" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="Capacity" class="form-label fw-bold">Capacity</label>
-                                <input asp-for="Capacity" type="number" class="form-control" placeholder="100">
-                                <span asp-validation-for="Capacity" class="text-danger small"></span>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-end mt-4">
-                            <a asp-action="Index" class="btn btn-light me-2">Cancel</a>
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Bin Details</h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                            <button type="submit" class="btn btn-primary px-4">Save Bin</button>
+                        <div class="form-group mb-3">
+                            <label asp-for="Code" class="control-label"></label>
+                            <input asp-for="Code" class="form-control" />
+                            <span asp-validation-for="Code" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Capacity" class="control-label"></label>
+                            <input asp-for="Capacity" class="form-control" />
+                            <span asp-validation-for="Capacity" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="RackId" class="control-label">Rack</label>
+                            <select asp-for="RackId" class="form-control" asp-items="ViewBag.RackId">
+                                <option value="">-- Select Rack --</option>
+                            </select>
+                            <span asp-validation-for="RackId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="BinTypeId" class="control-label">Bin Type</label>
+                            <select asp-for="BinTypeId" class="form-control" asp-items="ViewBag.BinTypeId">
+                                <option value="">-- Select Bin Type --</option>
+                            </select>
+                            <span asp-validation-for="BinTypeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="submit" value="Create" class="btn btn-primary" />
+                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
                         </div>
                     </form>
                 </div>
@@ -61,9 +58,6 @@
     </div>
 </div>
 
-
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

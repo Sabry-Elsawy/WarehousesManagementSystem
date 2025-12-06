@@ -32,6 +32,9 @@ public class PickingTaskViewModel
     public PickingStatus Status { get; set; }
     public string StatusDisplay => Status.ToString();
 
+    [Display(Name = "Picked By")]
+    public string PickedBy { get; set; } = string.Empty;
+
     public DateTime CreatedOn { get; set; }
 }
 
