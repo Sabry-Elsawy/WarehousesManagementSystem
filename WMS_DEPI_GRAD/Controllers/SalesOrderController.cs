@@ -101,6 +101,8 @@ public class SalesOrderController : Controller
             LastModifiedBy = so.LastModifiedBy,
             Items = so.SO_Items?.Select(i => new SalesOrderItemViewModel
             {
+                Id = i.Id,
+                ProductId = i.ProductId,
                 ProductName = products.FirstOrDefault(p => p.Id == i.ProductId)?.Name ?? "",
                 SKU = products.FirstOrDefault(p => p.Id == i.ProductId)?.Code ?? "",
                 QtyOrdered = i.QtyOrdered,
@@ -237,39 +239,39 @@ public class SalesOrderController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddItem([FromBody] AddSalesOrderItemRequest request)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddItem(int salesOrderId, int productId, int qtyOrdered, decimal unitPrice)
     {
-        if (request == null || request.Item == null)
-        {
-            return Json(new { success = false, message = "Invalid request data." });
-        }
-
         try
         {
-            var product = await _productService.GetByIdAsync(request.Item.ProductId);
+            var product = await _productService.GetByIdAsync(productId);
             if (product == null)
             {
-                return Json(new { success = false, message = "Product not found." });
+                TempData["Error"] = "Product not found.";
+                return RedirectToAction(nameof(Details), new { id = salesOrderId });
             }
 
             var item = new SO_Item
             {
-                ProductId = request.Item.ProductId,
-                QtyOrdered = request.Item.QtyOrdered,
-                UnitPrice = request.Item.UnitPrice
+                ProductId = productId,
+                QtyOrdered = qtyOrdered,
+                UnitPrice = unitPrice
             };
 
-            await _soService.AddItemAsync(request.SoId, item);
-            return Json(new { success = true, message = "Item added successfully" });
+            await _soService.AddItemAsync(salesOrderId, item);
+            TempData["Success"] = "Item added successfully!";
         }
         catch (Exception ex)
         {
-            return Json(new { success = false, message = ex.Message });
+            TempData["Error"] = ex.Message;
         }
+
+        return RedirectToAction(nameof(Details), new { id = salesOrderId });
     }
 
     [HttpPost]
-    public async Task<IActionResult> RemoveItem(int itemId)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveItem(int salesOrderId, int itemId)
     {
         try
         {
@@ -281,7 +283,7 @@ public class SalesOrderController : Controller
             TempData["Error"] = ex.Message;
         }
 
-        return  RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Details), new { id = salesOrderId });
     }
 
     [HttpPost]

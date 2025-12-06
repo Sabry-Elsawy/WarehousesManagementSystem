@@ -111,8 +111,14 @@
 
     <!-- Order Items -->
     <div class="card shadow-sm mb-4">
-        <div class="card-header bg-info text-white">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="bi bi-box-seam"></i> Order Items</h5>
+            @if (Model.Status == WMS.DAL.SalesOrderStatus.Draft)
+            {
+                <button type="button" class="btn btn-light btn-sm text-primary fw-bold" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                    <i class="bi bi-plus-circle"></i> Add Item
+                </button>
+            }
         </div>
         <div class="card-body">
             @if (Model.Items != null && Model.Items.Any())
@@ -128,6 +134,10 @@
                                 <th>Unit Price</th>
                                 <th>Total</th>
                                 <th>Status</th>
+                                @if (Model.Status == WMS.DAL.SalesOrderStatus.Draft)
+                                {
+                                    <th class="text-end">Action</th>
+                                }
                             </tr>
                         </thead>
                         <tbody>
@@ -164,6 +174,21 @@
                                             <span class="badge bg-secondary">Pending</span>
                                         }
                                     </td>
+
+                                    @if (Model.Status == WMS.DAL.SalesOrderStatus.Draft)
+                                    {
+                                        <td class="text-end">
+                                            <form asp-action="RemoveItem" method="post" class="d-inline"
+                                                  asp-route-salesOrderId="@Model.Id" 
+                                                  asp-route-itemId="@item.Id"
+                                                  onsubmit="return confirm('Are you sure you want to remove this item?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove Item">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    }
                                 </tr>
                             }
                         </tbody>
@@ -172,6 +197,10 @@
                                 <td colspan="5" class="text-end"><strong>Grand Total:</strong></td>
                                 <td><strong>@Model.Items.Sum(i => i.LineTotal).ToString("C")</strong></td>
                                 <td></td>
+                                @if (Model.Status == WMS.DAL.SalesOrderStatus.Draft)
+                                {
+                                    <td></td>
+                                }
                             </tr>
                         </tfoot>
                     </table>
@@ -247,6 +276,52 @@
                     <i class="bi bi-x-circle"></i> Cancel Order
                 </button>
             }
+        </div>
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="AddItem" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="salesOrderId" value="@Model.Id" />
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addItemModalLabel">
+                        <i class="bi bi-plus-circle"></i> Add Item to Order
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Product <span class="text-danger">*</span></label>
+                        <select name="productId" class="form-select" asp-items="ViewBag.Products" required>
+                            <option value="">-- Select Product --</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                            <input type="number" name="qtyOrdered" class="form-control" min="1" value="1" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Unit Price <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" name="unitPrice" class="form-control" step="0.01" min="0.01" value="0.00" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-lg"></i> Add Item
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
