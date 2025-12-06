@@ -1,0 +1,51 @@
+@model WMS_DEPI_GRAD.ViewModels.CreateTransferOrderViewModel
+
+@{
+    ViewData["Title"] = "Create Transfer Order";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Create Transfer Order</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Order Details</h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="SourceWarehouseId" class="control-label"></label>
+                            <select asp-for="SourceWarehouseId" class="form-control" asp-items="ViewBag.Warehouses">
+                                <option value="">-- Select Source Warehouse --</option>
+                            </select>
+                            <span asp-validation-for="SourceWarehouseId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="DestinationWarehouseId" class="control-label"></label>
+                            <select asp-for="DestinationWarehouseId" class="form-control" asp-items="ViewBag.Warehouses">
+                                <option value="">-- Select Destination Warehouse --</option>
+                            </select>
+                            <span asp-validation-for="DestinationWarehouseId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Create Order</button>
+                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

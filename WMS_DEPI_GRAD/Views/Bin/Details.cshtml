@@ -1,0 +1,49 @@
+@model WMS.DAL.Entities.Bin
+
+@{
+    ViewData["Title"] = "Bin Details";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Bin Details</h1>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Bin Information</h6>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Code)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Code)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Capacity)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Capacity)
+                </dd>
+                <dt class="col-sm-2">
+                    Rack
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Rack.Name)
+                </dd>
+                <dt class="col-sm-2">
+                    Type
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.BinType.Name)
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+</div>
