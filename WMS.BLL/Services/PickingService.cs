@@ -60,7 +60,8 @@ public class PickingService : IPickingService
         var soRepo = _unitOfWork.GetRepository<SalesOrder, int>();
         var so = await soRepo.GetByIdAsync(
             salesOrderId,
-            include: q => q.Include(s => s.SO_Items));
+            include: q => q.Include(s => s.SO_Items),
+            withTracking: true);
 
         if (so == null)
             throw new InvalidOperationException("Sales Order not found");
@@ -171,7 +172,8 @@ public class PickingService : IPickingService
         var picking = await pickingRepo.GetByIdAsync(
             pickingId,
             include: q => q.Include(p => p.SO_Item)
-                          .ThenInclude(i => i.SalesOrder));
+                          .ThenInclude(i => i.SalesOrder),
+            withTracking: true);
 
         if (picking == null)
             throw new InvalidOperationException("Picking task not found");

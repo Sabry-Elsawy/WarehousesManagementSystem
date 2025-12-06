@@ -130,7 +130,8 @@ public class SalesOrderService : ISalesOrderService
         var repo = _unitOfWork.GetRepository<SalesOrder, int>();
         var so = await repo.GetByIdAsync(
             id,
-            include: q => q.Include(s => s.SO_Items)
+            include: q => q.Include(s => s.SO_Items),
+            withTracking: true
         );
 
         if (so == null)
