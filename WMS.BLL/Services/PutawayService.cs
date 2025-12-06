@@ -369,6 +369,31 @@ namespace WMS.BLL.Services
                 putaway.LastModifiedOn = DateTime.UtcNow;
                 putawayRepo.Update(putaway);
 
+                // Create inventory transaction logs for each bin assignment
+                var transactionRepo = _unitOfWork.GetRepository<InventoryTransaction, int>();
+                
+                foreach (var putawayBin in putaway.PutawayBins)
+                {
+                    var transaction = new InventoryTransaction
+                    {
+                        TransactionType = "Putaway Completed",
+                        QuantityChange = putawayBin.Qty,
+                        ProductId = putaway.ReceiptItem.ProductId,
+                        DestinationBinId = putawayBin.BinId,
+                        SourceBinId = null, // Coming from receiving dock
+                        TransactionDate = DateTime.UtcNow,
+                        CreatedBy = performedBy,
+                        ReferenceNumber = $"Putaway-{putawayId}",
+                        Reason = $"Putaway #{putawayId} completed - placed items in bin",
+                        CreatedOn = DateTime.UtcNow
+                    };
+
+                    await transactionRepo.AddAsync(transaction);
+                    
+                    _logger.LogInformation("Created inventory transaction for Putaway {PutawayId}, Product {ProductId}, Bin {BinId}, Qty {Qty}",
+                        putawayId, putaway.ReceiptItem.ProductId, putawayBin.BinId, putawayBin.Qty);
+                }
+
                 await _unitOfWork.CompleteAsync();
 
                 _logger.LogInformation("Successfully executed putaway {PutawayId}", putawayId);

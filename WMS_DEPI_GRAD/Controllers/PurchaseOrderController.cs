@@ -287,7 +287,8 @@ public class PurchaseOrderController : Controller
     {
         try
         {
-            await _poService.CloseAsync(id);
+            var closedBy = User.Identity?.Name ?? "System";
+            await _poService.CloseAsync(id, closedBy);
             TempData["Success"] = "Purchase Order closed successfully!";
         }
         catch (Exception ex)

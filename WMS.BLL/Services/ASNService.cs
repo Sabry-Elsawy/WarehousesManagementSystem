@@ -96,7 +96,7 @@ public class ASNService : IASNService
         return true;
     }
 
-    public async Task<bool> CloseAsync(int asnId)
+    public async Task<bool> CloseAsync(int asnId, string closedBy, string? reason = null)
     {
         var repo = _unitOfWork.GetRepository<AdvancedShippingNotice, int>();
         var asn = await repo.GetByIdAsync(asnId);
@@ -123,10 +123,51 @@ public class ASNService : IASNService
 
         // All validations passed, close the ASN
         asn.Status = AdvancedShippingNoticeStatus.Closed;
+        asn.ClosedOn = DateTime.UtcNow;
+        asn.ClosedBy = closedBy;
+        asn.IsAutoClosed = false; // Manual close
+        asn.CloseReason = reason ?? "Manually closed - all receipts processed";
+        
         repo.Update(asn);
         await _unitOfWork.CompleteAsync();
 
         // Trigger automatic PO closure check
+        await TryAutoClosePOAsync(asnId);
+
+        return true;
+    }
+
+    public async Task<bool> ForceCloseAsync(int asnId, string closedBy, string reason)
+    {
+        if (string.IsNullOrWhiteSpace(reason) || reason.Length < 10)
+            throw new ArgumentException("CloseReason must be at least 10 characters");
+
+        var repo = _unitOfWork.GetRepository<AdvancedShippingNotice, int>();
+        var asn = await repo.GetByIdAsync(asnId);
+
+        if (asn == null)
+            throw new InvalidOperationException("ASN not found");
+
+        if (asn.Status == AdvancedShippingNoticeStatus.Closed)
+            throw new InvalidOperationException("ASN is already closed");
+
+        // Check for in-progress receipts (validation)
+        var receiptRepo = _unitOfWork.GetRepository<Receipt, int>();
+        var receipts = await receiptRepo.GetAllWithIncludeAsync(withTracking: false,
+            query => query.Where(r => r.AdvancedShippingNoticeId == asnId));
+
+        if (receipts.Any(r => r.Status == ReceiptStatus.Open))
+            throw new InvalidOperationException("Cannot force-close ASN while receipts are in progress");
+
+        asn.Status = AdvancedShippingNoticeStatus.Closed;
+        asn.ClosedOn = DateTime.UtcNow;
+        asn.ClosedBy = closedBy;
+        asn.IsAutoClosed = false;
+        asn.CloseReason = reason;
+
+        repo.Update(asn);
+        await _unitOfWork.CompleteAsync();
+
         await TryAutoClosePOAsync(asnId);
 
         return true;
@@ -212,6 +253,11 @@ public class ASNService : IASNService
 
             // All conditions met - auto-close the PO
             po.Status = PurchaseOrderStatus.Closed;
+            po.ClosedOn = DateTime.UtcNow;
+            po.ClosedBy = "SYSTEM";
+            po.IsAutoClosed = true;
+            po.CloseReason = "Automatically closed - all items received and all ASNs closed";
+            
             poRepo.Update(po);
             await _unitOfWork.CompleteAsync();
 
