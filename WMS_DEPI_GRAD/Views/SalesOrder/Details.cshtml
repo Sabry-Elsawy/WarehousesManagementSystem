@@ -179,7 +179,7 @@
                                     {
                                         <td class="text-end">
                                             <form asp-action="RemoveItem" method="post" class="d-inline"
-                                                  asp-route-salesOrderId="@Model.Id" 
+                                                  asp-route-salesOrderId="@Model.Id"
                                                   asp-route-itemId="@item.Id"
                                                   onsubmit="return confirm('Are you sure you want to remove this item?');">
                                                 @Html.AntiForgeryToken()
@@ -239,7 +239,7 @@
                 }
                 else
                 {
-                        <button type="button" class="btn btn-success" disabled title="Add items before submitting">
+                    <button type="button" class="btn btn-success" disabled title="Add items before submitting">
                         <i class="bi bi-check-circle"></i> Submit Order
                     </button>
                 }
@@ -253,10 +253,10 @@
                 </form>
             }
 
-            @if (Model.Status == WMS.DAL.SalesOrderStatus.Submitted || 
-                 Model.Status == WMS.DAL.SalesOrderStatus.Processing ||
-                 Model.Status == WMS.DAL.SalesOrderStatus.Picked ||
-                 Model.Status == WMS.DAL.SalesOrderStatus.PartiallyPicked)
+            @if (Model.Status == WMS.DAL.SalesOrderStatus.Submitted ||
+            Model.Status == WMS.DAL.SalesOrderStatus.Processing ||
+            Model.Status == WMS.DAL.SalesOrderStatus.Picked ||
+            Model.Status == WMS.DAL.SalesOrderStatus.PartiallyPicked)
             {
                 <a asp-controller="Picking" asp-action="Details" asp-route-salesOrderId="@Model.Id" class="btn btn-info">
                     <i class="bi bi-list-check"></i> View Picking Tasks
@@ -366,25 +366,24 @@
 
                     <div class="mb-3">
                         <label class="form-label">Carrier <span class="text-danger">*</span></label>
-                        <select name="carrier" class="form-select" required>
-                            <option value="">-- Select Carrier --</option>
-                            <option value="FedEx">FedEx</option>
-                            <option value="UPS">UPS</option>
-                            <option value="USPS">USPS</option>
-                            <option value="DHL">DHL</option>
-                            <option value="Other">Other</option>
-                        </select>
+                        <input type="text" name="carrier" class="form-control" list="carrierOptions" placeholder="Enter Carrier Name" required>
+                        <datalist id="carrierOptions">
+                            <option value="FedEx"></option>
+                            <option value="UPS"></option>
+                            <option value="USPS"></option>
+                            <option value="DHL"></option>
+                        </datalist>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Tracking Number <span class="text-danger">*</span></label>
-                        <input type="text" name="trackingNumber" class="form-control" 
+                        <input type="text" name="trackingNumber" class="form-control"
                                placeholder="Enter tracking number" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Notes (Optional)</label>
-                        <textarea name="notes" class="form-control" rows="2" 
+                        <textarea name="notes" class="form-control" rows="2"
                                   placeholder="Any special shipping instructions..."></textarea>
                     </div>
 
@@ -424,8 +423,8 @@
 
                     <div class="mb-3">
                         <label class="form-label">Cancellation Reason <span class="text-danger">*</span></label>
-                        <textarea name="reason" class="form-control" rows="3" 
-                                  placeholder="Please provide a reason for cancellation (minimum 10 characters)..." 
+                        <textarea name="reason" class="form-control" rows="3"
+                                  placeholder="Please provide a reason for cancellation (minimum 10 characters)..."
                                   required minlength="10"></textarea>
                         <div class="form-text">Minimum 10 characters required.</div>
                     </div>
