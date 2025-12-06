@@ -8,4 +8,8 @@ public interface ITransferOrderService
     Task<TransferOrder?> GetByIdAsync(int id);
     Task CreateAsync(TransferOrder transferOrder);
     Task ApproveAsync(int id);
+    Task IssueAsync(int id);
+    Task ReceiveAsync(int id);
+    Task AddItemAsync(int transferOrderId, int productId, int quantity);
+    Task CancelAsync(int id);
 }

@@ -4,7 +4,7 @@ public enum TransferOrderStatus
 {
     Pending,
     Approved,
-    InProgress,
-    Completed,
+    Issued,    // Products picked and shipped from Source
+    Received,  // Products received at Destination
     Cancelled
 }
