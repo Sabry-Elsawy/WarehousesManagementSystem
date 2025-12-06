@@ -42,6 +42,7 @@ public class PickingController : Controller
             QuantityToPick = p.QuantityToPick,
             QuantityPicked = p.QuantityPicked,
             Status = p.Status,
+            PickedBy = p.PickedBy ?? "",
             CreatedOn = p.CreatedOn
         }).ToList();
 
@@ -83,6 +84,7 @@ public class PickingController : Controller
             QuantityToPick = p.QuantityToPick,
             QuantityPicked = p.QuantityPicked,
             Status = p.Status,
+            PickedBy = p.PickedBy ?? "",
             CreatedOn = p.CreatedOn
         }).ToList();
 

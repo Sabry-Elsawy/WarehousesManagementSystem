@@ -2,11 +2,12 @@
 
 @{
     ViewData["Title"] = "Ready for Shipping";
+    var readyCount = Model.Count();
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-truck"></i> Orders Ready for Shipping</h2>
+        <h2><i class="bi bi-truck"></i> Shipping Dashboard</h2>
     </div>
 
     @if (TempData["Success"] != null)
@@ -29,40 +30,69 @@
         </div>
     }
 
+    <!-- Summary Card -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">Orders Ready to Ship</h6>
+                        <h2 class="mb-0 mt-2">@readyCount</h2>
+                    </div>
+                    <i class="bi bi-box-seam display-4 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="alert alert-light border shadow-sm h-100 d-flex align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-info-circle-fill text-primary fs-3 me-3"></i>
+                    <div>
+                        <strong>Instructions:</strong> These orders have been fully or partially picked and are ready for shipment. 
+                        Click 'Ship' to enter tracking details and complete the process.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card shadow-sm">
-        <div class="card-body">
+        <div class="card-header bg-white text-primary">
+            <h5 class="mb-0"><i class="bi bi-list-task"></i> Ready for Shipping List</h5>
+        </div>
+        <div class="card-body p-0">
             @if (Model.Any())
             {
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>SO Number</th>
+                                <th class="ps-3">SO Number</th>
                                 <th>Customer</th>
                                 <th>Warehouse</th>
                                 <th>Order Date</th>
-                                <th>Items Count</th>
-                                <th>Total Quantity</th>
-                                <th>Actions</th>
+                                <th>Line Items</th>
+                                <th>Total Units</th>
+                                <th class="text-end pe-3">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model)
                             {
                                 <tr>
-                                    <td><strong>@item.SO_Number</strong></td>
+                                    <td class="ps-3">
+                                        <a asp-controller="SalesOrder" asp-action="Details" asp-route-id="@item.SalesOrderId" class="fw-bold text-decoration-none">
+                                            @item.SO_Number
+                                        </a>
+                                    </td>
                                     <td>@item.CustomerName</td>
                                     <td>@item.WarehouseName</td>
                                     <td>@item.OrderDate.ToString("yyyy-MM-dd")</td>
-                                    <td>@item.ItemCount</td>
-                                    <td>@item.TotalQuantity</td>
-                                    <td>
-                                        <a asp-action="Confirm" asp-route-id="@item.SalesOrderId" class="btn btn-sm btn-success" title="Ship Order">
-                                            <i class="bi bi-truck"></i> Ship
-                                        </a>
-                                        <a asp-controller="SalesOrder" asp-action="Details" asp-route-id="@item.SalesOrderId" 
-                                           class="btn btn-sm btn-info" title="View Details">
-                                            <i class="bi bi-eye"></i>
+                                    <td><span class="badge bg-secondary">@item.ItemCount items</span></td>
+                                    <td><strong>@item.TotalQuantity</strong></td>
+                                    <td class="text-end pe-3">
+                                        <a asp-action="Confirm" asp-route-id="@item.SalesOrderId" class="btn btn-sm btn-success shadow-sm" title="Ship Order">
+                                            <i class="bi bi-truck"></i> Ship Now
                                         </a>
                                     </td>
                                 </tr>
@@ -73,8 +103,10 @@
             }
             else
             {
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> No orders ready for shipping at this time.
+                <div class="p-5 text-center text-muted">
+                    <i class="bi bi-check-circle display-1 text-success opacity-25"></i>
+                    <h4 class="mt-3">All Caught Up!</h4>
+                    <p>No orders are currently waiting to be shipped.</p>
                 </div>
             }
         </div>
