@@ -109,11 +109,14 @@ public class TransferOrderService : ITransferOrderService
             var qtyRemaining = item.Qty;
 
             // Find stock in source warehouse (FIFO: order by Bin ID or Expiry)
-            // Assuming Bin.WarehouseId check involves joining with Bin table
-            var allInventory = await inventoryRepo.GetAllWithIncludeAsync(true, q => q.Include(i => i.Bin));
+            var allInventory = await inventoryRepo.GetAllWithIncludeAsync(true, q => q
+                .Include(i => i.Bin)
+                .ThenInclude(b => b.Rack)
+                .ThenInclude(r => r.Aisle)
+                .ThenInclude(a => a.Zone));
             
             var sourceInventory = allInventory
-                .Where(i => i.Bin.WarehouseId == order.SourceWarehouseId && i.ProductId == item.ProductId && (i.Quantity - i.ReservedQuantity) > 0)
+                .Where(i => i.Bin?.Rack?.Aisle?.Zone?.WarehouseId == order.SourceWarehouseId && i.ProductId == item.ProductId && (i.Quantity - i.ReservedQuantity) > 0)
                 .OrderBy(i => i.BinId) // Simple FIFO strategy
                 .ToList();
 
@@ -165,9 +168,14 @@ public class TransferOrderService : ITransferOrderService
             throw new InvalidOperationException("Can only receive Issued orders");
 
         // Add inventory to Destination Warehouse
+        // Add inventory to Destination Warehouse
         // Find a receiving bin in destination warehouse (first available bin for now)
-        var allBins = await binRepo.GetAllAsync(false);
-        var destBin = allBins.FirstOrDefault(b => b.WarehouseId == order.DestinationWarehouseId);
+        var allBins = await binRepo.GetAllWithIncludeAsync(false, q => q
+            .Include(b => b.Rack)
+            .ThenInclude(r => r.Aisle)
+            .ThenInclude(a => a.Zone));
+            
+        var destBin = allBins.FirstOrDefault(b => b.Rack?.Aisle?.Zone?.WarehouseId == order.DestinationWarehouseId);
 
         if (destBin == null)
             throw new InvalidOperationException($"No bins found in Destination Warehouse {order.DestinationWarehouseId}");
