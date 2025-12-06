@@ -79,7 +79,7 @@ public class InventoryService:IInventoryService
             ProductId = product.Id,
             BinId = bin.Id,
             Quantity = dto.Quantity,
-            Status = dto.Status,
+            Status = "Available",  // Auto-set to match Putaway behavior
             CreatedOn = DateTime.Now,
             BatchNumber = "",
             ExpiryDate = ""
