@@ -84,7 +84,7 @@ public class PickingService : IPickingService
             // Get available inventory for this product, ordered by BinId (simple FIFO)
             var inventoryRecords = await inventoryRepo.GetAllAsync(true);
             var availableInventory = inventoryRecords
-                .Where(inv => inv.ProductId == soItem.ProductId && inv.Quantity > 0)
+                .Where(inv => inv.ProductId == soItem.ProductId && (inv.Quantity - inv.ReservedQuantity) > 0)
                 .OrderBy(inv => inv.BinId)
                 .ToList();
 
@@ -93,22 +93,31 @@ public class PickingService : IPickingService
                 throw new InvalidOperationException($"No inventory available for product ID {soItem.ProductId}");
             }
 
-            var totalAvailable = availableInventory.Sum(inv => inv.Quantity);
+            var totalAvailable = availableInventory.Sum(inv => inv.Quantity - inv.ReservedQuantity);
             if (totalAvailable < qtyNeeded)
             {
                 throw new InvalidOperationException($"Insufficient inventory for product ID {soItem.ProductId}. Required: {qtyNeeded}, Available: {totalAvailable}");
             }
 
-            // Allocate from bins
+            // Allocate from bins and RESERVE inventory
             var qtyRemaining = qtyNeeded;
             foreach (var invRecord in availableInventory)
             {
                 if (qtyRemaining <= 0)
                     break;
 
-                var qtyToAllocate = Math.Min(qtyRemaining, invRecord.Quantity);
+                var availableQty = invRecord.Quantity - invRecord.ReservedQuantity;
+                var qtyToAllocate = Math.Min(qtyRemaining, availableQty);
 
-                // Create picking task
+                // RESERVE inventory
+                invRecord.ReservedQuantity += qtyToAllocate;
+                if (invRecord.ReservedQuantity >= invRecord.Quantity)
+                {
+                    invRecord.Status = "Reserved";
+                }
+                inventoryRepo.Update(invRecord);
+
+                // Create picking task with reservation link
                 var pickingTask = new Picking
                 {
                     SO_ItemId = soItem.Id,
@@ -116,7 +125,8 @@ public class PickingService : IPickingService
                     BinId = invRecord.BinId,
                     QuantityToPick = qtyToAllocate,
                     QuantityPicked = 0,
-                    Status = PickingStatus.Pending
+                    Status = PickingStatus.Pending,
+                    ReservedInventoryId = invRecord.Id
                 };
 
                 await pickingRepo.AddAsync(pickingTask);
@@ -125,7 +135,33 @@ public class PickingService : IPickingService
             }
         }
 
+        // Update SO status to Processing
+        so.Status = SalesOrderStatus.Processing;
+        soRepo.Update(so);
+
         await _unitOfWork.CompleteAsync();
+        return true;
+    }
+
+    public async Task<bool> StartPickingAsync(int pickingId, string performedBy)
+    {
+        var pickingRepo = _unitOfWork.GetRepository<Picking, int>();
+        var picking = await pickingRepo.GetByIdAsync(pickingId);
+
+        if (picking == null)
+            throw new InvalidOperationException("Picking task not found");
+
+        if (picking.Status != PickingStatus.Pending)
+            throw new InvalidOperationException("Only Pending tasks can be started");
+
+        // Update status to InProgress
+        picking.Status = PickingStatus.InProgress;
+        picking.StartedOn = DateTime.UtcNow;
+        picking.PickedBy = performedBy;
+
+        pickingRepo.Update(picking);
+        await _unitOfWork.CompleteAsync();
+
         return true;
     }
 
@@ -140,7 +176,7 @@ public class PickingService : IPickingService
         if (picking == null)
             throw new InvalidOperationException("Picking task not found");
 
-        if (picking.Status == PickingStatus.Picked)
+        if (picking.Status == PickingStatus.Picked || picking.Status == PickingStatus.PartiallyPicked)
             throw new InvalidOperationException("This picking task has already been confirmed");
 
         if (picking.Status == PickingStatus.Cancelled)
@@ -155,7 +191,19 @@ public class PickingService : IPickingService
 
         // Update picking task
         picking.QuantityPicked = quantityPicked;
-        picking.Status = PickingStatus.Picked;
+
+        // Check if partial pick
+        if (quantityPicked < picking.QuantityToPick)
+        {
+            picking.Status = PickingStatus.PartiallyPicked;
+            picking.ShortageQuantity = picking.QuantityToPick - quantityPicked;
+            picking.ShortageReason = "Inventory shortage during picking";
+        }
+        else
+        {
+            picking.Status = PickingStatus.Picked;
+        }
+
         pickingRepo.Update(picking);
 
         // Update SO_Item
@@ -167,29 +215,43 @@ public class PickingService : IPickingService
             itemRepo.Update(soItem);
         }
 
-        // Reduce inventory
-        var inventoryRepo = _unitOfWork.GetRepository<Inventory, int>();
-        var inventoryRecords = await inventoryRepo.GetAllAsync(true);
-        var inventory = inventoryRecords.FirstOrDefault(inv => inv.BinId == picking.BinId && inv.ProductId == picking.ProductId);
+        // NOTE: Inventory reduction moved to ShipOrderAsync - do NOT reduce here!
+        // Inventory is only reduced when order is actually shipped
 
-        if (inventory != null)
+        // Log picking transaction
+        var transactionRepo = _unitOfWork.GetRepository<InventoryTransaction, int>();
+        var transaction = new InventoryTransaction
         {
-            inventory.Quantity -= quantityPicked;
-            inventoryRepo.Update(inventory);
-        }
+            TransactionType = "Picking Confirmed",
+            QuantityChange = quantityPicked,  // Positive for tracking
+            ProductId = picking.ProductId,
+            SourceBinId = picking.BinId,
+            DestinationBinId = null,
+            TransactionDate = DateTime.UtcNow,
+            CreatedBy = picking.PickedBy ?? "System",
+            ReferenceNumber = $"PICK-{pickingId}-{DateTime.UtcNow:yyyyMMddHHmmss}",
+            Reason = $"Picked for SO #{picking.SO_Item.SalesOrder.SO_Number}",
+            CreatedOn = DateTime.UtcNow
+        };
+        await transactionRepo.AddAsync(transaction);
 
         // Check if all picking tasks for this SO are completed
         var allPickingsForSO = await GetBySalesOrderIdAsync(picking.SO_Item.SalesOrderId);
-        var allPicked = allPickingsForSO.All(p => p.Status == PickingStatus.Picked || p.Status == PickingStatus.Cancelled);
+        var allCompleted = allPickingsForSO.All(p => 
+            p.Status == PickingStatus.Picked || 
+            p.Status == PickingStatus.PartiallyPicked || 
+            p.Status == PickingStatus.Cancelled);
 
-        if (allPicked)
+        if (allCompleted)
         {
-            // Update Sales Order status to Picked
+            // Update Sales Order status
             var soRepo = _unitOfWork.GetRepository<SalesOrder, int>();
             var so = await soRepo.GetByIdAsync(picking.SO_Item.SalesOrderId);
             if (so != null)
             {
-                so.Status = SalesOrderStatus.Picked;
+                // Check if any partial picks
+                var hasPartialPicks = allPickingsForSO.Any(p => p.Status == PickingStatus.PartiallyPicked);
+                so.Status = hasPartialPicks ? SalesOrderStatus.PartiallyPicked : SalesOrderStatus.Picked;
                 soRepo.Update(so);
             }
         }

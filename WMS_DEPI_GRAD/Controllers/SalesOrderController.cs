@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using WMS.BLL.DTOs;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
 using WMS.DAL.Entities._Identity;
@@ -280,7 +281,58 @@ public class SalesOrderController : Controller
             TempData["Error"] = ex.Message;
         }
 
-        return RedirectToAction(nameof(Index));
+        return  RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ShipOrder(int id, string carrier, string trackingNumber, string notes)
+    {
+        try
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            var performedBy = currentUser != null ? $"{currentUser.FirstName} {currentUser.LastName}" : User.Identity?.Name ?? "System";
+
+            var shipmentDto = new ShipmentDto
+            {
+                Carrier = carrier,
+                TrackingNumber = trackingNumber,
+                Notes = notes ?? string.Empty,
+                PerformedBy = performedBy
+            };
+
+            await _soService.ShipOrderAsync(id, shipmentDto);
+            TempData["Success"] = $"Sales Order shipped successfully! Tracking: {trackingNumber}";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CancelOrder(int id, string reason)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(reason) || reason.Length < 10)
+            {
+                TempData["Error"] = "Cancellation reason must be at least 10 characters.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            await _soService.CancelSalesOrderAsync(id, reason);
+            TempData["Success"] = "Sales Order cancelled successfully.";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Details), new { id });
     }
 
     [HttpPost]

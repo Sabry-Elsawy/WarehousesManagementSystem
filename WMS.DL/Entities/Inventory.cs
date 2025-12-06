@@ -7,6 +7,7 @@ public class Inventory : BaseAuditableEntity<int>
 {
     public string Status { get; set; }
     public int Quantity { get; set; }
+    public int ReservedQuantity { get; set; } = 0;  // NEW: Track reserved qty
     public string BatchNumber { get; set; }
     public string ExpiryDate { get; set; }
 

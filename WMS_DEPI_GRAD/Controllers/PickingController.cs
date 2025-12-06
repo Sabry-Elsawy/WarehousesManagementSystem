@@ -1,6 +1,11 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
+using WMS.DAL.Entities._Identity;
+using WMS.DAL.UnitOfWork;
+using WMS_DEPI_GRAD.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using WMS.DAL.UnitOfWork;
 using WMS_DEPI_GRAD.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +17,13 @@ public class PickingController : Controller
 {
     private readonly IPickingService _pickingService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public PickingController(IPickingService pickingService, IUnitOfWork unitOfWork)
+    public PickingController(IPickingService pickingService, IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
     {
         _pickingService = pickingService;
         _unitOfWork = unitOfWork;
+        _userManager = userManager;
     }
 
     public async Task<IActionResult> Index()
@@ -120,6 +127,25 @@ public class PickingController : Controller
         }
 
         return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> StartPicking(int id)
+    {
+        try
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            var performedBy = currentUser != null ? $"{currentUser.FirstName} {currentUser.LastName}" : User.Identity?.Name ?? "System";
+
+            await _pickingService.StartPickingAsync(id, performedBy);
+            TempData["Success"] = "Picking task started successfully!";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]

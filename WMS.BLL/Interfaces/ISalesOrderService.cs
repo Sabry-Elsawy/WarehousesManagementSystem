@@ -1,3 +1,4 @@
+using WMS.BLL.DTOs;
 using WMS.DAL;
 
 namespace WMS.BLL.Interfaces;
@@ -19,4 +20,6 @@ public interface ISalesOrderService
     Task<bool> AddItemAsync(int soId, SO_Item item);
     Task<bool> RemoveItemAsync(int itemId);
     Task<bool> DeleteAsync(int id);
+    Task<bool> ShipOrderAsync(int salesOrderId, ShipmentDto shipmentDto);
+    Task<bool> CancelSalesOrderAsync(int salesOrderId, string reason);
 }
