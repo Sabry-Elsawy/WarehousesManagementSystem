@@ -1,13 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using WMS.BLL.DTOs;
 using WMS.BLL.Interfaces;
 
 namespace WMS_DEPI_GRAD.Controllers
 {
-    public class InventoryController(IInventoryService inventoryService, IBinService binService) : Controller
+    public class InventoryController : Controller
     {
-        private readonly IInventoryService _inventoryService = inventoryService;
-        private readonly IBinService _binService = binService;
+        private readonly IInventoryService _inventoryService;
+        private readonly IBinService _binService;
+        private readonly IProductService _productService;
+
+        public InventoryController(IInventoryService inventoryService, IBinService binService, IProductService productService)
+        {
+            _inventoryService = inventoryService;
+            _binService = binService;
+            _productService = productService;
+        }
 
         public async Task<IActionResult> Index(string? search, int? productId, int? binId, string? status, int page = 1, int pageSize = 20)
         {
@@ -26,7 +35,21 @@ namespace WMS_DEPI_GRAD.Controllers
             var summary = await _inventoryService.GetStockSummaryAsync();
             ViewBag.StockSummary = summary;
 
+            // Load products and bins for Add SKU dropdown
+            await LoadDropdownsAsync();
+
             return View(items);
+        }
+
+        private async Task LoadDropdownsAsync()
+        {
+            // Get all products for dropdown
+            var products = await _productService.GetAllAsync();
+            ViewBag.Products = new SelectList(products, "Id", "Name");
+            
+            // Get all bins for dropdown  
+            var bins = await _binService.GetAllBinsAsync();
+            ViewBag.Bins = new SelectList(bins, "Code", "Code");
         }
 
         public async Task<IActionResult> Details(int id)

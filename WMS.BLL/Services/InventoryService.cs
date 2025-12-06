@@ -58,11 +58,10 @@ public class InventoryService:IInventoryService
     {
         
         var productRepo = _unitOfWork.GetRepository<Product, int>();
-        var product = (await productRepo.GetAllAsync())
-            .FirstOrDefault(p => p.Name.ToLower() == dto.ProductName.ToLower());
+        var product = await productRepo.GetByIdAsync(dto.ProductId);
 
         if (product == null)
-            throw new Exception("Product not found. Create product first.");
+            throw new Exception("Product not found. Please select a valid product.");
 
         
         var binRepo = _unitOfWork.GetRepository<Bin, int>();
