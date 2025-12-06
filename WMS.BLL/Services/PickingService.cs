@@ -238,7 +238,15 @@ public class PickingService : IPickingService
         await transactionRepo.AddAsync(transaction);
 
         // Check if all picking tasks for this SO are completed
-        var allPickingsForSO = await GetBySalesOrderIdAsync(picking.SO_Item.SalesOrderId);
+        var allPickingsForSO = (await GetBySalesOrderIdAsync(picking.SO_Item.SalesOrderId)).ToList();
+        
+        // Update the current picking task in the list with the new status
+        var currentPickingInList = allPickingsForSO.FirstOrDefault(p => p.Id == pickingId);
+        if (currentPickingInList != null)
+        {
+            currentPickingInList.Status = picking.Status;
+        }
+
         var allCompleted = allPickingsForSO.All(p => 
             p.Status == PickingStatus.Picked || 
             p.Status == PickingStatus.PartiallyPicked || 
