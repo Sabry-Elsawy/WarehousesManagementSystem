@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using WMS.BLL.DTOs;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
+using WMS.DAL.Entities;
 using WMS.DAL.UnitOfWork;
 
 namespace WMS.BLL.Services;
@@ -128,7 +130,8 @@ public class SalesOrderService : ISalesOrderService
         var repo = _unitOfWork.GetRepository<SalesOrder, int>();
         var so = await repo.GetByIdAsync(
             id,
-            include: q => q.Include(s => s.SO_Items)
+            include: q => q.Include(s => s.SO_Items),
+            withTracking: true
         );
 
         if (so == null)
@@ -238,6 +241,134 @@ public class SalesOrderService : ISalesOrderService
         soRepo.Delete(so);
         await _unitOfWork.CompleteAsync();
 
+        return true;
+    }
+
+    public async Task<bool> ShipOrderAsync(int salesOrderId, ShipmentDto shipmentDto)
+    {
+        var soRepo = _unitOfWork.GetRepository<SalesOrder, int>();
+        var so = await soRepo.GetByIdAsync(
+            salesOrderId,
+            include: q => q.Include(s => s.SO_Items));
+
+        if (so == null)
+            throw new InvalidOperationException("Sales Order not found");
+
+        // Validation: Must  be "Picked" to ship
+        if (so.Status != SalesOrderStatus.Picked && so.Status != SalesOrderStatus.PartiallyPicked)
+            throw new InvalidOperationException("Only Picked or PartiallyPicked orders can be shipped");
+
+        // Update order status
+        so.Status = SalesOrderStatus.Shipped;
+        so.ShippedDate = DateTime.UtcNow;
+        so.Carrier = shipmentDto.Carrier;
+        so.TrackingNumber = shipmentDto.TrackingNumber;
+        soRepo.Update(so);
+
+        // Get all picked items and reduce inventory
+        var pickingRepo = _unitOfWork.GetRepository<Picking, int>();
+        var pickings = await pickingRepo.GetAllAsync(false);
+        
+        var itemRepo = _unitOfWork.GetRepository<SO_Item, int>();
+        var items = await itemRepo.GetAllAsync(false);
+        var soItemIds = items.Where(i => i.SalesOrderId == salesOrderId).Select(i => i.Id).ToList();
+        var soPickings = pickings.Where(p => soItemIds.Contains(p.SO_ItemId) && 
+                                             (p.Status == PickingStatus.Picked || p.Status == PickingStatus.PartiallyPicked)).ToList();
+
+        // Reduce inventory and log transactions
+        var inventoryRepo = _unitOfWork.GetRepository<Inventory, int>();
+        var transactionRepo = _unitOfWork.GetRepository<InventoryTransaction, int>();
+
+        foreach (var picking in soPickings)
+        {
+            // Reduce inventory
+            var inventoryRecords = await inventoryRepo.GetAllAsync(true);
+            var inventory = inventoryRecords.FirstOrDefault(i => i.BinId == picking.BinId && i.ProductId == picking.ProductId);
+
+            if (inventory != null)
+            {
+                inventory.Quantity -= picking.QuantityPicked;
+                inventory.ReservedQuantity -= picking.QuantityPicked;
+                inventoryRepo.Update(inventory);
+            }
+
+            // Log transaction
+            var transaction = new InventoryTransaction
+            {
+                TransactionType = "Shipment",
+                QuantityChange = -picking.QuantityPicked,
+                ProductId = picking.ProductId,
+                SourceBinId = picking.BinId,
+                DestinationBinId = null,
+                TransactionDate = DateTime.UtcNow,
+                CreatedBy = shipmentDto.PerformedBy,
+                ReferenceNumber = $"SHIP-SO{so.SO_Number}-{DateTime.UtcNow:yyyyMMddHHmmss}",
+                Reason = $"Shipped for SO #{so.SO_Number}",
+                CreatedOn = DateTime.UtcNow
+            };
+            await transactionRepo.AddAsync(transaction);
+        }
+
+        await _unitOfWork.CompleteAsync();
+        return true;
+    }
+
+    public async Task<bool> CancelSalesOrderAsync(int salesOrderId, string reason)
+    {
+        var soRepo = _unitOfWork.GetRepository<SalesOrder, int>();
+        var so = await soRepo.GetByIdAsync(salesOrderId);
+
+        if (so == null)
+            throw new InvalidOperationException("Sales Order not found");
+
+        if (so.Status == SalesOrderStatus.Shipped)
+            throw new InvalidOperationException("Cannot cancel shipped orders");
+
+        if (string.IsNullOrWhiteSpace(reason) || reason.Length < 10)
+            throw new ArgumentException("Cancellation reason must be at least 10 characters");
+
+        // Release inventory reservations from picking tasks
+        var pickingRepo = _unitOfWork.GetRepository<Picking, int>();
+        var itemRepo = _unitOfWork.GetRepository<SO_Item, int>();
+        var inventoryRepo = _unitOfWork.GetRepository<Inventory, int>();
+
+        var items = await itemRepo.GetAllAsync(false);
+        var soItemIds = items.Where(i => i.SalesOrderId == salesOrderId).Select(i => i.Id).ToList();
+
+        var pickings = await pickingRepo.GetAllAsync(true);
+        var soPickings = pickings.Where(p => soItemIds.Contains(p.SO_ItemId) && 
+                                             p.Status != PickingStatus.Picked && 
+                                             p.Status != PickingStatus.PartiallyPicked).ToList();
+
+        foreach (var picking in soPickings)
+        {
+            // Cancel picking task
+            picking.Status = PickingStatus.Cancelled;
+            pickingRepo.Update(picking);
+
+            // Release inventory reservation
+            if (picking.ReservedInventoryId.HasValue)
+            {
+                var inventory = await inventoryRepo.GetByIdAsync(picking.ReservedInventoryId.Value);
+                if (inventory != null)
+                {
+                    inventory.ReservedQuantity -= picking.QuantityToPick;
+                    if (inventory.ReservedQuantity <= 0)
+                    {
+                        inventory.Status = "Available";
+                    }
+                    inventoryRepo.Update(inventory);
+                }
+            }
+        }
+
+        // Update sales order
+        so.Status = SalesOrderStatus.Cancelled;
+        so.CancelledOn = DateTime.UtcNow;
+        so.CancellationReason = reason;
+        soRepo.Update(so);
+
+        await _unitOfWork.CompleteAsync();
         return true;
     }
 }

@@ -5,60 +5,65 @@
 }
 
 <div class="container-fluid">
-    <h2><i class="bi bi-check-circle"></i> Confirm Picking</h2>
-    <hr />
-
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Picking Task Details</h5>
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-check-circle"></i> Confirm Picking</h4>
                 </div>
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-5">Product:</dt>
-                        <dd class="col-sm-7">@Model.ProductName</dd>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <h5 class="text-muted mb-3">Task Details</h5>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="small text-muted">Product</label>
+                                <div class="fw-bold fs-5">@Model.ProductName</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="small text-muted">SKU</label>
+                                <div class="fw-bold"><code>@Model.SKU</code></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="small text-muted">Bin Location</label>
+                                <div class="fw-bold fs-5 text-primary">@Model.BinLocation</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="small text-muted">Quantity to Pick</label>
+                                <div class="fw-bold fs-4">@Model.QuantityToPick</div>
+                            </div>
+                        </div>
+                    </div>
 
-                        <dt class="col-sm-5">SKU:</dt>
-                        <dd class="col-sm-7">@Model.SKU</dd>
-
-                        <dt class="col-sm-5">Bin Location:</dt>
-                        <dd class="col-sm-7"><strong class="text-primary">@Model.BinLocation</strong></dd>
-
-                        <dt class="col-sm-5">Quantity to Pick:</dt>
-                        <dd class="col-sm-7"><strong>@Model.QuantityToPick</strong></dd>
-                    </dl>
+                    <hr />
 
                     <form asp-action="Confirm" method="post">
                         <input type="hidden" asp-for="PickingTaskId" />
                         <input type="hidden" asp-for="QuantityToPick" />
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                        <div class="mb-3">
-                            <label asp-for="QuantityPicked" class="form-label"></label>
+                        <div class="mb-4">
+                            <label asp-for="QuantityPicked" class="form-label fw-bold">Quantity Picked</label>
                             <input asp-for="QuantityPicked" class="form-control form-control-lg" 
                                    type="number" min="0" max="@Model.QuantityToPick" autofocus />
                             <span asp-validation-for="QuantityPicked" class="text-danger"></span>
-                            <small class="form-text text-muted">
-                                Maximum allowed: @Model.QuantityToPick
-                            </small>
+                            
+                            <div id="shortageWarning" class="alert alert-warning mt-2 d-none">
+                                <i class="bi bi-exclamation-triangle"></i> 
+                                <strong>Short pick detected:</strong> You are reporting less than the requested quantity. This will mark the task as "Partially Picked" and log a shortage.
+                            </div>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-success btn-lg">
-                                <i class="bi bi-check-circle"></i> Confirm Picking
+                                <i class="bi bi-check-lg"></i> Confirm Picking
                             </button>
-                            <a asp-action="Index" class="btn btn-secondary btn-lg">
-                                <i class="bi bi-x-circle"></i> Cancel
-                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>
-            </div>
-
-            <div class="alert alert-warning mt-3">
-                <i class="bi bi-exclamation-triangle"></i> 
-                <strong>Important:</strong> Confirming this picking task will reduce the inventory quantity from the specified bin.
+                <div class="card-footer bg-light text-muted small">
+                    <i class="bi bi-info-circle"></i> Inventory will be reserved but visible as "Picked" until shipped.
+                </div>
             </div>
         </div>
     </div>
@@ -66,4 +71,19 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var qtyInput = document.getElementById('QuantityPicked');
+            var qtyToPick = @Model.QuantityToPick;
+            var warning = document.getElementById('shortageWarning');
+
+            qtyInput.addEventListener('input', function() {
+                if (parseInt(this.value) < qtyToPick && parseInt(this.value) >= 0) {
+                    warning.classList.remove('d-none');
+                } else {
+                    warning.classList.add('d-none');
+                }
+            });
+        });
+    </script>
 }

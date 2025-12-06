@@ -1,12 +1,17 @@
 @model IEnumerable<WMS_DEPI_GRAD.ViewModels.PickingTaskViewModel>
 
 @{
-    ViewData["Title"] = "Picking Tasks";
+    ViewData["Title"] = "Picking Tasks Dashboard";
+    var pendingCount = Model.Count(p => p.Status == WMS.DAL.PickingStatus.Pending);
+    var inProgressCount = Model.Count(p => p.Status == WMS.DAL.PickingStatus.InProgress);
+    var pickedCount = Model.Count(p => p.Status == WMS.DAL.PickingStatus.Picked);
+    var partialCount = Model.Count(p => p.Status == WMS.DAL.PickingStatus.PartiallyPicked);
+    var totalTasks = Model.Count();
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-list-check"></i> Picking Tasks</h2>
+        <h2><i class="bi bi-list-check"></i> Picking Tasks Dashboard</h2>
     </div>
 
     @if (TempData["Success"] != null)
@@ -25,75 +30,162 @@
         </div>
     }
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>SO Number</th>
-                            <th>Customer</th>
-                            <th>Product</th>
-                            <th>SKU</th>
-                            <th>Bin Location</th>
-                            <th>Qty to Pick</th>
-                            <th>Qty Picked</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>
-                                    <a asp-controller="SalesOrder" asp-action="Details" asp-route-id="@item.SalesOrderId">
-                                        @item.SO_Number
-                                    </a>
-                                </td>
-                                <td>@item.CustomerName</td>
-                                <td>@item.ProductName</td>
-                                <td>@item.SKU</td>
-                                <td><strong>@item.BinLocation</strong></td>
-                                <td>@item.QuantityToPick</td>
-                                <td>@item.QuantityPicked</td>
-                                <td>
-                                    @if (item.Status == WMS.DAL.PickingStatus.Pending)
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
-                                    else if (item.Status == WMS.DAL.PickingStatus.InProgress)
-                                    {
-                                        <span class="badge bg-info">In Progress</span>
-                                    }
-                                    else if (item.Status == WMS.DAL.PickingStatus.Picked)
-                                    {
-                                        <span class="badge bg-success">Picked</span>
-                                    }
-                                    else if (item.Status == WMS.DAL.PickingStatus.Cancelled)
-                                    {
-                                        <span class="badge bg-secondary">Cancelled</span>
-                                    }
-                                </td>
-                                <td>
-                                    @if (item.Status == WMS.DAL.PickingStatus.Pending || item.Status == WMS.DAL.PickingStatus.InProgress)
-                                    {
-                                        <a asp-action="Confirm" asp-route-id="@item.Id" class="btn btn-sm btn-primary" title="Confirm Picking">
-                                            <i class="bi bi-check-circle"></i> Confirm
-                                        </a>
-                                        <form asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline"
-                                              onsubmit="return confirm('Are you sure you want to cancel this picking task?');">
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Cancel">
-                                                <i class="bi bi-x-circle"></i>
-                                            </button>
-                                        </form>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="text-warning">@pendingCount</h3>
+                    <p class="mb-0">Pending</p>
+                </div>
             </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-primary">
+                <div class="card-body">
+                    <h3 class="text-primary">@inProgressCount</h3>
+                    <p class="mb-0">In Progress</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-success">
+                <div class="card-body">
+                    <h3 class="text-success">@(pickedCount + partialCount)</h3>
+                    <p class="mb-0">Completed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3>@totalTasks</h3>
+                    <p class="mb-0">Total Tasks</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Picking Tasks Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-box-seam"></i> All Picking Tasks</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Task #</th>
+                                <th>SO Number</th>
+                                <th>Customer</th>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>Bin Location</th>
+                                <th>To Pick</th>
+                                <th>Picked</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderBy(p => p.Status).ThenBy(p => p.Id))
+                            {
+                                <tr>
+                                    <td><strong>#@item.Id</strong></td>
+                                    <td>
+                                        <a asp-controller="SalesOrder" asp-action="Details" asp-route-id="@item.SalesOrderId">
+                                            <code>@item.SO_Number</code>
+                                        </a>
+                                    </td>
+                                    <td>@item.CustomerName</td>
+                                    <td>@item.ProductName</td>
+                                    <td><code>@item.SKU</code></td>
+                                    <td><span class="badge bg-secondary">@item.BinLocation</span></td>
+                                    <td>@item.QuantityToPick</td>
+                                    <td>
+                                        @item.QuantityPicked
+                                        @if (item.QuantityPicked == item.QuantityToPick && item.QuantityPicked > 0)
+                                        {
+                                            <i class="bi bi-check-circle text-success"></i>
+                                        }
+                                        else if (item.QuantityPicked > 0)
+                                        {
+                                            <i class="bi bi-exclamation-triangle text-warning"></i>
+                                        }
+                                    </td>
+                                    <td>
+                                        @switch (item.Status)
+                                        {
+                                            case WMS.DAL.PickingStatus.Pending:
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                                break;
+                                            case WMS.DAL.PickingStatus.InProgress:
+                                                <span class="badge bg-primary">In Progress</span>
+                                                break;
+                                            case WMS.DAL.PickingStatus.Picked:
+                                                <span class="badge bg-success">Picked</span>
+                                                break;
+                                            case WMS.DAL.PickingStatus.PartiallyPicked:
+                                                <span class="badge bg-warning text-dark">Partially Picked</span>
+                                                break;
+                                            case WMS.DAL.PickingStatus.Backorder:
+                                                <span class="badge bg-danger">Backorder</span>
+                                                break;
+                                            case WMS.DAL.PickingStatus.Cancelled:
+                                                <span class="badge bg-secondary">Cancelled</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.Status == WMS.DAL.PickingStatus.Pending)
+                                        {
+                                            <form asp-action="StartPicking" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-primary" title="Start Picking">
+                                                    <i class="bi bi-play-fill"></i> Start
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (item.Status == WMS.DAL.PickingStatus.InProgress)
+                                        {
+                                            <a asp-action="Confirm" asp-route-id="@item.Id" class="btn btn-sm btn-success" title="Confirm Picking">
+                                                <i class="bi bi-check-circle"></i> Confirm
+                                            </a>
+                                        }
+                                        @if (item.Status == WMS.DAL.PickingStatus.Pending || item.Status == WMS.DAL.PickingStatus.InProgress)
+                                        {
+                                            <form asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Are you sure you want to cancel this picking task?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancel">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (item.Status == WMS.DAL.PickingStatus.Picked || 
+                                             item.Status == WMS.DAL.PickingStatus.PartiallyPicked)
+                                        {
+                                            <a asp-controller="SalesOrder" asp-action="Details" asp-route-id="@item.SalesOrderId" 
+                                               class="btn btn-sm btn-info" title="View Order">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No picking tasks found. Submit sales orders to generate picking tasks.
+                </div>
+            }
         </div>
     </div>
 </div>

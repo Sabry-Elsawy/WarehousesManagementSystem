@@ -9,6 +9,10 @@ public class SO_Item : BaseAuditableEntity<int>
     public int QtyOrdered { get; set; }
     public int QtyPicked { get; set; }
     public decimal UnitPrice { get; set; }
+    
+    // Backorder Tracking
+    public bool IsBackorder { get; set; } = false;
+    public int? OriginalSOItemId { get; set; }
 
     // Navigation properties
     public SalesOrder SalesOrder { get; set; } = null!;
