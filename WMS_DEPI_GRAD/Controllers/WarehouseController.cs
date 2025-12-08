@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
 
 namespace WMS_DEPI_GRAD.Controllers
 {
+    [Authorize]
     public class WarehouseController : Controller
     {
         private readonly IWarehouseService _warehouseService;
@@ -29,11 +31,13 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(warehouse);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Warehouse warehouse)
@@ -54,6 +58,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(warehouse);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         public async Task<IActionResult> Edit(int id)
         {
             var warehouse = await _warehouseService.GetWarehouseByIdAsync(id);
@@ -64,6 +69,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(warehouse);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Warehouse warehouse)
@@ -89,6 +95,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(warehouse);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var warehouse = await _warehouseService.GetWarehouseByIdAsync(id);
@@ -99,6 +106,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(warehouse);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -11,9 +11,11 @@
             </h2>
             <p class="text-muted mb-0">Manage bin type categories and classifications</p>
         </div>
-        <a asp-action="Create" class="btn btn-primary rounded-pill px-4">
-            <i class="fas fa-plus me-2"></i>Create New
-        </a>
+        @if (User.IsInRole("Admin")){
+            <a asp-action="Create" class="btn btn-primary rounded-pill px-4">
+                <i class="fas fa-plus me-2"></i>Create New
+            </a>
+        }
     </div>
 
     @if (TempData["Success"] != null)
@@ -43,7 +45,9 @@
                             <tr>
                                 <th class="ps-4 py-3">Name</th>
                                 <th class="py-3">Description</th>
-                                <th class="py-3 text-end pe-4">Actions</th>
+                                @if (User.IsInRole("Admin") || User.IsInRole("WarehouseManager")){
+                                    <th class="py-3 text-end pe-4">Actions</th>
+                                }
                             </tr>
                         </thead>
                         <tbody>
@@ -54,12 +58,17 @@
                                     <td class="text-muted">@(string.IsNullOrEmpty(item.Description) ? "No description" : item.Description)</td>
                                     <td class="text-end pe-4">
                                         <div class="btn-group">
-                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light text-primary-orange" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-light text-danger" title="Delete">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </a>
+                                            @if (User.IsInRole("Admin") || User.IsInRole("WarehouseManager"))
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light text-primary-orange" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            }
+                                            @if (User.IsInRole("Admin")){
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-light text-danger" title="Delete">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            }
                                         </div>
                                     </td>
                                 </tr>
@@ -74,9 +83,11 @@
                     <i class="fas fa-tags fa-3x text-muted mb-3"></i>
                     <h5 class="text-muted">No bin types found</h5>
                     <p class="text-muted">Create your first bin type to get started</p>
-                    <a asp-action="Create" class="btn btn-primary mt-3">
-                        <i class="fas fa-plus me-2"></i>Create Bin Type
-                    </a>
+                    @if (User.IsInRole("Admin")){
+                        <a asp-action="Create" class="btn btn-primary mt-3">
+                            <i class="fas fa-plus me-2"></i>Create Bin Type
+                        </a>
+                    }
                 </div>
             }
         </div>

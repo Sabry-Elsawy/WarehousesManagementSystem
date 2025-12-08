@@ -10,7 +10,7 @@ using WMS.DAL.UnitOfWork;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-//[Authorize]
+[Authorize(Roles = "Admin,PurchasingManager")]
 public class PurchaseOrderController : Controller
 {
     private readonly IPurchaseOrderService _poService;

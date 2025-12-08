@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WMS.BLL.DTOs;
 using WMS.BLL.Interfaces;
 
 namespace WMS_DEPI_GRAD.Controllers
 {
+    [Authorize(Roles = "Admin,Storekeeper")]
     public class InventoryController : Controller
     {
         private readonly IInventoryService _inventoryService;

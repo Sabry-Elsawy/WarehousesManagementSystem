@@ -10,15 +10,23 @@
         <div>
             @if (Model.Status == WMS.DAL.ReceiptStatus.Open)
             {
-                <a asp-action="Scan" asp-route-id="@Model.Id" class="btn btn-success">
-                    <i class="fas fa-barcode"></i> Scan Items
-                </a>
-                <form asp-action="Close" asp-route-id="@Model.Id" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-secondary" 
-                            onclick="return confirm('Are you sure you want to close this receipt? All items should be processed.')">
-                        <i class="fas fa-lock"></i> Close Receipt
-                    </button>
-                </form>
+                @if (User.IsInRole("Admin") || User.IsInRole("Storekeeper"))
+                {
+                    <a asp-action="Scan" asp-route-id="@Model.Id" class="btn btn-success">
+                        <i class="fas fa-barcode"></i> Scan Items
+                    </a>
+                }
+
+                @if (User.IsInRole("Admin") || User.IsInRole("PurchasingManager"))
+                {
+                    <form asp-action="Close" asp-route-id="@Model.Id" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-secondary"
+                                onclick="return confirm('Are you sure you want to close this receipt? All items should be processed.')">
+                            <i class="fas fa-lock"></i> Close Receipt
+                        </button>
+                    </form>
+                }
+                
             }
         </div>
     </div>

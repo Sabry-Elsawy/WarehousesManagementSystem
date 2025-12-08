@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WMS.BLL.Interfaces;
@@ -5,6 +6,7 @@ using WMS.DAL;
 
 namespace WMS_DEPI_GRAD.Controllers
 {
+    [Authorize]
     public class RackController : Controller
     {
         private readonly IRackService _rackService;
@@ -32,12 +34,14 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(rack);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             await PopulateAislesDropdown();
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(Rack rack)
         {
@@ -58,6 +62,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(rack);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         public async Task<IActionResult> Edit(int id)
         {
             var rack = await _rackService.GetRackByIdAsync(id);
@@ -69,6 +74,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(rack);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         [HttpPost]
         public async Task<IActionResult> Edit(int id, Rack rack)
         {
@@ -94,6 +100,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(rack);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var rack = await _rackService.GetRackByIdAsync(id);
@@ -104,6 +111,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(rack);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

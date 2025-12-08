@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WMS.BLL.Interfaces;
@@ -5,6 +6,7 @@ using WMS.DAL;
 
 namespace WMS_DEPI_GRAD.Controllers
 {
+    [Authorize]
     public class ZoneController : Controller
     {
         private readonly IZoneService _zoneService;
@@ -32,12 +34,14 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(zone);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             await PopulateWarehousesDropdown();
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(Zone zone)
         {
@@ -58,6 +62,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(zone);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         public async Task<IActionResult> Edit(int id)
         {
             var zone = await _zoneService.GetZoneByIdAsync(id);
@@ -69,6 +74,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(zone);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         [HttpPost]
         public async Task<IActionResult> Edit(int id, Zone zone)
         {
@@ -94,6 +100,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(zone);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var zone = await _zoneService.GetZoneByIdAsync(id);
@@ -104,6 +111,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(zone);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

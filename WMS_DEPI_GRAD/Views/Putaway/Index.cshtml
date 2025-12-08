@@ -115,7 +115,7 @@
 
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
-                                        @if (item.Status == "Pending")
+                                        @if (item.Status == "Pending" && (User.IsInRole("Admin") || User.IsInRole("InboundSpecialist")))
                                         {
                                             <a asp-action="AutoAssign" asp-route-id="@item.PutawayId" 
                                                class="btn btn-sm btn-primary" title="Auto-Assign Bins">
@@ -128,16 +128,18 @@
                                         }
                                         else if (item.Status == "Assigned")
                                         {
-                                            <a asp-action="Execute" asp-route-id="@item.PutawayId" 
-                                               class="btn btn-sm btn-success" title="Execute Putaway">
-                                                <i class="bi bi-check-circle"></i> Execute
-                                            </a>
+                                            @if(User.IsInRole("Admin")){
+                                                <a asp-action="Execute" asp-route-id="@item.PutawayId"
+                                                   class="btn btn-sm btn-success" title="Execute Putaway">
+                                                    <i class="bi bi-check-circle"></i> Execute
+                                                </a>
+                                            }
                                             <a asp-action="AssignManual" asp-route-id="@item.PutawayId" 
                                                class="btn btn-sm btn-warning" title="Edit Assignment">
                                                 <i class="bi bi-pencil"></i> Edit
                                             </a>
                                         }
-                                        else if (item.Status == "Completed")
+                                        else if (item.Status == "Completed" && User.IsInRole("Admin"))
                                         {
                                             <form asp-action="Close" asp-route-id="@item.PutawayId" method="post" class="d-inline">
                                                 @Html.AntiForgeryToken()

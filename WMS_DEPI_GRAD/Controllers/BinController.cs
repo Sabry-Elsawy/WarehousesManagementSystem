@@ -1,4 +1,5 @@
-﻿ 
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -10,6 +11,7 @@ using WMS.DAL.Entities;
 
 namespace WMS_DEPI_GRAD.Controllers
 {
+    [Authorize]
     public class BinController : Controller
     {
         private readonly IBinService _binService;
@@ -29,12 +31,14 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(bins);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             await PopulateDropdowns();
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Code,Capacity,RackId,BinTypeId")] Bin bin)
@@ -63,6 +67,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(bin);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         public async Task<IActionResult> Edit(int id)
         {
             var bin = await _binService.GetBinByIdAsync(id);
@@ -72,6 +77,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(bin);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Capacity,RackId,BinTypeId")] Bin bin)
@@ -109,6 +115,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(bin);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var bin = await _binService.GetBinByIdAsync(id);
@@ -116,6 +123,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(bin);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

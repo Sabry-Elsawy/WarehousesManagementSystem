@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
@@ -5,6 +6,7 @@ using WMS_DEPI_GRAD.ViewModels;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
+[Authorize(Roles = "Admin")]
 public class CustomerController : Controller
 {
     private readonly ICustomerService _customerService;

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WMS.BLL.Interfaces;
@@ -5,6 +6,7 @@ using WMS.DAL;
 
 namespace WMS_DEPI_GRAD.Controllers
 {
+    [Authorize]
     public class AisleController : Controller
     {
         private readonly IAisleService _aisleService;
@@ -32,12 +34,14 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(aisle);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             await PopulateZonesDropdown();
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(Aisle aisle)
         {
@@ -58,6 +62,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(aisle);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         public async Task<IActionResult> Edit(int id)
         {
             var aisle = await _aisleService.GetAisleByIdAsync(id);
@@ -69,6 +74,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(aisle);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         [HttpPost]
         public async Task<IActionResult> Edit(int id, Aisle aisle)
         {
@@ -94,6 +100,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(aisle);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var aisle = await _aisleService.GetAisleByIdAsync(id);
@@ -104,6 +111,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(aisle);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

@@ -10,7 +10,7 @@ using WMS_DEPI_GRAD.ViewModels.PutawayCircle;
 
 namespace WMS_DEPI_GRAD.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,InboundSpecialist")]
     public class PutawayController : Controller
     {
         private readonly IPutawayService _putawayService;
@@ -120,6 +120,7 @@ namespace WMS_DEPI_GRAD.Controllers
 
         #region Create
 
+        [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -168,6 +169,7 @@ namespace WMS_DEPI_GRAD.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreatePutawayViewModel model)
@@ -201,6 +203,7 @@ namespace WMS_DEPI_GRAD.Controllers
 
         #region Auto-Assign
 
+        [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpGet]
         public async Task<IActionResult> AutoAssign(int id)
         {
@@ -236,6 +239,7 @@ namespace WMS_DEPI_GRAD.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AcceptAutoAssign(int id, List<PutawayBinDto> suggestedBins)
@@ -260,6 +264,7 @@ namespace WMS_DEPI_GRAD.Controllers
 
         #region Manual Assignment
 
+        [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpGet]
         public async Task<IActionResult> AssignManual(int id)
         {
@@ -298,6 +303,7 @@ namespace WMS_DEPI_GRAD.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignManual(int id, List<PutawayBinDto> assignments)
@@ -322,6 +328,7 @@ namespace WMS_DEPI_GRAD.Controllers
 
         #region Execute
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Execute(int id)
         {
@@ -359,6 +366,7 @@ namespace WMS_DEPI_GRAD.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ExecuteConfirm(int id)
@@ -388,6 +396,7 @@ namespace WMS_DEPI_GRAD.Controllers
 
         #region Close
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Close(int id)
@@ -412,6 +421,7 @@ namespace WMS_DEPI_GRAD.Controllers
 
         #region Legacy Actions (For Backwards Compatibility)
 
+        [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpGet]
         public async Task<IActionResult> Assign(int id)
         {
@@ -440,6 +450,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(vm);
         }
 
+        [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpPost]
         public async Task<IActionResult> AssignPost(int putawayId, int binId, int qty)
         {
@@ -473,6 +484,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(vm);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> ConfirmPost(int id)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WMS.DAL.Entities._Identity;
@@ -6,6 +7,7 @@ using WMS_DEPI_GRAD.ViewModels;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
+[Authorize(Roles = "Admin")]
 public class ProfileController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment) : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;

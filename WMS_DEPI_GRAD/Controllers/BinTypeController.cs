@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using WMS.BLL.Interfaces;
@@ -6,6 +7,7 @@ using WMS.DAL.Entities;
 
 namespace WMS_DEPI_GRAD.Controllers
 {
+    [Authorize]
     public class BinTypeController : Controller
     {
         private readonly IBinTypeService _binTypeService;
@@ -21,11 +23,13 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(binTypes);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BinType binType)
@@ -46,6 +50,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(binType);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         public async Task<IActionResult> Edit(int id)
         {
             var binType = await _binTypeService.GetBinTypeByIdAsync(id);
@@ -53,6 +58,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(binType);
         }
 
+        [Authorize(Roles = "Admin,WarehouseManager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, BinType binType)
@@ -75,6 +81,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(binType);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var binType = await _binTypeService.GetBinTypeByIdAsync(id);
@@ -82,6 +89,7 @@ namespace WMS_DEPI_GRAD.Controllers
             return View(binType);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

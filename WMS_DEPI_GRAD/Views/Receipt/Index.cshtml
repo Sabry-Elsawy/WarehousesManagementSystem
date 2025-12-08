@@ -77,7 +77,7 @@
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    @if (item.Status == WMS.DAL.ReceiptStatus.Open)
+                                    @if (item.Status == WMS.DAL.ReceiptStatus.Open && (User.IsInRole("Admin") || User.IsInRole("Storekeeper")))
                                     {
                                         <a asp-action="Scan" asp-route-id="@item.Id" class="btn btn-sm btn-success" title="Scan Items">
                                             <i class="fas fa-barcode"></i>

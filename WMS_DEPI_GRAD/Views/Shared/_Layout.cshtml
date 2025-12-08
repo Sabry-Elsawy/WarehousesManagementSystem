@@ -51,15 +51,18 @@
 							<li class="nav-item"><a class="nav-link" href="/Rack/Index"><span class="nav-text">Racks</span></a></li>
 							<li class="nav-item"><a class="nav-link" href="/Bin/Index"><span class="nav-text">Bins</span></a></li>
 							<li class="nav-item"><a class="nav-link" href="/BinType/Index"><span class="nav-text">Bin Types</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="/Product/Index"><span class="nav-text">Products</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="/Supplier/Index"><span class="nav-text">Suppliers</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="/Customer/Index"><span class="nav-text">Customers</span></a></li>
+							@if(User.IsInRole("Admin")){
+								<li class="nav-item"><a class="nav-link" href="/Product/Index"><span class="nav-text">Products</span></a></li>
+								<li class="nav-item"><a class="nav-link" href="/Supplier/Index"><span class="nav-text">Suppliers</span></a></li>
+								<li class="nav-item"><a class="nav-link" href="/Customer/Index"><span class="nav-text">Customers</span></a></li>
+							}
 						</ul>
 					</div>
 				</li>
 
 				<!-- Procurement Cycle -->
-				<li class="nav-item">
+				@if(User.IsInRole("Admin") || User.IsInRole("PurchasingManager") || User.IsInRole("Storekeeper")){
+					<li class="nav-item">
 					<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#procurementCollapse">
 						<i class="fas fa-shopping-cart nav-icon"></i>
 						<span class="nav-text">Procurement</span>
@@ -67,12 +70,17 @@
 					</a>
 					<div class="collapse" id="procurementCollapse" data-bs-parent="#sidebarNav">
 						<ul class="nav flex-column ms-3">
-							<li class="nav-item"><a class="nav-link" href="/PurchaseOrder/Index"><span class="nav-text">Purchase Orders</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="/ASN/Index"><span class="nav-text">ASNs</span></a></li>
+							@if(User.IsInRole("Admin") || User.IsInRole("PurchasingManager")){
+								<li class="nav-item"><a class="nav-link" href="/PurchaseOrder/Index"><span class="nav-text">Purchase Orders</span></a></li>
+							}
+							@if(User.IsInRole("Admin") || User.IsInRole("PurchasingManager")){
+							    <li class="nav-item"><a class="nav-link" href="/ASN/Index"><span class="nav-text">ASNs</span></a></li>
+							}
 							<li class="nav-item"><a class="nav-link" href="/Receipt/Index"><span class="nav-text">Receipts</span></a></li>
 						</ul>
 					</div>
 				</li>
+				}
 
 				<!-- Inventory Management -->
 				<li class="nav-item">
@@ -83,9 +91,13 @@
 					</a>
 					<div class="collapse" id="inventoryCollapse" data-bs-parent="#sidebarNav">
 						<ul class="nav flex-column ms-3">
-							<li class="nav-item"><a class="nav-link" href="/Inventory/Index"><span class="nav-text">Inventory List</span></a></li>
-							<li class="nav-item"><a class="nav-link" href="/Putaway/Index"><span class="nav-text">Putaway</span></a></li>
-							@* <li class="nav-item"><a class="nav-link" href="/Picking/Index"><span class="nav-text">Picking</span></a></li> *@
+							@if(User.IsInRole("Admin") || User.IsInRole("Storekeeper")){
+								<li class="nav-item"><a class="nav-link" href="/Inventory/Index"><span class="nav-text">Inventory List</span></a></li>
+							}
+							@if (User.IsInRole("Admin") || User.IsInRole("InboundSpecialist"))
+							{
+							    <li class="nav-item"><a class="nav-link" href="/Putaway/Index"><span class="nav-text">Putaway</span></a></li>
+							}
 						</ul>
 					</div>
 				</li>
@@ -119,40 +131,22 @@
 					</div>
 				</li>
 
-				<!-- Reports / Analytics -->
-				@* <li class="nav-item"> *@
-				@* 	<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#reportsCollapse"> *@
-				@* 		<i class="fas fa-chart-bar nav-icon"></i> *@
-				@* 		<span class="nav-text">Reports</span> *@
-				@* 		<i class="fas fa-chevron-right ms-auto collapse-icon"></i> *@
-				@* 	</a> *@
-				@* 	<div class="collapse" id="reportsCollapse" data-bs-parent="#sidebarNav"> *@
-				@* 		<ul class="nav flex-column ms-3"> *@
-				@* 			<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Stock Reports</span></a></li> *@
-				@* 			<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">PO / ASN Reports</span></a></li> *@
-				@* 			<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Inventory Movement</span></a></li> *@
-				@* 			<li class="nav-item"><a class="nav-link" href="#"><span class="nav-text">Discrepancy Reports</span></a></li> *@
-				@* 		</ul> *@
-				@* 	</div> *@
-				@* </li> *@
-
 				<!-- Settings / Users -->
-				<li class="nav-item">
-					<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#settingsCollapse" aria-expanded="false" aria-controls="settingsCollapse">
-						<i class="fas fa-cog nav-icon"></i>
-						<span class="nav-text">Settings / Users</span>
-						<i class="fas fa-chevron-right ms-auto collapse-icon"></i>
-					</a>
-					<div class="collapse" id="settingsCollapse" data-bs-parent="#sidebarNav">
-						<ul class="nav flex-column ms-3">
-							<li class="nav-item"><a class="nav-link" href="/User/Index"><span class="nav-text">User Management</span></a></li>
-							@* <li class="nav-item"><a class="nav-link" href="/Role/Index"><span class="nav-text">Roles & Permissions</span></a></li> *@
-							@* <li class="nav-item"><a class="nav-link" href="/Settings/Index"><span class="nav-text">System Settings</span></a></li> *@
-							<li class="nav-item"><a class="nav-link" href="/Profile/Index"><span class="nav-text">Profile</span></a></li>
-							 @*<li class="nav-item"><a class="nav-link" href="/Home/Privacy"><span class="nav-text">Privacy</span></a></li>*@
-						</ul>
-					</div>
-				</li>
+				@if(User.IsInRole("Admin")){
+					<li class="nav-item">
+						<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#settingsCollapse" aria-expanded="false" aria-controls="settingsCollapse">
+							<i class="fas fa-cog nav-icon"></i>
+							<span class="nav-text">Settings / Users</span>
+							<i class="fas fa-chevron-right ms-auto collapse-icon"></i>
+						</a>
+						<div class="collapse" id="settingsCollapse" data-bs-parent="#sidebarNav">
+							<ul class="nav flex-column ms-3">
+								<li class="nav-item"><a class="nav-link" href="/User/Index"><span class="nav-text">User Management</span></a></li>
+								<li class="nav-item"><a class="nav-link" href="/Profile/Index"><span class="nav-text">Profile</span></a></li>
+							</ul>
+						</div>
+					</li>
+				}
 
 				<!-- Logout -->
 				<li class="nav-item mt-3">

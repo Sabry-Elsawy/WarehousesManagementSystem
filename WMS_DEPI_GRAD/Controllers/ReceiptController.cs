@@ -7,7 +7,7 @@ using WMS.DAL.UnitOfWork;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-//[Authorize]
+[Authorize]
 public class ReceiptController : Controller
 {
     private readonly IReceiptService _receiptService;
@@ -90,7 +90,7 @@ public class ReceiptController : Controller
         return View(viewModel);
     }
 
-    //[Authorize(Roles = "Warehouse,Admin")]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> Create(int? asnId)
     {
         await LoadLookups();
@@ -104,7 +104,7 @@ public class ReceiptController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    //[Authorize(Roles = "Warehouse,Admin")]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> Create(CreateReceiptViewModel viewModel)
     {
         if (ModelState.IsValid)
@@ -140,7 +140,7 @@ public class ReceiptController : Controller
         return View(viewModel);
     }
 
-    //[Authorize(Roles = "Warehouse,Admin")]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> Scan(int id)
     {
         var receipt = await _receiptService.GetByIdAsync(id);
@@ -177,6 +177,7 @@ public class ReceiptController : Controller
         return View(viewModel);
     }
 
+    [Authorize(Roles = "Storekeeper,Admin")]
     [HttpPost]
     [Route("api/receipt/scan")]
     public async Task<IActionResult> ScanItem([FromBody] ScanRequest request)
@@ -207,7 +208,7 @@ public class ReceiptController : Controller
     }
 
     [HttpPost]
-    //[Authorize(Roles = "Warehouse,Admin")]
+    [Authorize(Roles = "Admin,PurchasingManager")]
     public async Task<IActionResult> Close(int id)
     {
         try

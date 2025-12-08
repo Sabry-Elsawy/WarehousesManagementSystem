@@ -106,37 +106,7 @@
                            value="@ViewBag.Search" />
                 </div>
             </div>
-            <div class="col-md-3">
-                <select name="status" class="form-select">
-                    <option value="">All Statuses</option>
-                    @if (ViewBag.Status == "Completed")
-                    {
-                        <option value="Completed" selected>Completed</option>
-                    }
-                    else
-                    {
-                        <option value="Completed">Completed</option>
-                    }
-                    
-                    @if (ViewBag.Status == "In-Progress")
-                    {
-                        <option value="In-Progress" selected>In Progress</option>
-                    }
-                    else
-                    {
-                        <option value="In-Progress">In Progress</option>
-                    }
-                    
-                    @if (ViewBag.Status == "Pending")
-                    {
-                        <option value="Pending" selected>Pending</option>
-                    }
-                    else
-                    {
-                        <option value="Pending">Pending</option>
-                    }
-                </select>
-            </div>
+            
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="fa-solid fa-filter"></i> Apply Filter

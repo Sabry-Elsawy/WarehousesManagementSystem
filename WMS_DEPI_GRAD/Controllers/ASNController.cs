@@ -8,7 +8,7 @@ using WMS.DAL.UnitOfWork;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-//[Authorize]
+[Authorize(Roles = "Admin,PurchasingManager")]
 public class ASNController : Controller
 {
     private readonly IASNService _asnService;
@@ -42,47 +42,6 @@ public class ASNController : Controller
 
         return View(viewModels);
     }
-
-    //public async Task<IActionResult> Details(int id)
-    //{
-    //    var asn = await _asnService.GetByIdAsync(id);
-    //    if (asn == null)
-    //        return NotFound();
-
-    //    var viewModel = new ASNViewModel
-    //    {
-    //        Id = asn.Id,
-    //        ASN_Number = asn.ASN_Number,
-    //        PurchaseOrderId = asn.PurchaseOrderId,
-    //        PO_Number = asn.PurchaseOrder?.PO_Number ?? "",
-    //        ExpectedArrivalDate = asn.ExpectedArrivalDate,
-    //        TrackingNumber = asn.TrackingNumber,
-    //        Status = asn.Status,
-    //        CreatedOn = asn.CreatedOn,
-    //        CreatedBy = asn.CreatedBy,
-    //        Items = asn.ASNItems.Select(i => new ASNItemViewModel
-    //        {
-    //            Id = i.Id,
-    //            ProductId = i.ProductId,
-    //            ProductName = i.Product?.Name ?? "",
-    //            SKU = i.Product?.Code ?? "",
-    //            QtyShipped = i.QtyShipped,
-    //            QtyOrdered = i.LinkedPOItemId.HasValue ? asn.PurchaseOrder?.POItems.FirstOrDefault(p => p.Id == i.LinkedPOItemId)?.QtyOrdered : null,
-    //            LinkedPOItemId = i.LinkedPOItemId
-    //        }).ToList(),
-    //        POItems = asn.PurchaseOrder?.POItems.Select(p => new PurchaseOrderItemViewModel
-    //        {
-    //            Id = p.Id,
-    //            ProductId = p.ProductId,
-    //            ProductName = p.Product?.Name ?? "",
-    //            QtyOrdered = p.QtyOrdered,
-    //            QtyReceived = p.QtyReceived
-    //        }).ToList() ?? new List<PurchaseOrderItemViewModel>()
-    //    };
-
-    //    return View(viewModel);
-    //}
-
 
     public async Task<IActionResult> Details(int id)
     {
@@ -139,7 +98,6 @@ public class ASNController : Controller
     }
 
 
-    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Create(int? poId)
     {
         await LoadLookups();
@@ -153,7 +111,6 @@ public class ASNController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Create(CreateASNViewModel viewModel)
     {
         if (ModelState.IsValid)
@@ -208,7 +165,6 @@ public class ASNController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> Edit(int id, ASNViewModel viewModel)
     {
         if (id != viewModel.Id)
@@ -241,7 +197,6 @@ public class ASNController : Controller
     }
 
     [HttpPost]
-    //[Authorize(Roles = "Warehouse,Admin")]
     public async Task<IActionResult> MarkReceived(int id)
     {
         try
@@ -258,7 +213,6 @@ public class ASNController : Controller
     }
 
     [HttpPost]
-    //[Authorize(Roles = "Warehouse,Admin")]
     public async Task<IActionResult> Close(int id)
     {
         try
@@ -276,7 +230,6 @@ public class ASNController : Controller
     }
 
     [HttpPost]
-    //[Authorize(Roles = "Procurement,Admin")]
     public async Task<IActionResult> AddItem([FromBody] ViewModels.AddASNItemRequest request)
     {
         if (request == null || request.Item == null)
