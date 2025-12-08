@@ -1,18 +1,14 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
 using WMS.DAL.Entities._Identity;
 using WMS.DAL.UnitOfWork;
-using WMS_DEPI_GRAD.ViewModels;
-using Microsoft.EntityFrameworkCore;
-using WMS.DAL.UnitOfWork;
-using WMS_DEPI_GRAD.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-//[Authorize]
+[Authorize(Roles = "Admin,Picker")]
 public class PickingController : Controller
 {
     private readonly IPickingService _pickingService;

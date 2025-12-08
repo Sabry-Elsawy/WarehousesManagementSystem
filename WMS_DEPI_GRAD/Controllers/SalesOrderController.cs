@@ -11,7 +11,7 @@ using WMS_DEPI_GRAD.ViewModels;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
-//[Authorize]
+[Authorize(Roles = "Admin,SalesManager,Storekeeper")]
 public class SalesOrderController : Controller
 {
     private readonly ISalesOrderService _soService;

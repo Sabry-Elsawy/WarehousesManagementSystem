@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WMS.BLL.Interfaces;
 using WMS.DAL;
-using WMS_DEPI_GRAD.ViewModels;
 
 namespace WMS_DEPI_GRAD.Controllers;
 
+[Authorize(Roles = "Admin,WarehouseManager")]
 public class TransferOrderController : Controller
 {
     private readonly ITransferOrderService _transferService;

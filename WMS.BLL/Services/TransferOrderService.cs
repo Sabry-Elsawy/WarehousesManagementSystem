@@ -168,7 +168,6 @@ public class TransferOrderService : ITransferOrderService
             throw new InvalidOperationException("Can only receive Issued orders");
 
         // Add inventory to Destination Warehouse
-        // Add inventory to Destination Warehouse
         // Find a receiving bin in destination warehouse (first available bin for now)
         var allBins = await binRepo.GetAllWithIncludeAsync(false, q => q
             .Include(b => b.Rack)

@@ -223,9 +223,9 @@
         <div class="card-body">
             @if (Model.Status == WMS.DAL.SalesOrderStatus.Draft)
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                    <i class="bi bi-pencil"></i> Edit Order
-                </a>
+                @* <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning"> *@
+                @*     <i class="bi bi-pencil"></i> Edit Order *@
+                @* </a> *@
 
                 @if (Model.Items != null && Model.Items.Any())
                 {
