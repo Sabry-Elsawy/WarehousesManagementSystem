@@ -77,7 +77,6 @@ public class SupplierController : Controller
 
     // POST: Supplier/Create
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateSupplierViewModel viewModel)
     {
         if (ModelState.IsValid)
@@ -128,7 +127,6 @@ public class SupplierController : Controller
 
     // POST: Supplier/Edit/5
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, SupplierViewModel viewModel)
     {
         if (id != viewModel.Id)
@@ -183,7 +181,6 @@ public class SupplierController : Controller
 
     // POST: Supplier/Delete/5
     [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         try

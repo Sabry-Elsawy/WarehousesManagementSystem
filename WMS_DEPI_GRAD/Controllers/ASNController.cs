@@ -110,7 +110,6 @@ public class ASNController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateASNViewModel viewModel)
     {
         if (ModelState.IsValid)
@@ -164,7 +163,6 @@ public class ASNController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, ASNViewModel viewModel)
     {
         if (id != viewModel.Id)

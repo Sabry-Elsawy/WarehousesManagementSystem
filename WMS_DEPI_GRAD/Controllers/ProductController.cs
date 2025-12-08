@@ -83,7 +83,6 @@ public class ProductController : Controller
 
     // POST: Product/Create
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateProductViewModel viewModel)
     {
         if (ModelState.IsValid)
@@ -140,7 +139,6 @@ public class ProductController : Controller
 
     // POST: Product/Edit/5
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, ProductViewModel viewModel)
     {
         if (id != viewModel.Id)
@@ -201,7 +199,6 @@ public class ProductController : Controller
 
     // POST: Product/Delete/5
     [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         try

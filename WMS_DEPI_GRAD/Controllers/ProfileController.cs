@@ -56,7 +56,6 @@ public class ProfileController(UserManager<ApplicationUser> userManager, IWebHos
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ProfileViewModel model)
     {
         if (!ModelState.IsValid)

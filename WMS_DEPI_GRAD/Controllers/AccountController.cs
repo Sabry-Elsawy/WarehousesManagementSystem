@@ -87,76 +87,6 @@ public class AccountController(UserManager<ApplicationUser> userManager,
         }
     }
 
-    //[HttpGet]
-    //public IActionResult ForgotPassword()
-    //{
-    //    return View();
-    //}
-    //[HttpPost]
-    //public IActionResult SendResetPasswordLink(ForgetPasswordViewModel viewModel)
-    //{
-    //    if (!ModelState.IsValid)
-    //    {
-    //        return View(nameof(ForgotPassword), viewModel);
-    //    }
-
-    //    var user = _userManager.FindByEmailAsync(viewModel.Email).Result;
-    //        if (user is not null)
-    //        {
-    //            var token = _userManager.GeneratePasswordResetTokenAsync(user).Result;
-    //            var ResetPasswordLink = Url.Action("ResetPassword", "Account", new { email = viewModel.Email, token }, Request.Scheme);
-    //            var email = new Email()
-    //            {
-    //                To = viewModel.Email,
-    //                Subject = "Password Reset Link",
-    //                Body = ResetPasswordLink //ToDo
-    //            };
-    //            // Send Email    
-    //            EmailSettings.SendEmail(email);
-    //        }
-
-    //    //  ModelState.AddModelError(string.Empty, "Invalid Operation");
-    //    return RedirectToAction(nameof(ResetPassword));
-    //   }
-    //[HttpGet]
-    //public IActionResult ResetPassword(string email, string Token)
-    //{
-    //    TempData["email"] = email;
-    //    TempData["Token"] = Token;
-
-    //    return View();
-    //}
-    //[HttpPost]
-    //public IActionResult ResetPassword(ResetPasswordViewModel ViewModel)
-    //{
-    //    if (!ModelState.IsValid)
-    //    {
-    //        return View(ViewModel);
-
-    //    }
-    //    string email = TempData["email"] as string ?? string.Empty;
-    //    string token = TempData["Token"] as string ?? string.Empty;
-
-    //    var user = _userManager.FindByEmailAsync(email).Result;
-    //    if (user is not null)
-    //    {
-    //        var result = _userManager.ResetPasswordAsync(user, token, ViewModel.Password).Result;
-    //        if (result.Succeeded)
-    //        {
-    //            return RedirectToAction(nameof(Index));
-    //        }
-    //        else
-    //        {
-    //            foreach (var error in result.Errors)
-    //            {
-    //                ModelState.AddModelError(string.Empty, error.Description);
-    //            }
-    //            return View(ViewModel);
-    //        }
-    //    }
-    //    return View(nameof(Index));
-    //}
-
     [HttpGet]
     public IActionResult ForgotPassword()
     {
@@ -189,7 +119,6 @@ public class AccountController(UserManager<ApplicationUser> userManager,
             EmailSettings.SendEmail(emailMessage);
         }
 
-        // رسالة موحدة لتجنب كشف البريد
         ViewBag.Message = "If your email exists, you will receive a reset link.";
         return View();
     }
@@ -217,7 +146,7 @@ public class AccountController(UserManager<ApplicationUser> userManager,
 
         var user = await _userManager.FindByEmailAsync(viewModel.Email);
         if (user == null)
-            return RedirectToAction("Login"); // لا تكشف إذا البريد موجود أم لا
+            return RedirectToAction("Login");
 
         var result = await _userManager.ResetPasswordAsync(user, viewModel.Token, viewModel.Password);
         if (result.Succeeded)
@@ -233,7 +162,6 @@ public class AccountController(UserManager<ApplicationUser> userManager,
 
         return RedirectToAction("Login");
     }
-
 
     [HttpPost]
     public async Task<IActionResult> Logout()

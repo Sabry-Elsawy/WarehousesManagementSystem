@@ -39,7 +39,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Warehouse warehouse)
         {
             if (ModelState.IsValid)
@@ -71,7 +70,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin,WarehouseManager")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Warehouse warehouse)
         {
             if (id != warehouse.Id)
@@ -108,7 +106,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try

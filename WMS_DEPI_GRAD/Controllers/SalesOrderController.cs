@@ -121,7 +121,6 @@ public class SalesOrderController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateSalesOrderViewModel viewModel)
     {
         if (ModelState.IsValid)
@@ -178,7 +177,6 @@ public class SalesOrderController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, SalesOrderViewModel viewModel)
     {
         if (id != viewModel.Id)
@@ -239,7 +237,6 @@ public class SalesOrderController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddItem(int salesOrderId, int productId, int qtyOrdered, decimal unitPrice)
     {
         try
@@ -270,7 +267,6 @@ public class SalesOrderController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveItem(int salesOrderId, int itemId)
     {
         try
@@ -287,7 +283,6 @@ public class SalesOrderController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> ShipOrder(int id, string carrier, string trackingNumber, string notes)
     {
         try
@@ -315,7 +310,6 @@ public class SalesOrderController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> CancelOrder(int id, string reason)
     {
         try

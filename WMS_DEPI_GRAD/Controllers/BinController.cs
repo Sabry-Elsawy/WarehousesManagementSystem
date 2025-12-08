@@ -40,7 +40,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Code,Capacity,RackId,BinTypeId")] Bin bin)
         {
             // Remove navigation properties from ModelState to prevent validation errors
@@ -79,7 +78,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin,WarehouseManager")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Capacity,RackId,BinTypeId")] Bin bin)
         {
             if (id != bin.Id) return BadRequest();
@@ -125,7 +123,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
