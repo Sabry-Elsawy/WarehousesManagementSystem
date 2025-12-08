@@ -77,7 +77,6 @@ public class CustomerController : Controller
 
     // POST: Customer/Create
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateCustomerViewModel viewModel)
     {
         if (ModelState.IsValid)
@@ -128,7 +127,6 @@ public class CustomerController : Controller
 
     // POST: Customer/Edit/5
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, CustomerViewModel viewModel)
     {
         if (id != viewModel.Id)
@@ -183,7 +181,6 @@ public class CustomerController : Controller
 
     // POST: Customer/Delete/5
     [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         try

@@ -82,7 +82,6 @@ public class TransferOrderController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateTransferOrderViewModel model)
     {
         if (ModelState.IsValid)
@@ -111,7 +110,6 @@ public class TransferOrderController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddItem(AddTransferItemViewModel model)
     {
         if (ModelState.IsValid)

@@ -103,7 +103,6 @@ public class ReceiptController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> Create(CreateReceiptViewModel viewModel)
     {
@@ -226,7 +225,6 @@ public class ReceiptController : Controller
     }
 
     [HttpPost]
-    //[Authorize(Roles = "Warehouse,Admin")]
     public async Task<IActionResult> HandleDiscrepancy(int receiptItemId, string notes)
     {
         try

@@ -107,7 +107,6 @@ public class PickingController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Confirm(int id, ConfirmPickingViewModel viewModel)
     {
         if (ModelState.IsValid)

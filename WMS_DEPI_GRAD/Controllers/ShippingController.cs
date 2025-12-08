@@ -80,7 +80,6 @@ public class ShippingController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Confirm(int id, string carrier, string trackingNumber, string notes)
     {
         try

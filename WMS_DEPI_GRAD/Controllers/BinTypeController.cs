@@ -31,7 +31,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BinType binType)
         {
             if (ModelState.IsValid)
@@ -60,7 +59,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin,WarehouseManager")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, BinType binType)
         {
             if (id != binType.Id) return BadRequest();
@@ -91,7 +89,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try

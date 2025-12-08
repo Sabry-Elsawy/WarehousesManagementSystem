@@ -171,7 +171,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreatePutawayViewModel model)
         {
             try
@@ -241,7 +240,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AcceptAutoAssign(int id, List<PutawayBinDto> suggestedBins)
         {
             try
@@ -305,7 +303,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin,InboundSpecialist")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignManual(int id, List<PutawayBinDto> assignments)
         {
             try
@@ -368,7 +365,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ExecuteConfirm(int id)
         {
             try
@@ -398,7 +394,6 @@ namespace WMS_DEPI_GRAD.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Close(int id)
         {
             try
